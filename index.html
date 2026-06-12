@@ -24,11 +24,16 @@
     font-weight:bold; touch-action:none; backdrop-filter:blur(2px);
   }
   .btn.pressed { background:rgba(255,255,255,.38); }
-  #btnL, #btnR { width:17vmin; height:17vmin; bottom:calc(4vmin + env(safe-area-inset-bottom)); font-size:7vmin; }
-  #btnL { left:calc(4vmin + env(safe-area-inset-left)); }
-  #btnR { left:calc(24vmin + env(safe-area-inset-left)); }
-  #btnA { width:19vmin; height:19vmin; right:calc(4vmin + env(safe-area-inset-right)); bottom:calc(9vmin + env(safe-area-inset-bottom)); font-size:6vmin; }
-  #btnB { width:14vmin; height:14vmin; right:calc(24vmin + env(safe-area-inset-right)); bottom:calc(4vmin + env(safe-area-inset-bottom)); font-size:5vmin; }
+  #btnA { width:21vmin; height:21vmin; right:calc(5vmin + env(safe-area-inset-right)); bottom:calc(7vmin + env(safe-area-inset-bottom)); font-size:7vmin; }
+  /* invisible hit-area for the drag-to-move thumb-stick (bottom strip) */
+  #padZone { position:fixed; left:0; right:0; bottom:0; height:46%; z-index:5; touch-action:none; }
+  #dragHint {
+    position:fixed; left:0; right:0; bottom:calc(3vmin + env(safe-area-inset-bottom));
+    z-index:6; text-align:center; color:rgba(255,255,255,.55);
+    font-size:3.6vmin; pointer-events:none; transition:opacity .6s;
+    animation:pulse 1.6s infinite; text-shadow:0 1px 3px rgba(0,0,0,.6);
+  }
+  #dragHint.gone { opacity:0; }
   #btnM {
     position:fixed; top:calc(2vmin + env(safe-area-inset-top)); right:calc(2vmin + env(safe-area-inset-right));
     z-index:10; width:9vmin; height:9vmin; border-radius:20%;
@@ -54,16 +59,16 @@
 </head>
 <body>
 <canvas id="game"></canvas>
-<div class="btn" id="btnL">&#9664;</div>
-<div class="btn" id="btnR">&#9654;</div>
-<div class="btn" id="btnA">A<br></div>
-<div class="btn" id="btnB">B</div>
+<div id="padZone"></div>
+<div id="dragHint">&#9664; drag along the bottom to move &#9654;</div>
+<div class="btn" id="btnA">A</div>
 <div id="btnM">&#128266;</div>
 <div id="overlay">
   <h1>SUPER PLUMBER BROS</h1>
   <h2>&#9733; LEVEL 1-1 &#9733;</h2>
-  <p>&#9664; &#9654; move &nbsp;&bull;&nbsp; A jump &nbsp;&bull;&nbsp; B run<br>
-     Keyboard: arrows / WASD + Space / Shift<br>
+  <p>Drag along the bottom of the screen to move<br>
+     — push further out to run &nbsp;&bull;&nbsp; A to jump<br>
+     Keyboard: arrows / WASD + Space + Shift<br>
      Rotate your phone any time — the world adapts!</p>
   <div id="tapHint">TAP TO START</div>
 </div>
@@ -206,7 +211,75 @@ function bindBtn(id, name) {
   el.addEventListener('pointercancel', up);
   el.addEventListener('pointerleave', up);
 }
-bindBtn('btnL','left'); bindBtn('btnR','right'); bindBtn('btnA','jump'); bindBtn('btnB','run');
+bindBtn('btnA','jump');
+
+// ---------- Drag-to-move thumb-stick ----------
+// Put a finger anywhere on the bottom strip and slide left/right to walk;
+// push further out past the run threshold to sprint. Direction & speed are
+// relative to where the finger first landed (a floating, trailing stick).
+const pad = { active:false, id:-1, anchorX:0, anchorY:0, curX:0, dir:0, run:false };
+const padZone = document.getElementById('padZone');
+const dragHint = document.getElementById('dragHint');
+let hintGone = false;
+function hideDragHint() { if (!hintGone) { hintGone = true; dragHint.classList.add('gone'); } }
+
+// thresholds in CSS px: dead-zone, walk→run distance, max travel (stick radius)
+const PAD_DEAD = 9, PAD_RUN = 44, PAD_MAX = 86;
+
+function padApply() {
+  const dx = pad.curX - pad.anchorX, adx = Math.abs(dx);
+  if (adx < PAD_DEAD) {
+    pad.dir = 0; pad.run = false;
+    input.left = input.right = input.run = false;
+    return;
+  }
+  pad.dir = dx < 0 ? -1 : 1;
+  input.left  = pad.dir < 0;
+  input.right = pad.dir > 0;
+  pad.run = adx > PAD_RUN;
+  input.run = pad.run;
+}
+function padEnd(e) {
+  if (e && pad.id !== -1 && e.pointerId !== pad.id) return;
+  pad.active = false; pad.id = -1; pad.dir = 0; pad.run = false;
+  input.left = input.right = input.run = false;
+}
+padZone.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  unlockAudio(); hideDragHint();
+  tryRestart();                       // a tap also revives on win / game-over
+  pad.active = true; pad.id = e.pointerId;
+  pad.anchorX = pad.curX = e.clientX; pad.anchorY = e.clientY;
+  try { padZone.setPointerCapture(e.pointerId); } catch (_) {}
+  padApply();
+});
+padZone.addEventListener('pointermove', e => {
+  if (!pad.active || e.pointerId !== pad.id) return;
+  e.preventDefault();
+  const prevX = pad.curX;
+  pad.curX = e.clientX; pad.curY = e.clientY;
+  const inc = pad.curX - prevX;        // instant reversal: a flick the other way
+  if (pad.dir > 0 && inc < -4) pad.anchorX = pad.curX + PAD_DEAD;   // re-centre so
+  else if (pad.dir < 0 && inc > 4) pad.anchorX = pad.curX - PAD_DEAD; // it flips now
+  const dx = pad.curX - pad.anchorX;   // trailing anchor: stick follows at the edge
+  if (dx >  PAD_MAX) pad.anchorX = pad.curX - PAD_MAX;
+  else if (dx < -PAD_MAX) pad.anchorX = pad.curX + PAD_MAX;
+  padApply();
+});
+padZone.addEventListener('pointerup', e => { e.preventDefault(); padEnd(e); });
+padZone.addEventListener('pointercancel', padEnd);
+padZone.addEventListener('lostpointercapture', padEnd);
+
+// ---------- Block iOS double-tap / pinch zoom (the old "B button zoom") ----------
+document.addEventListener('gesturestart', e => e.preventDefault(), { passive:false });
+document.addEventListener('gesturechange', e => e.preventDefault(), { passive:false });
+document.addEventListener('dblclick', e => e.preventDefault(), { passive:false });
+let _lastTap = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - _lastTap < 350) e.preventDefault();   // swallow the zoom-triggering 2nd tap
+  _lastTap = now;
+}, { passive:false });
 
 // ---------- Audio (all original, synthesized) ----------
 let AC = null, muted = false, musicTimer = null;
@@ -1026,6 +1099,42 @@ function draw() {
     bigCenterText('GAME OVER', '#ff6b6b');
     smallCenterText('Tap to retry', CH*0.5 + T*1.6);
   }
+
+  if (pad.active) drawPad();
+}
+
+// virtual thumb-stick feedback (screen space; clientX/Y are CSS px → ×DPR)
+function drawPad() {
+  const ax = pad.anchorX * DPR, ay = pad.anchorY * DPR;
+  let dx = pad.curX - pad.anchorX;
+  dx = Math.max(-PAD_MAX, Math.min(PAD_MAX, dx)) * DPR;
+  const R = PAD_MAX * DPR, knob = 30 * DPR;
+  cx.save();
+  cx.lineCap = 'round';
+  // track
+  cx.strokeStyle = 'rgba(255,255,255,0.16)';
+  cx.lineWidth = knob * 1.5;
+  cx.beginPath(); cx.moveTo(ax - R, ay); cx.lineTo(ax + R, ay); cx.stroke();
+  // direction chevrons at the ends
+  cx.strokeStyle = 'rgba(255,255,255,0.32)';
+  cx.lineWidth = 4 * DPR;
+  const ch = 12 * DPR;
+  cx.beginPath();
+  cx.moveTo(ax - R + ch, ay - ch); cx.lineTo(ax - R, ay); cx.lineTo(ax - R + ch, ay + ch);
+  cx.moveTo(ax + R - ch, ay - ch); cx.lineTo(ax + R, ay); cx.lineTo(ax + R - ch, ay + ch);
+  cx.stroke();
+  // knob — glows green while sprinting
+  cx.fillStyle = pad.run ? 'rgba(124,252,142,0.9)' : 'rgba(255,255,255,0.78)';
+  cx.beginPath(); cx.arc(ax + dx, ay, knob, 0, 7); cx.fill();
+  cx.strokeStyle = 'rgba(0,0,0,0.28)'; cx.lineWidth = 3 * DPR;
+  cx.beginPath(); cx.arc(ax + dx, ay, knob, 0, 7); cx.stroke();
+  if (pad.run) {
+    cx.fillStyle = '#1a5a28';
+    cx.font = `bold ${20*DPR}px 'Courier New', monospace`;
+    cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    cx.fillText('»', ax + dx, ay);
+  }
+  cx.restore();
 }
 
 function bigCenterText(txt, color) {
@@ -1078,15 +1187,13 @@ overlay.addEventListener('pointerdown', e => {
   G.state = 'play';
   startMusic();
 });
-cv.addEventListener('pointerdown', () => {
-  unlockAudio();
-  if (G.state === 'gameover' && G.stateTimer > 0.8) {
+function tryRestart() {
+  if ((G.state === 'gameover' && G.stateTimer > 0.8) ||
+      (G.state === 'win' && G.winPhase === 2 && G.stateTimer > 1.5)) {
     resetLevel(true); G.state = 'play'; startMusic();
   }
-  if (G.state === 'win' && G.winPhase === 2 && G.stateTimer > 1.5) {
-    resetLevel(true); G.state = 'play'; startMusic();
-  }
-});
+}
+cv.addEventListener('pointerdown', () => { unlockAudio(); tryRestart(); });
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) stopMusic();

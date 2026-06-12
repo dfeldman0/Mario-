@@ -19,10 +19,14 @@ Add it to your phone's home screen for a fullscreen app-like experience.
 
 ## 📱 Mobile features
 
-- **Touch controls** — on-screen D-pad, A (jump), B (run), with multi-touch
+- **Drag-to-move** — put a thumb anywhere on the bottom strip and slide left/right
+  to walk; push further out to **run**. It's a floating, trailing thumb-stick that
+  re-centres on a flick, so reversing direction is instant. A button to jump.
 - **Rotation support** — play portrait or landscape; the camera and HUD adapt live
 - **High-DPI rendering** — vector art scaled to your device's pixel ratio (retina-crisp)
 - **Safe-area aware** — controls clear the notch / home indicator
+- **No accidental zoom** — pinch / double-tap zoom is suppressed so taps never
+  zoom the page
 - Keyboard also works on desktop: arrows / WASD + Space (jump) + Shift (run)
 
 ## ✨ Creative effects
