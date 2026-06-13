@@ -19,15 +19,22 @@ Add it to your phone's home screen for a fullscreen app-like experience.
 
 ## 📱 Mobile features
 
-- **Drag-to-move** — put a thumb anywhere on the bottom strip and slide left/right
-  to walk; push further out to **run**. It's a floating, trailing thumb-stick that
-  re-centres on a flick, so reversing direction is instant. A button to jump.
+- **Touch controls** — ◀ ▶ D-pad (left), **A** = jump, **B** = run / throw
+  fireballs (right), with multi-touch
 - **Rotation support** — play portrait or landscape; the camera and HUD adapt live
 - **High-DPI rendering** — vector art scaled to your device's pixel ratio (retina-crisp)
 - **Safe-area aware** — controls clear the notch / home indicator
 - **No accidental zoom** — pinch / double-tap zoom is suppressed so taps never
   zoom the page
-- Keyboard also works on desktop: arrows / WASD + Space (jump) + Shift (run)
+- Keyboard also works on desktop: arrows / WASD + Space (jump) + Shift (run/fire)
+
+## 🔥 Power-ups
+
+- **Mushroom** — grow big: break bricks and survive a hit
+- **Fire flower** — appears from a power block when you're already big. Turns you
+  into Fire Plumber (white shirt, red overalls) and lets you press **B** to throw
+  bouncing fireballs that ricochet off the ground and burn goombas. Up to two
+  fireballs in the air at once. Getting hit steps you back down: fire → big → small.
 
 ## ✨ Creative effects
 
