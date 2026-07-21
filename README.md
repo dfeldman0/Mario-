@@ -44,6 +44,29 @@ and **Endless Rush** (procedurally generated rounds until the rush claims you).
   after every choice, endless-mode best-run tracking, ranks from *Splash
   Survivor* to *Urinal Grandmaster*.
 
+### Viral loop (all client-side, no backend)
+
+- **📅 Daily Challenge** — date-seeded rounds, identical for everyone
+  worldwide (deterministic seeded RNG), one recorded attempt per day, and a
+  Wordle-style emoji result grid (`🟩🟩💦🚪😬…`) shared via the native share
+  sheet.
+- **⚔️ Challenge links** — every run is seeded; one tap builds a URL that
+  makes a friend play your *exact* rounds with your score to beat. Verdict
+  shown on their end screen. Score travels in the URL — no server.
+- **📜 Shareable certificate** — a canvas-rendered "Certificate of Urinal
+  Etiquette" PNG (rank, stats, home ballpark, gold seal, Chief Attendant
+  signature) shared as an image.
+- **🧻 Share → 5 free towels** — completing any share banks 5 free respawns
+  in a cookie + localStorage.
+- **📺 Rewarded-ad respawn slot** — after pissing yourself (or any loss):
+  use a banked towel, or hit the "watch ad for a towel" flow — currently a
+  placeholder modal with a single `showRewardedAd(callback)` hook ready for
+  Google AdMob / Ad Manager.
+- **🌆 Metro-wide localization** — your home park also localizes the airport
+  round (O'Hare, LGA, Sea-Tac…), the train-station round (Union Station,
+  Grand Central, 30th Street…), and stamps a "CHICAGO EDITION" banner on the
+  title screen.
+
 Open `urinal-test.html` in any browser — best on a phone, where wrong picks
 trigger real haptic feedback.
 

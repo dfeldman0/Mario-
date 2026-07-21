@@ -48,7 +48,31 @@
   .bigbtn.alt:active { box-shadow: 0 1px 0 #1d548e; }
   .bigbtn.loc { background: linear-gradient(#8a6fd0, #6247a8); box-shadow: 0 4px 0 #46327a; margin-top: 12px; font-size: clamp(13px, 3.4vw, 16px); }
   .bigbtn.loc:active { box-shadow: 0 1px 0 #46327a; }
+  .bigbtn.daily { background: linear-gradient(#e6b93d, #c2932a); box-shadow: 0 4px 0 #8a6a1d; margin-top: 12px; color: #241d08; }
+  .bigbtn.daily:active { box-shadow: 0 1px 0 #8a6a1d; }
+  .bigbtn.respawn { background: linear-gradient(#57b8ff, #2f7fd4); box-shadow: 0 4px 0 #1d548e; }
   #locline { color: #b8a5e8; font-size: 13px; margin-top: 8px; min-height: 16px; max-width: 90%; }
+  #towelline { color: #9fe0b8; font-size: 13px; margin-top: 6px; min-height: 16px; }
+  #cityline { color: #ffd76a; font-weight: bold; letter-spacing: 3px; font-size: clamp(13px, 3.6vw, 16px); margin-bottom: 8px; min-height: 18px; }
+  .hiddenrow { display: none !important; }
+  #chalbanner { background: #3a2430; border: 1px solid #a03a5a; color: #ffb8cf; border-radius: 12px;
+    padding: 10px 16px; margin-bottom: 14px; font-size: clamp(13px, 3.5vw, 15px); max-width: 480px; }
+  #trailline { font-size: clamp(16px, 5vw, 22px); letter-spacing: 3px; margin-bottom: 10px; word-break: break-all; max-width: 90%; }
+  #chalresult { color: #ffd76a; font-weight: bold; font-size: clamp(14px, 4vw, 18px); margin-bottom: 10px; min-height: 20px; }
+  #respawnrow { margin-bottom: 14px; }
+  .sharerow { display: flex; gap: 8px; margin-bottom: 14px; }
+  .sharebtn { font-family: inherit; font-weight: bold; font-size: clamp(12px, 3.2vw, 14px); color: #fff;
+    background: #223047; border: 1px solid #3a4a63; border-radius: 12px; padding: 10px 14px; cursor: pointer; line-height: 1.3; }
+  .sharebtn:active { background: #2c3d5a; }
+  .sharebtn small { color: #9fb0c3; font-weight: normal; }
+  #admodal { position: fixed; inset: 0; background: rgba(5,8,12,.92); z-index: 100;
+    display: flex; align-items: center; justify-content: center; }
+  #admodal.show { display: flex !important; }
+  .adbox { background: #1a2130; border: 2px solid #3a4a63; border-radius: 16px; padding: 28px 34px; text-align: center; }
+  .adtitle { font-size: 26px; font-weight: 900; margin-bottom: 10px; }
+  .adbody { font-size: 16px; line-height: 1.6; }
+  .adbody span { color: #ffd76a; font-weight: bold; }
+  .adfoot { margin-top: 14px; color: #66788d; font-size: 11px; letter-spacing: 1px; }
   .subnote { margin-top: 12px; color: #66788d; font-size: 12px; }
   #bestline { color: #57b8ff; font-size: 13px; margin-top: 10px; min-height: 16px; }
 
@@ -339,6 +363,8 @@
   <div id="start" class="screen">
     <h1>THE URINAL <span class="drop">TEST</span> 🚹</h1>
     <div class="tagline">One sacred code. Infinite bathrooms. Do you have what it takes?</div>
+    <div id="cityline"></div>
+    <div id="chalbanner" class="hiddenrow"></div>
     <div class="rules">
       <b>The Rules of the Restroom:</b>
       <li><b>Maximize distance</b> from every occupied spot. <b>Ends are elite.</b></li>
@@ -351,9 +377,11 @@
       <li>No decent option (and sober-ish)? A master <b>holds it and walks away</b>. 🚪</li>
     </div>
     <button class="bigbtn" id="startbtn">🏆 THE GAUNTLET — 10 rounds</button>
+    <button class="bigbtn daily" id="dailybtn">📅 DAILY CHALLENGE</button>
     <button class="bigbtn alt" id="endlessbtn">♾️ ENDLESS RUSH</button>
     <button class="bigbtn loc" id="locbtn">📍 PLAY YOUR HOME BALLPARK</button>
     <div id="locline"></div>
+    <div id="towelline"></div>
     <div id="bestline"></div>
     <div class="subnote">📱 Best on a phone — wrong picks trigger haptic splash feedback.</div>
   </div>
@@ -364,9 +392,29 @@
     <div class="rank" id="ranktext"></div>
     <div class="finalscore" id="finaltext"></div>
     <div class="statline" id="stattext"></div>
+    <div id="trailline"></div>
+    <div id="chalresult"></div>
+    <div id="respawnrow" class="hiddenrow">
+      <button class="bigbtn respawn" id="respawnbtn"></button>
+    </div>
+    <div class="sharerow">
+      <button class="sharebtn" id="sharebtn">📤 Share<br><small>result</small></button>
+      <button class="sharebtn" id="certbtn">📜 Certificate<br><small>image</small></button>
+      <button class="sharebtn" id="chalbtn">⚔️ Challenge<br><small>a friend</small></button>
+    </div>
+    <div class="subnote" id="sharereward">Share anything → earn 🧻 5 free towels (respawns)</div>
     <button class="bigbtn" id="againbtn">WASH HANDS &amp; RETRY</button>
     <button class="bigbtn alt" id="menubtn">🚪 BACK TO MENU</button>
     <div class="subnote">You washed your hands, right? …Right?</div>
+  </div>
+
+  <!-- rewarded ad placeholder (wire Google AdMob / Ad Manager here) -->
+  <div id="admodal" class="hiddenrow">
+    <div class="adbox">
+      <div class="adtitle">📺 AD BREAK</div>
+      <div class="adbody">Rewarded ad placeholder.<br>Your towel arrives in <span id="adcount">5</span>s…</div>
+      <div class="adfoot">Google ad integration coming soon</div>
+    </div>
   </div>
 
   <!-- GAME -->
@@ -448,9 +496,41 @@
    ========================================================= */
 
 const $ = id => document.getElementById(id);
+/* cosmetic randomness (colors, FX) — never seeded, so seeded runs stay in sync */
 const rand = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 const rnd = (a, b) => a + Math.random() * (b - a);
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+/* seeded RNG for round GENERATION — daily & challenge runs replay identically */
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+let seededFn = null;
+function setSeed(s) { seededFn = (s == null) ? null : mulberry32(s); }
+const grnd = () => seededFn ? seededFn() : Math.random();
+const grand = (a, b) => a + Math.floor(grnd() * (b - a + 1));
+const gpick = arr => arr[Math.floor(grnd() * arr.length)];
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(grnd() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+function dateSeed() {
+  const d = new Date();
+  const key = d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
+  return (Math.imul(key, 2654435761) >>> 1);
+}
+function dailyKey() {
+  const d = new Date();
+  return `${d.getUTCFullYear()}-${d.getUTCMonth() + 1}-${d.getUTCDate()}`;
+}
 
 /* ---------- haptics ---------- */
 function buzz(pattern) { if (navigator.vibrate) { try { navigator.vibrate(pattern); } catch (e) {} } }
@@ -706,36 +786,36 @@ const THEMES = {
 
 /* ---------- MLB ballpark localization (opt-in, on-device only) ---------- */
 const MLB_PARKS = [
-  { park: "Angel Stadium", team: "Angels", lat: 33.8003, lon: -117.8827, c: "#ba0021", flavor: "the Big A is watching" },
-  { park: "Daikin Park", team: "Astros", lat: 29.7573, lon: -95.3555, c: "#eb6e1f", flavor: "no banging on the divider" },
-  { park: "Sutter Health Park", team: "Athletics", lat: 38.5802, lon: -121.5133, c: "#003831", flavor: "temporary home, permanent code" },
-  { park: "Tropicana Field", team: "Rays", lat: 27.7683, lon: -82.6534, c: "#092c5c", flavor: "under the dome, everyone hears" },
-  { park: "Yankee Stadium", team: "Yankees", lat: 40.8296, lon: -73.9262, c: "#0c2340", flavor: "27 rings of pressure", sig: "frieze" },
-  { park: "Progressive Field", team: "Guardians", lat: 41.4962, lon: -81.6852, c: "#00385d", flavor: "guard your spacing" },
-  { park: "Comerica Park", team: "Tigers", lat: 42.3390, lon: -83.0485, c: "#0c2340", flavor: "the tigers can smell fear" },
-  { park: "Kauffman Stadium", team: "Royals", lat: 39.0517, lon: -94.4803, c: "#004687", flavor: "fountains outside, pressure inside" },
-  { park: "Target Field", team: "Twins", lat: 44.9817, lon: -93.2776, c: "#002b5c", flavor: "Minnesota nice ends at the door" },
-  { park: "Rate Field", team: "White Sox", lat: 41.8299, lon: -87.6338, c: "#27251f", flavor: "South Side rules apply" },
-  { park: "Wrigley Field", team: "Cubs", lat: 41.9484, lon: -87.6553, c: "#0e3386", flavor: "the ivy is judging you", sig: "ivy", signc: "#d31145" },
-  { park: "Great American Ball Park", team: "Reds", lat: 39.0975, lon: -84.5066, c: "#c6011f", flavor: "great American responsibility" },
-  { park: "American Family Field", team: "Brewers", lat: 43.0280, lon: -87.9712, c: "#12284b", flavor: "brats and beers catching up fast" },
-  { park: "PNC Park", team: "Pirates", lat: 40.4469, lon: -80.0057, c: "#fdb827", flavor: "prettiest park, same old rules" },
-  { park: "Busch Stadium", team: "Cardinals", lat: 38.6226, lon: -90.1928, c: "#c41e3a", flavor: "the best fans expect the best picks" },
-  { park: "Coors Field", team: "Rockies", lat: 39.7559, lon: -104.9942, c: "#33006f", flavor: "everything flows faster at altitude" },
-  { park: "Dodger Stadium", team: "Dodgers", lat: 34.0739, lon: -118.2400, c: "#005a9c", flavor: "go now, beat the traffic" },
-  { park: "Petco Park", team: "Padres", lat: 32.7076, lon: -117.1570, c: "#2f241d", flavor: "the fish tacos were a choice" },
-  { park: "Oracle Park", team: "Giants", lat: 37.7786, lon: -122.3893, c: "#fd5a1e", flavor: "McCovey Cove is not an option" },
-  { park: "Chase Field", team: "D-backs", lat: 33.4453, lon: -112.0667, c: "#a71930", flavor: "the pool is NOT a trough" },
-  { park: "T-Mobile Park", team: "Mariners", lat: 47.5914, lon: -122.3325, c: "#0c2c56", flavor: "stay calm under the retractable roof" },
-  { park: "Globe Life Field", team: "Rangers", lat: 32.7473, lon: -97.0842, c: "#003278", flavor: "everything's bigger, including the line" },
-  { park: "Fenway Park", team: "Red Sox", lat: 42.3467, lon: -71.0972, c: "#bd3039", flavor: "the Green Monster looms", sig: "monster", wallc: ["#9fc4ab", "#86ad92"] },
-  { park: "Camden Yards", team: "Orioles", lat: 39.2839, lon: -76.6217, c: "#df4601", flavor: "Boog's BBQ was a mistake" },
-  { park: "Rogers Centre", team: "Blue Jays", lat: 43.6414, lon: -79.3894, c: "#134a8e", flavor: "politeness will not save you" },
-  { park: "Truist Park", team: "Braves", lat: 33.8907, lon: -84.4677, c: "#ce1141", flavor: "the Battery is watching" },
-  { park: "loanDepot park", team: "Marlins", lat: 25.7781, lon: -80.2196, c: "#00a3e0", flavor: "humidity changes nothing" },
-  { park: "Citi Field", team: "Mets", lat: 40.7571, lon: -73.8458, c: "#002d72", flavor: "ya gotta believe in spacing" },
-  { park: "Citizens Bank Park", team: "Phillies", lat: 39.9061, lon: -75.1665, c: "#e81828", flavor: "Philly WILL boo a bad pick" },
-  { park: "Nationals Park", team: "Nationals", lat: 38.8730, lon: -77.0074, c: "#ab0003", flavor: "a capital offense awaits" },
+  { park: "Angel Stadium", team: "Angels", lat: 33.8003, lon: -117.8827, c: "#ba0021", flavor: "the Big A is watching", city: "ANAHEIM", ap: "John Wayne Airport", st: "Anaheim ARTIC" },
+  { park: "Daikin Park", team: "Astros", lat: 29.7573, lon: -95.3555, c: "#eb6e1f", flavor: "no banging on the divider", city: "HOUSTON", ap: "Bush Intercontinental", st: "Houston Amtrak Station" },
+  { park: "Sutter Health Park", team: "Athletics", lat: 38.5802, lon: -121.5133, c: "#003831", flavor: "temporary home, permanent code", city: "SACRAMENTO", ap: "Sacramento International", st: "Sacramento Valley Station" },
+  { park: "Tropicana Field", team: "Rays", lat: 27.7683, lon: -82.6534, c: "#092c5c", flavor: "under the dome, everyone hears", city: "TAMPA BAY", ap: "Tampa International", st: "Tampa Union Station" },
+  { park: "Yankee Stadium", team: "Yankees", lat: 40.8296, lon: -73.9262, c: "#0c2340", flavor: "27 rings of pressure", sig: "frieze", city: "NEW YORK", ap: "LaGuardia Airport", st: "Grand Central Terminal" },
+  { park: "Progressive Field", team: "Guardians", lat: 41.4962, lon: -81.6852, c: "#00385d", flavor: "guard your spacing", city: "CLEVELAND", ap: "Cleveland Hopkins", st: "Tower City Station" },
+  { park: "Comerica Park", team: "Tigers", lat: 42.3390, lon: -83.0485, c: "#0c2340", flavor: "the tigers can smell fear", city: "DETROIT", ap: "Detroit Metro Airport", st: "Michigan Central Station" },
+  { park: "Kauffman Stadium", team: "Royals", lat: 39.0517, lon: -94.4803, c: "#004687", flavor: "fountains outside, pressure inside", city: "KANSAS CITY", ap: "Kansas City International", st: "Union Station Kansas City" },
+  { park: "Target Field", team: "Twins", lat: 44.9817, lon: -93.2776, c: "#002b5c", flavor: "Minnesota nice ends at the door", city: "MINNEAPOLIS", ap: "MSP International", st: "Target Field Station" },
+  { park: "Rate Field", team: "White Sox", lat: 41.8299, lon: -87.6338, c: "#27251f", flavor: "South Side rules apply", city: "CHICAGO", ap: "Midway International", st: "Union Station Chicago" },
+  { park: "Wrigley Field", team: "Cubs", lat: 41.9484, lon: -87.6553, c: "#0e3386", flavor: "the ivy is judging you", sig: "ivy", signc: "#d31145", city: "CHICAGO", ap: "O'Hare International", st: "Union Station Chicago" },
+  { park: "Great American Ball Park", team: "Reds", lat: 39.0975, lon: -84.5066, c: "#c6011f", flavor: "great American responsibility", city: "CINCINNATI", ap: "CVG International", st: "Cincinnati Union Terminal" },
+  { park: "American Family Field", team: "Brewers", lat: 43.0280, lon: -87.9712, c: "#12284b", flavor: "brats and beers catching up fast", city: "MILWAUKEE", ap: "Mitchell International", st: "Milwaukee Intermodal Station" },
+  { park: "PNC Park", team: "Pirates", lat: 40.4469, lon: -80.0057, c: "#fdb827", flavor: "prettiest park, same old rules", city: "PITTSBURGH", ap: "Pittsburgh International", st: "Pittsburgh Union Station" },
+  { park: "Busch Stadium", team: "Cardinals", lat: 38.6226, lon: -90.1928, c: "#c41e3a", flavor: "the best fans expect the best picks", city: "ST. LOUIS", ap: "St. Louis Lambert", st: "Gateway Station" },
+  { park: "Coors Field", team: "Rockies", lat: 39.7559, lon: -104.9942, c: "#33006f", flavor: "everything flows faster at altitude", city: "DENVER", ap: "Denver International", st: "Denver Union Station" },
+  { park: "Dodger Stadium", team: "Dodgers", lat: 34.0739, lon: -118.2400, c: "#005a9c", flavor: "go now, beat the traffic", city: "LOS ANGELES", ap: "LAX", st: "LA Union Station" },
+  { park: "Petco Park", team: "Padres", lat: 32.7076, lon: -117.1570, c: "#2f241d", flavor: "the fish tacos were a choice", city: "SAN DIEGO", ap: "San Diego International", st: "Santa Fe Depot" },
+  { park: "Oracle Park", team: "Giants", lat: 37.7786, lon: -122.3893, c: "#fd5a1e", flavor: "McCovey Cove is not an option", city: "SAN FRANCISCO", ap: "SFO International", st: "Salesforce Transit Center" },
+  { park: "Chase Field", team: "D-backs", lat: 33.4453, lon: -112.0667, c: "#a71930", flavor: "the pool is NOT a trough", city: "PHOENIX", ap: "Sky Harbor", st: "Phoenix Union Station" },
+  { park: "T-Mobile Park", team: "Mariners", lat: 47.5914, lon: -122.3325, c: "#0c2c56", flavor: "stay calm under the retractable roof", city: "SEATTLE", ap: "Sea-Tac International", st: "King Street Station" },
+  { park: "Globe Life Field", team: "Rangers", lat: 32.7473, lon: -97.0842, c: "#003278", flavor: "everything's bigger, including the line", city: "DALLAS–FT. WORTH", ap: "DFW International", st: "Dallas Union Station" },
+  { park: "Fenway Park", team: "Red Sox", lat: 42.3467, lon: -71.0972, c: "#bd3039", flavor: "the Green Monster looms", sig: "monster", wallc: ["#9fc4ab", "#86ad92"], city: "BOSTON", ap: "Logan International", st: "South Station" },
+  { park: "Camden Yards", team: "Orioles", lat: 39.2839, lon: -76.6217, c: "#df4601", flavor: "Boog's BBQ was a mistake", city: "BALTIMORE", ap: "BWI Marshall", st: "Penn Station Baltimore" },
+  { park: "Rogers Centre", team: "Blue Jays", lat: 43.6414, lon: -79.3894, c: "#134a8e", flavor: "politeness will not save you", city: "TORONTO", ap: "Pearson International", st: "Union Station Toronto" },
+  { park: "Truist Park", team: "Braves", lat: 33.8907, lon: -84.4677, c: "#ce1141", flavor: "the Battery is watching", city: "ATLANTA", ap: "Hartsfield–Jackson", st: "Peachtree Station" },
+  { park: "loanDepot park", team: "Marlins", lat: 25.7781, lon: -80.2196, c: "#00a3e0", flavor: "humidity changes nothing", city: "MIAMI", ap: "Miami International", st: "MiamiCentral Station" },
+  { park: "Citi Field", team: "Mets", lat: 40.7571, lon: -73.8458, c: "#002d72", flavor: "ya gotta believe in spacing", city: "NEW YORK", ap: "JFK International", st: "Penn Station New York" },
+  { park: "Citizens Bank Park", team: "Phillies", lat: 39.9061, lon: -75.1665, c: "#e81828", flavor: "Philly WILL boo a bad pick", city: "PHILADELPHIA", ap: "Philadelphia International", st: "30th Street Station" },
+  { park: "Nationals Park", team: "Nationals", lat: 38.8730, lon: -77.0074, c: "#ab0003", flavor: "a capital offense awaits", city: "WASHINGTON D.C.", ap: "Reagan National", st: "Washington Union Station" },
 ];
 function mixWhite(hex, t) {
   const n = parseInt(hex.slice(1), 16);
@@ -758,6 +838,13 @@ function applyPark(p, km) {
   s.backdrop = `⚾  🌭  ⚾`;
   s.flavor = p.flavor;
   s.parkRef = p;
+  // localize the whole metro: airport and train-station rounds too
+  THEMES.airport.name = `${p.ap} — Gate Sprint`;
+  THEMES.airport.flavor = "boarding group C is boarding";
+  THEMES.station.name = p.st;
+  THEMES.station.flavor = "the 5:15 waits for no bladder";
+  G.city = p.city;
+  $("cityline").textContent = `🌆 ${p.city} EDITION`;
   const line = km != null
     ? `⚾ Home park set: ${p.park} (${p.team}), ~${Math.round(km)} km away — "${p.flavor}"`
     : `⚾ Home park: ${p.park} (${p.team}) — "${p.flavor}"`;
@@ -782,14 +869,6 @@ function localizeStadium() {
       : "Couldn't get a location fix — generic stadium it is.";
   }, { timeout: 9000, maximumAge: 600000 });
 }
-try {
-  const saved = JSON.parse(localStorage.getItem("ut_park") || "null");
-  if (saved) {
-    const p = MLB_PARKS.find(x => x.park === saved.park);
-    if (p) applyPark(p, saved.km);
-  }
-} catch (e) {}
-
 /* ---------- gauntlet round scripts (difficulty curve) ---------- */
 const ROUND_PLAN = [
   { theme: "office",  n: [5, 5],  occ: [0, 0], div: 0,   time: 10 },                              // 1: empty tutorial
@@ -806,13 +885,13 @@ const ROUND_PLAN = [
 
 /* ---------- endless plan generator: infinite combinations ---------- */
 function endlessPlan(r) {
-  const waitRound = r >= 3 && Math.random() < 0.15;
-  const roll = Math.random();
+  const waitRound = r >= 3 && grnd() < 0.15;
+  const roll = grnd();
   const tub = !waitRound && r >= 2 && roll < 0.18;
   const trough = !waitRound && !tub && roll < 0.40;
-  const theme = tub ? pick(["stadium", "festival", "divebar"])
-    : trough ? pick(["divebar", "stadium", "festival", "station"])
-    : pick(Object.keys(THEMES));
+  const theme = tub ? gpick(["stadium", "festival", "divebar"])
+    : trough ? gpick(["divebar", "stadium", "festival", "station"])
+    : gpick(Object.keys(THEMES));
   const traveler = (theme === "airport" || theme === "station") ? .65 : .18;
   if (waitRound) return { theme, n: [5, 6], occ: [2, 2], div: 0, time: Math.max(5, 8 - r * .15), waitRound: true, traveler };
   const lo = Math.min(9, (tub ? 6 : 4) + Math.floor(r / 3));
@@ -833,23 +912,175 @@ function endlessPlan(r) {
 const G = {
   mode: "gauntlet",
   round: 0, score: 0, streak: 0, lives: 3, drinks: 0, pissed: false,
-  splashes: 0, perfects: 0,
+  splashes: 0, perfects: 0, trail: [], seed: null, city: null,
   cur: null, timer: null, timeLeft: 0, locked: false,
 };
 function desperate() { return G.drinks >= 3; }
 
-/* ---------- round generation ---------- */
-function chance(v) { return v === true || Math.random() < (v || 0); }
+/* ---------- towels (free respawns), earned by sharing ---------- */
+function getTowels() {
+  try {
+    const ls = Number(localStorage.getItem("ut_towels"));
+    if (!Number.isNaN(ls) && localStorage.getItem("ut_towels") !== null) return ls;
+    const m = document.cookie.match(/(?:^|;\s*)ut_towels=(\d+)/);
+    return m ? Number(m[1]) : 0;
+  } catch (e) { return 0; }
+}
+function setTowels(n) {
+  try {
+    localStorage.setItem("ut_towels", n);
+    document.cookie = `ut_towels=${n};max-age=31536000;path=/;SameSite=Lax`;
+  } catch (e) {}
+  updateStartLines();
+}
+function grantShareReward() {
+  setTowels(Math.max(getTowels(), 5));
+  toast("🧻 +5 free towels (respawns) for sharing!");
+}
 
-function planFor(idx) { return G.mode === "gauntlet" ? ROUND_PLAN[idx] : endlessPlan(idx); }
+/* ---------- sharing ---------- */
+function gameURL() { return location.origin + location.pathname; }
+function resultText() {
+  const [rank] = rankFor(G.score, G.lives > 0 && !G.pissed);
+  const head = G.mode === "daily" ? `🚹 The Urinal Test — Daily ${dailyKey()}` : `🚹 The Urinal Test`;
+  const where = G.city ? ` @ ${THEMES.stadium.parkRef ? THEMES.stadium.parkRef.park : G.city}` : "";
+  return `${head}${where}\n${G.trail.join("")}\n${G.score} pts · ${rank}${G.pissed ? " (yes, that means what you think)" : ""}\n${gameURL()}`;
+}
+async function doShare(text, files) {
+  try {
+    if (navigator.share && (!files || (navigator.canShare && navigator.canShare({ files })))) {
+      await navigator.share(files ? { text, files } : { text });
+      grantShareReward();
+      return true;
+    }
+  } catch (e) { if (e && e.name === "AbortError") return false; }
+  try {
+    await navigator.clipboard.writeText(text);
+    toast("📋 Copied — paste it in the group chat!");
+    grantShareReward();
+    return true;
+  } catch (e) { toast("Couldn't share on this device."); return false; }
+}
+function challengeURL() {
+  return `${gameURL()}?c=${G.seed}&s=${G.score}&m=${G.mode === "daily" ? "gauntlet" : G.mode}`;
+}
+function shareChallenge() {
+  doShare(`⚔️ I scored ${G.score} pts on The Urinal Test.\nSame bathrooms, same chaos — beat me:\n${challengeURL()}`);
+}
+
+/* ---------- certificate (canvas → PNG) ---------- */
+async function shareCertificate() {
+  const [rank, blurb] = rankFor(G.score, G.lives > 0 && !G.pissed);
+  const cv = document.createElement("canvas");
+  cv.width = 1000; cv.height = 1250;
+  const x = cv.getContext("2d");
+  x.fillStyle = "#f7f1e0"; x.fillRect(0, 0, 1000, 1250);
+  x.strokeStyle = "#8a6a1d"; x.lineWidth = 14; x.strokeRect(30, 30, 940, 1190);
+  x.lineWidth = 3; x.strokeRect(52, 52, 896, 1146);
+  x.fillStyle = "#241d08"; x.textAlign = "center";
+  x.font = "bold 44px Georgia, serif";
+  x.fillText("CERTIFICATE OF URINAL ETIQUETTE", 500, 150);
+  x.font = "26px Georgia, serif";
+  x.fillText("The International Restroom Standards Board", 500, 200);
+  x.fillText("hereby certifies the bearer as", 500, 300);
+  x.font = "bold 60px Georgia, serif"; x.fillStyle = "#8a2020";
+  x.fillText(rank.replace(/[^\x20-\x7E]/g, "").trim() || "CERTIFIED", 500, 390);
+  x.font = "italic 28px Georgia, serif"; x.fillStyle = "#241d08";
+  x.fillText(`"${blurb}"`, 500, 450);
+  x.font = "120px serif";
+  x.fillText("🚹", 500, 620);
+  x.font = "30px Georgia, serif";
+  x.fillText(`Score: ${G.score} pts`, 500, 730);
+  x.fillText(`${G.perfects} perfect picks · ${G.splashes} splashes`, 500, 780);
+  if (G.city) x.fillText(`Certified at ${THEMES.stadium.parkRef ? THEMES.stadium.parkRef.park : G.city}`, 500, 830);
+  x.fillText(G.trail.join(" "), 500, 890);
+  x.font = "26px Georgia, serif";
+  x.fillText(new Date().toDateString(), 500, 990);
+  x.font = "100px serif";
+  x.fillText("⚾", 250, 1120);
+  x.font = "italic 24px Georgia, serif";
+  x.fillText("____________________", 690, 1090);
+  x.fillText("Chief Attendant", 690, 1130);
+  x.font = "20px Georgia, serif"; x.fillStyle = "#8a6a1d";
+  x.fillText(gameURL(), 500, 1210);
+  const blob = await new Promise(res => cv.toBlob(res, "image/png"));
+  const file = new File([blob], "urinal-test-certificate.png", { type: "image/png" });
+  const ok = await doShare(resultText(), [file]);
+  if (!ok) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "urinal-test-certificate.png";
+    a.click();
+    grantShareReward();
+  }
+}
+
+/* ---------- rewarded ad slot (stub) ----------
+   TODO: replace the fake countdown with Google AdMob / Ad Manager rewarded ad:
+   load SDK, call showRewardedAd(onReward) → on ad completion invoke onReward(). */
+function showRewardedAd(onReward) {
+  const modal = $("admodal");
+  modal.classList.remove("hiddenrow"); modal.classList.add("show");
+  let n = 5;
+  $("adcount").textContent = n;
+  const iv = setInterval(() => {
+    n--;
+    $("adcount").textContent = n;
+    if (n <= 0) {
+      clearInterval(iv);
+      modal.classList.remove("show"); modal.classList.add("hiddenrow");
+      onReward();
+    }
+  }, 1000);
+}
+
+/* ---------- respawn ---------- */
+function respawn() {
+  G.pissed = false; G.lives = 1; G.drinks = 0; G.locked = false;
+  $("end").classList.add("hidden");
+  toast("🧻 Toweled off. One pair of pants. Make it count.");
+  startRound();
+}
+function offerRespawn() {
+  const row = $("respawnrow"), btn = $("respawnbtn");
+  const t = getTowels();
+  row.classList.remove("hiddenrow");
+  if (t > 0) {
+    btn.innerHTML = `🧻 USE A TOWEL — RESPAWN (${t} left)`;
+    btn.onclick = () => { setTowels(t - 1); respawn(); };
+  } else {
+    btn.innerHTML = `📺 WATCH AD FOR A TOWEL — RESPAWN`;
+    btn.onclick = () => showRewardedAd(respawn);
+  }
+}
+
+/* ---------- daily & challenge ---------- */
+let pendingChallenge = null;
+function updateStartLines() {
+  const t = getTowels();
+  $("towelline").textContent = t > 0 ? `🧻 ${t} free towel${t === 1 ? "" : "s"} (respawns) banked` : "";
+  try {
+    const daily = JSON.parse(localStorage.getItem("ut_daily_" + dailyKey()) || "null");
+    $("dailybtn").innerHTML = daily
+      ? `📅 DAILY ✓ ${daily.score} pts — practice again`
+      : `📅 DAILY CHALLENGE — same bathrooms worldwide`;
+    const best = Number(localStorage.getItem("ut_bestEndless") || 0);
+    const bestScore = Number(localStorage.getItem("ut_bestEndlessScore") || 0);
+    $("bestline").textContent = best ? `♾️ Endless best: round ${best} · ${bestScore} pts` : "";
+  } catch (e) {}
+}
+
+/* ---------- round generation ---------- */
+function chance(v) { return v === true || grnd() < (v || 0); }
+
+function planFor(idx) { return G.mode === "endless" ? endlessPlan(idx) : ROUND_PLAN[idx]; }
 
 function makeRound(idx) {
   const plan = planFor(idx);
   const theme = THEMES[plan.theme];
   let round = null;
   for (let attempt = 0; attempt < 120; attempt++) {
-    const n = rand(plan.n[0], plan.n[1]);
-    const occCount = Math.max(0, Math.min(rand(plan.occ[0], plan.occ[1]), n - 2));
+    const n = grand(plan.n[0], plan.n[1]);
+    const occCount = Math.max(0, Math.min(grand(plan.occ[0], plan.occ[1]), n - 2));
     const tub = chance(plan.tub);
     const trough = !tub && chance(plan.trough);
     const layout = tub ? "tub" : trough ? "trough" : "wall";
@@ -868,19 +1099,19 @@ function makeRound(idx) {
       const occIdx = n <= 5 ? [1, 3] : [1, 4];
       occIdx.forEach(i => { if (i < n) spots[i].occupant = "regular"; });
     } else {
-      const order = [...Array(n).keys()].sort(() => Math.random() - 0.5);
+      const order = shuffle([...Array(n).keys()]);
       for (let k = 0; k < occCount; k++) spots[order[k]].occupant = "regular";
     }
 
     const occupiedIdx = spots.map((s, i) => s.occupant ? i : -1).filter(i => i >= 0);
     if (occupiedIdx.length) {
-      if (chance(plan.glasses)) spots[pick(occupiedIdx)].persona = "glasses";
+      if (chance(plan.glasses)) spots[gpick(occupiedIdx)].persona = "glasses";
       if (chance(plan.traveler)) {
         const cand = occupiedIdx.filter(i => !spots[i].persona);
-        if (cand.length) spots[pick(cand)].persona = "traveler";
+        if (cand.length) spots[gpick(cand)].persona = "traveler";
       }
       occupiedIdx.forEach(i => {
-        if (!spots[i].persona) spots[i].persona = Math.random() < 0.3 ? pick(["phone", "headphones"]) : "regular";
+        if (!spots[i].persona) spots[i].persona = grnd() < 0.3 ? gpick(["phone", "headphones"]) : "regular";
       });
     }
 
@@ -890,7 +1121,7 @@ function makeRound(idx) {
       occupiedIdx.forEach(i => {
         if (spots[i].persona === "traveler" && luggageAt < 0) {
           const sides = [i - 1, i + 1].filter(j => j >= 0 && j < n && !spots[j].occupant);
-          if (sides.length) { luggageAt = pick(sides); spots[luggageAt].blocked = true; }
+          if (sides.length) { luggageAt = gpick(sides); spots[luggageAt].blocked = true; }
         }
       });
     }
@@ -1040,7 +1271,8 @@ function renderRound(round) {
 }
 
 function updateHUD() {
-  $("roundchip").textContent = G.mode === "gauntlet" ? `Round ${G.round + 1}/10` : `Round ${G.round + 1} ♾️`;
+  $("roundchip").textContent = G.mode === "endless" ? `Round ${G.round + 1} ♾️`
+    : G.mode === "daily" ? `Daily ${G.round + 1}/10` : `Round ${G.round + 1}/10`;
   $("scorechip").textContent = `${G.score} pts`;
   $("lives").textContent = "👖".repeat(G.lives) + "💦".repeat(Math.max(0, 3 - G.lives));
   $("streakchip").textContent = `🔥 ${G.streak}`;
@@ -1242,7 +1474,7 @@ function resolveChoice(i) {
     if (desperate() && sc.comfort >= r.bestComfort - 0.01) {
       // no good spots, but with a full bladder the least-bad pick is survival
       const drinksAtPick = G.drinks;
-      G.streak++;
+      G.streak++; G.trail.push("😬");
       const pts = Math.round(80 * buzzMult());
       G.score += pts; G.perfects++;
       relieve();
@@ -1263,7 +1495,7 @@ function resolveChoice(i) {
   }
 
   if (sc.comfort >= r.bestComfort - 0.01) {
-    G.streak++;
+    G.streak++; G.trail.push("🟩");
     const mult = 1 + Math.min(0.5, (G.streak - 1) * 0.1);
     const pts = Math.round((100 + speedBonus) * mult * buzzMult());
     const buzzNote = G.drinks > 0 ? ` 🍺 +${G.drinks * 10}% buzz bonus!` : "";
@@ -1277,7 +1509,7 @@ function resolveChoice(i) {
       `Optimal pick: ${describeBest(r)}.${buzzNote} ${G.streak >= 3 ? `🔥 ${G.streak}-streak multiplier active!` : ""}`, pts);
     if (r.attendant) showAttendant();
   } else if (sc.eff > 1.0) {
-    G.streak = 0;
+    G.streak = 0; G.trail.push("🟨");
     const pts = Math.round(40 * buzzMult());
     G.score += pts;
     relieve();
@@ -1304,6 +1536,7 @@ function fail(i, big, text) {
   G.streak = 0;
   if (G.shield) {
     G.shield = false;
+    G.trail.push("🧖");
     buzz([40, 30, 40]); sfx.ok();
     verdict("TOWELED OFF! 🧖", "ok");
     if (i >= 0) markSlot(i, "chosen-bad");
@@ -1313,7 +1546,7 @@ function fail(i, big, text) {
     updateHUD();
     return;
   }
-  G.lives--; G.splashes++;
+  G.lives--; G.splashes++; G.trail.push("💦");
   splashFX(false);
   verdict(big, "bad");
   if (i >= 0) markSlot(i, "chosen-bad");
@@ -1330,7 +1563,7 @@ function markSlot(i, cls) {
 function pissSelf(reason) {
   G.locked = true;
   stopTimer();
-  G.lives = 0; G.pissed = true; G.pissReason = reason;
+  G.lives = 0; G.pissed = true; G.pissReason = reason; G.trail.push("🌊");
   splashFX(true);
   verdict("OH NO.", "bad");
   setTimeout(() => splashFX(true), 450);
@@ -1371,7 +1604,7 @@ function onWait() {
   stopTimer();
   const r = G.cur;
   if (r.isWaitRound) {
-    G.streak++;
+    G.streak++; G.trail.push("🚪");
     const pts = 150;
     G.score += pts; G.perfects++;
     buzz([30, 60, 30]); sfx.flush();
@@ -1380,7 +1613,7 @@ function onWait() {
       `Every open spot meant standing shoulder-to-shoulder${r.spots.some(s => s.persona === "glasses") ? " (one of them was <b>recording</b>)" : ""}. ` +
       `Walking away costs nothing but time — <b>as long as your bladder can cash that check</b>. Legends hold it.`, pts);
   } else {
-    G.streak = 0;
+    G.streak = 0; G.trail.push("🐔");
     buzz([200]); sfx.chicken();
     verdict("CHICKENED OUT 🐔", "ok");
     showLesson("You bailed on a solvable board.",
@@ -1424,7 +1657,7 @@ function nextRound() {
     setTimeout(() => toast(t.drinkMsg), 350);
   }
   G.round++;
-  if (G.mode === "gauntlet" && G.round >= ROUND_PLAN.length) { endGame(true); return; }
+  if (G.mode !== "endless" && G.round >= ROUND_PLAN.length) { endGame(true); return; }
   startRound();
 }
 
@@ -1469,38 +1702,84 @@ function endGame(survived) {
     (G.pissed ? `${G.drinks} drinks proved fatal · ` : "") +
     `${G.perfects} perfect picks · ${G.splashes} splash${G.splashes === 1 ? "" : "es"} · ` +
     (G.mode === "endless" ? `survived to round ${roundsReached}` : `reached round ${Math.min(roundsReached, 10)}/10`);
+  $("trailline").textContent = G.trail.join("");
+  // daily: record first result of the day
+  if (G.mode === "daily") {
+    try {
+      const k = "ut_daily_" + dailyKey();
+      if (!localStorage.getItem(k)) localStorage.setItem(k, JSON.stringify({ score: G.score, rank, trail: G.trail.join("") }));
+    } catch (e) {}
+  }
+  // challenge verdict
+  if (pendingChallenge && pendingChallenge.active) {
+    $("chalresult").textContent = G.score > pendingChallenge.score
+      ? `⚔️ YOU BEAT THEIR ${pendingChallenge.score}! Send it back. 🏆`
+      : `⚔️ ${pendingChallenge.score} stands. They remain champion… for now.`;
+    pendingChallenge.active = false;
+  } else {
+    $("chalresult").textContent = "";
+  }
+  // respawn offer on any loss (rewarded-ad slot / free towels)
+  if (!survived) offerRespawn(); else $("respawnrow").classList.add("hiddenrow");
   $("end").classList.remove("hidden");
-  if (survived && G.mode === "gauntlet") sfx.flush();
+  if (survived && G.mode !== "endless") sfx.flush();
 }
 
-function resetGame(mode) {
-  Object.assign(G, { mode: mode || G.mode, round: 0, score: 0, streak: 0, lives: 3, drinks: 0, pissed: false,
-    shield: false, musk: false, splashes: 0, perfects: 0, locked: false });
+function resetGame(mode, seed) {
+  const m = mode || G.mode;
+  const s = (seed != null) ? seed
+    : m === "daily" ? dateSeed()
+    : (Math.floor(Math.random() * 2147483647));
+  setSeed(s);
+  Object.assign(G, { mode: m, seed: s, round: 0, score: 0, streak: 0, lives: 3, drinks: 0, pissed: false,
+    shield: false, musk: false, splashes: 0, perfects: 0, trail: [], locked: false });
   $("end").classList.add("hidden");
   $("start").classList.add("hidden");
+  $("respawnrow").classList.add("hiddenrow");
   startRound();
 }
 
-function showBestLine() {
-  try {
-    const best = Number(localStorage.getItem("ut_bestEndless") || 0);
-    const bestScore = Number(localStorage.getItem("ut_bestEndlessScore") || 0);
-    $("bestline").textContent = best ? `♾️ Endless best: round ${best} · ${bestScore} pts` : "";
-  } catch (e) {}
-}
-showBestLine();
+/* ---------- boot: restore park, towels, parse challenge links ---------- */
+try {
+  const saved = JSON.parse(localStorage.getItem("ut_park") || "null");
+  if (saved) {
+    const p = MLB_PARKS.find(x => x.park === saved.park);
+    if (p) applyPark(p, saved.km);
+  }
+} catch (e) {}
+try {
+  const q = new URLSearchParams(location.search);
+  if (q.has("c")) {
+    pendingChallenge = { seed: Number(q.get("c")), score: Number(q.get("s")) || 0,
+      mode: q.get("m") === "endless" ? "endless" : "gauntlet", active: false };
+    const b = $("chalbanner");
+    b.classList.remove("hiddenrow");
+    b.innerHTML = `⚔️ <b>You've been challenged!</b> Same bathrooms, score to beat: <b>${pendingChallenge.score}</b> ` +
+      `<button class="bigbtn" style="min-width:0;padding:8px 16px;font-size:14px;margin-top:8px" id="acceptbtn">ACCEPT</button>`;
+    $("acceptbtn").addEventListener("click", () => {
+      audio(); buzz(20);
+      pendingChallenge.active = true;
+      resetGame(pendingChallenge.mode, pendingChallenge.seed);
+    });
+  }
+} catch (e) {}
+updateStartLines();
 
 /* ---------- wire up ---------- */
 $("startbtn").addEventListener("click", () => { audio(); buzz(20); resetGame("gauntlet"); });
+$("dailybtn").addEventListener("click", () => { audio(); buzz(20); resetGame("daily"); });
 $("endlessbtn").addEventListener("click", () => { audio(); buzz(20); resetGame("endless"); });
-$("againbtn").addEventListener("click", () => { buzz(20); resetGame(); });
-$("menubtn").addEventListener("click", () => { $("end").classList.add("hidden"); $("start").classList.remove("hidden"); showBestLine(); });
+$("againbtn").addEventListener("click", () => { buzz(20); resetGame(undefined, undefined); });
+$("menubtn").addEventListener("click", () => { $("end").classList.add("hidden"); $("start").classList.remove("hidden"); updateStartLines(); });
 $("nextbtn").addEventListener("click", () => nextRound());
 $("waitbtn").addEventListener("click", () => onWait());
 $("locbtn").addEventListener("click", () => localizeStadium());
 $("att-tip").addEventListener("click", () => attTip());
 $("att-col").addEventListener("click", () => attCologne());
 $("att-walk").addEventListener("click", () => attWalk());
+$("sharebtn").addEventListener("click", () => doShare(resultText()));
+$("certbtn").addEventListener("click", () => shareCertificate());
+$("chalbtn").addEventListener("click", () => shareChallenge());
 </script>
 </body>
 </html>
