@@ -104,6 +104,32 @@
   #backdrop { position: absolute; top: 10%; left: 0; right: 0; text-align: center;
     font-size: clamp(22px, 7vw, 34px); opacity: .75; letter-spacing: 14px; }
 
+  /* ---------- ballpark branding ---------- */
+  #parkdeco { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+  .bunt { position: absolute; top: 6.8%; left: 0; right: 0; height: 4.2%; }
+  .bunt svg { width: 100%; height: 100%; }
+  .parksign { position: absolute; top: 12.5%; left: 50%; transform: translateX(-50%) rotate(-1.2deg);
+    background: var(--signbg, #1f6b3a); color: #fff; border: 3px solid #fff; border-radius: 10px;
+    padding: 6px 18px; text-align: center; box-shadow: 0 5px 12px rgba(0,0,0,.45); max-width: 92%; }
+  .parksign .big { font-size: clamp(15px, 5vw, 26px); font-weight: 900; letter-spacing: 2px; white-space: nowrap; }
+  .parksign .sub { font-size: clamp(9px, 2.4vw, 12px); letter-spacing: 3px; color: rgba(255,255,255,.88); margin-top: 1px; }
+  .ivyband { position: absolute; left: 0; right: 0; bottom: 34%; height: 27%; z-index: 0;
+    background-color: #2a5433;
+    background-image:
+      radial-gradient(circle, #386f44 26%, transparent 28%),
+      radial-gradient(circle, #244a2c 30%, transparent 32%),
+      radial-gradient(circle, #437f50 22%, transparent 24%);
+    background-size: 26px 24px, 38px 30px, 20px 18px;
+    background-position: 0 0, 13px 9px, 7px 15px;
+    box-shadow: inset 0 8px 12px rgba(0,0,0,.3); }
+  .monsterboard { position: absolute; left: 5%; right: 5%; top: 30%; height: 6.5%;
+    background: #123b24; border: 3px solid #e8ecef; border-radius: 4px;
+    display: flex; align-items: center; justify-content: space-around;
+    color: #fff; font-weight: bold; font-size: clamp(9px, 2.6vw, 13px); letter-spacing: 1px; }
+  .frieze { position: absolute; top: 6.5%; left: 0; right: 0; height: 3.4%;
+    background: radial-gradient(circle at 50% -30%, transparent 60%, #f2f5f8 62%);
+    background-size: 30px 100%; }
+
   #row { position: absolute; left: 0; right: 0; bottom: 8%; top: 18%; display: flex;
     align-items: flex-end; justify-content: center; padding: 0 8px; z-index: 4; }
 
@@ -345,6 +371,7 @@
       <div class="lightpool" style="left:33%"></div>
       <div class="lightpool" style="left:63%"></div>
       <div id="backdrop"></div>
+      <div id="parkdeco"></div>
       <div class="floorline"></div>
       <div class="floor"></div>
       <div id="trough">
@@ -505,9 +532,22 @@ function personSVG(persona, facing) {
     extra = `<path d="M${x0+2} 33 Q35 44 ${x0+torsoW-2} 33 L${x0+torsoW-2} 39 Q35 50 ${x0+2} 39 Z" fill="#9aa8b8"/>`;
   }
 
-  const arms = `
-    <path d="M${x0+2} 44 q-7 10 -4 22 q1.5 5 6 4 l3 -2 q-4 -12 0 -21 Z" fill="${shirt}" stroke="rgba(0,0,0,.12)"/>
-    <path d="M${x0+torsoW-2} 44 q7 10 4 22 q-1.5 5 -6 4 l-3 -2 q4 -12 0 -21 Z" fill="${shirt}" stroke="rgba(0,0,0,.12)"/>`;
+  /* Front-facing guys hold a ballpark frank at waist level with both hands.
+     It makes the orientation unmistakable, and it is ALSO why this game is rated E. */
+  const arms = front
+    ? `<path d="M${x0+2} 44 q-6 12 2 24 q4 5 10 3 l2 -4 q-8 -8 -6 -21 Z" fill="${shirt}" stroke="rgba(0,0,0,.12)"/>
+       <path d="M${x0+torsoW-2} 44 q6 12 -2 24 q-4 5 -10 3 l-2 -4 q8 -8 6 -21 Z" fill="${shirt}" stroke="rgba(0,0,0,.12)"/>
+       <g>
+         <ellipse cx="35" cy="73" rx="18" ry="7" fill="#e0a952"/>
+         <rect x="15" y="67.5" width="40" height="7" rx="3.5" fill="#b35b2e"/>
+         <rect x="15" y="67.5" width="40" height="3" rx="1.5" fill="rgba(255,255,255,.18)"/>
+         <path d="M20 71 q3 -3.4 6 0 t6 0 t6 0 t6 0" stroke="#f3c73a" stroke-width="2" fill="none"/>
+         <path d="M17 74 a18 7 0 0 0 36 0 z" fill="#d9a24e"/>
+         <circle cx="22" cy="73.5" r="4" fill="${skin}"/>
+         <circle cx="48" cy="73.5" r="4" fill="${skin}"/>
+       </g>`
+    : `<path d="M${x0+2} 44 q-7 10 -4 22 q1.5 5 6 4 l3 -2 q-4 -12 0 -21 Z" fill="${shirt}" stroke="rgba(0,0,0,.12)"/>
+       <path d="M${x0+torsoW-2} 44 q7 10 4 22 q-1.5 5 -6 4 l-3 -2 q4 -12 0 -21 Z" fill="${shirt}" stroke="rgba(0,0,0,.12)"/>`;
 
   const backDetail = front ? "" :
     `<path d="M${x0+3} 40 q${torsoW/2-3} 8 ${torsoW-6} 0 l0 5 q-${torsoW/2-3} 7 -${torsoW-6} 0 Z" fill="rgba(0,0,0,.18)"/>`;
@@ -590,13 +630,13 @@ const MLB_PARKS = [
   { park: "Daikin Park", team: "Astros", lat: 29.7573, lon: -95.3555, c: "#eb6e1f", flavor: "no banging on the divider" },
   { park: "Sutter Health Park", team: "Athletics", lat: 38.5802, lon: -121.5133, c: "#003831", flavor: "temporary home, permanent code" },
   { park: "Tropicana Field", team: "Rays", lat: 27.7683, lon: -82.6534, c: "#092c5c", flavor: "under the dome, everyone hears" },
-  { park: "Yankee Stadium", team: "Yankees", lat: 40.8296, lon: -73.9262, c: "#0c2340", flavor: "27 rings of pressure" },
+  { park: "Yankee Stadium", team: "Yankees", lat: 40.8296, lon: -73.9262, c: "#0c2340", flavor: "27 rings of pressure", sig: "frieze" },
   { park: "Progressive Field", team: "Guardians", lat: 41.4962, lon: -81.6852, c: "#00385d", flavor: "guard your spacing" },
   { park: "Comerica Park", team: "Tigers", lat: 42.3390, lon: -83.0485, c: "#0c2340", flavor: "the tigers can smell fear" },
   { park: "Kauffman Stadium", team: "Royals", lat: 39.0517, lon: -94.4803, c: "#004687", flavor: "fountains outside, pressure inside" },
   { park: "Target Field", team: "Twins", lat: 44.9817, lon: -93.2776, c: "#002b5c", flavor: "Minnesota nice ends at the door" },
   { park: "Rate Field", team: "White Sox", lat: 41.8299, lon: -87.6338, c: "#27251f", flavor: "South Side rules apply" },
-  { park: "Wrigley Field", team: "Cubs", lat: 41.9484, lon: -87.6553, c: "#0e3386", flavor: "the ivy is judging you" },
+  { park: "Wrigley Field", team: "Cubs", lat: 41.9484, lon: -87.6553, c: "#0e3386", flavor: "the ivy is judging you", sig: "ivy", signc: "#d31145" },
   { park: "Great American Ball Park", team: "Reds", lat: 39.0975, lon: -84.5066, c: "#c6011f", flavor: "great American responsibility" },
   { park: "American Family Field", team: "Brewers", lat: 43.0280, lon: -87.9712, c: "#12284b", flavor: "brats and beers catching up fast" },
   { park: "PNC Park", team: "Pirates", lat: 40.4469, lon: -80.0057, c: "#fdb827", flavor: "prettiest park, same old rules" },
@@ -608,7 +648,7 @@ const MLB_PARKS = [
   { park: "Chase Field", team: "D-backs", lat: 33.4453, lon: -112.0667, c: "#a71930", flavor: "the pool is NOT a trough" },
   { park: "T-Mobile Park", team: "Mariners", lat: 47.5914, lon: -122.3325, c: "#0c2c56", flavor: "stay calm under the retractable roof" },
   { park: "Globe Life Field", team: "Rangers", lat: 32.7473, lon: -97.0842, c: "#003278", flavor: "everything's bigger, including the line" },
-  { park: "Fenway Park", team: "Red Sox", lat: 42.3467, lon: -71.0972, c: "#bd3039", flavor: "the Green Monster looms" },
+  { park: "Fenway Park", team: "Red Sox", lat: 42.3467, lon: -71.0972, c: "#bd3039", flavor: "the Green Monster looms", sig: "monster", wallc: ["#9fc4ab", "#86ad92"] },
   { park: "Camden Yards", team: "Orioles", lat: 39.2839, lon: -76.6217, c: "#df4601", flavor: "Boog's BBQ was a mistake" },
   { park: "Rogers Centre", team: "Blue Jays", lat: 43.6414, lon: -79.3894, c: "#134a8e", flavor: "politeness will not save you" },
   { park: "Truist Park", team: "Braves", lat: 33.8907, lon: -84.4677, c: "#ce1141", flavor: "the Battery is watching" },
@@ -633,10 +673,11 @@ function applyPark(p, km) {
   const s = THEMES.stadium;
   s.name = `${p.park} — 7th-Inning Rush`;
   s.icon = "⚾";
-  s.wall = mixWhite(p.c, 0.72);
-  s.wall2 = mixWhite(p.c, 0.58);
+  s.wall = p.wallc ? p.wallc[0] : mixWhite(p.c, 0.72);
+  s.wall2 = p.wallc ? p.wallc[1] : mixWhite(p.c, 0.58);
   s.backdrop = `⚾  🌭  ⚾`;
   s.flavor = p.flavor;
+  s.parkRef = p;
   const line = km != null
     ? `⚾ Home park set: ${p.park} (${p.team}), ~${Math.round(km)} km away — "${p.flavor}"`
     : `⚾ Home park: ${p.park} (${p.team}) — "${p.flavor}"`;
@@ -834,6 +875,15 @@ function analyze(round) {
 /* ---------- rendering ---------- */
 function slotEl(i) { return $("scene").querySelector(`.slot[data-i="${i}"]`); }
 
+function buntingSVG(c) {
+  let t = "";
+  for (let x = 0; x < 400; x += 25) {
+    const col = (x / 25) % 2 ? "#f5f7f9" : c;
+    t += `<path d="M${x} 2 L${x + 11} 19 L${x + 22} 2 Z" fill="${col}" stroke="rgba(0,0,0,.18)"/>`;
+  }
+  return `<svg viewBox="0 0 400 22" preserveAspectRatio="none"><line x1="0" y1="2" x2="400" y2="2" stroke="#d8dde2" stroke-width="2.5"/>${t}</svg>`;
+}
+
 function renderRound(round) {
   const scene = $("scene");
   scene.classList.toggle("trough", round.layout === "trough");
@@ -843,7 +893,26 @@ function renderRound(round) {
   rootStyle.setProperty("--wall2", round.theme.wall2);
   rootStyle.setProperty("--floor1", round.theme.floor1);
   rootStyle.setProperty("--floor2", round.theme.floor2);
-  $("backdrop").textContent = round.theme.backdrop;
+  // ballpark branding: bunting, marquee sign, and park-signature set dressing
+  const deco = $("parkdeco");
+  if (round.themeKey === "stadium") {
+    const p = round.theme.parkRef;
+    const c = p ? p.c : "#1f6b3a";
+    const name = p ? p.park.toUpperCase() : "HALFTIME RUSH";
+    const sub = p ? `HOME OF THE ${p.team.toUpperCase()}` : "TOP OF THE 7TH — GO NOW";
+    const signbg = (p && p.signc) ? p.signc : c;
+    deco.innerHTML =
+      `<div class="bunt">${buntingSVG(c)}</div>` +
+      (p && p.sig === "frieze" ? `<div class="frieze"></div>` : "") +
+      (p && p.sig === "ivy" ? `<div class="ivyband"></div>` : "") +
+      (p && p.sig === "monster"
+        ? `<div class="monsterboard"><span>BOS 3</span><span>OPP 2</span><span>▪ ▪ ▪</span><span>H 7</span><span>E 0</span></div>` : "") +
+      `<div class="parksign" style="--signbg:${signbg}"><div class="big">${name}</div><div class="sub">${sub}</div></div>`;
+    $("backdrop").textContent = "";
+  } else {
+    deco.innerHTML = "";
+    $("backdrop").textContent = round.theme.backdrop;
+  }
   $("themebar").innerHTML = `${round.theme.icon} <b>${round.theme.name}</b>` +
     (round.layout === "trough" ? " — old-school trough"
       : round.layout === "tub" ? " — ⚠️ the shame tub"

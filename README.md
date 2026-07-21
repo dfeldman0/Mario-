@@ -34,7 +34,12 @@ and **Endless Rush** (procedurally generated rounds until the rush claims you).
   your teeth at the least-bad spot is the right answer instead.
 - **📍 Play your home ballpark**: opt-in geolocation (on-device only) finds
   the nearest of all 30 MLB parks and turns stadium rounds into *your* park —
-  Wrigley's ivy, Fenway's Monster, team-colored walls, the works.
+  a big marquee sign ("WRIGLEY FIELD — HOME OF THE CUBS"), team-colored
+  bunting, and signature set dressing: Wrigley's ivy wall, Fenway's Green
+  Monster + scoreboard, Yankee Stadium's frieze.
+- **Orientation is obvious**: guys facing you at the shame tub hold a
+  ballpark frank at waist level with both hands. That's what the hands are
+  doing. It's a hot dog. Rated E for Everyone.
 - Streak multipliers, synthesized sound effects, a one-line etiquette lesson
   after every choice, endless-mode best-run tracking, ranks from *Splash
   Survivor* to *Urinal Grandmaster*.
