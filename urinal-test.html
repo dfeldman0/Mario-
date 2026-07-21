@@ -158,7 +158,7 @@
   #scene.tub .slot.chosen-good, #scene.trough .slot.chosen-good { outline: 3px solid rgba(47,180,107,.85); outline-offset: -3px; border-radius: 12px; }
   #scene.tub .slot.chosen-bad, #scene.trough .slot.chosen-bad { outline: 3px solid rgba(230,72,61,.85); outline-offset: -3px; border-radius: 12px; }
 
-  .divider { flex: 0 0 8px; height: 62%; align-self: flex-end; margin-bottom: 10%; position: relative;
+  .divider { flex: 0 0 8px; height: 38%; align-self: flex-end; margin-bottom: 21%; position: relative;
     background: linear-gradient(90deg, #dee3ea, #aab1bb 55%, #868d98); border-radius: 5px 5px 0 0;
     box-shadow: 2px 2px 3px rgba(0,0,0,.3); }
   .divider::after { content: ""; position: absolute; top: 12%; bottom: 12%; left: -3px; width: 3px;
@@ -282,6 +282,26 @@
   .led { animation: blinkled 1s steps(2) infinite; }
   @keyframes blinkled { 50% { opacity: .15; } }
 
+  /* ---------- bathroom attendant ---------- */
+  #attendantbox { position: absolute; left: 1%; bottom: 7%; width: clamp(78px, 22vw, 118px); z-index: 6;
+    pointer-events: none; }
+  #attendantbox .chip { position: absolute; left: 50%; transform: translateX(-50%); bottom: 101%;
+    background: rgba(20,26,36,.9); border: 1px solid #6b5a2e; color: #ffd76a; border-radius: 8px;
+    font-size: 10px; padding: 2px 6px; white-space: nowrap; animation: bob 1.8s ease-in-out infinite; }
+  #attrow { display: none; margin-top: 10px; }
+  #attrow.show { display: block; }
+  #attrow .attq { font-weight: bold; color: #ffd76a; margin-bottom: 8px; }
+  #attrow .attbtns { display: flex; gap: 6px; }
+  #attrow button { flex: 1; font-family: inherit; font-weight: bold; font-size: clamp(11px, 3vw, 13px);
+    padding: 9px 4px; border: none; border-radius: 10px; color: #fff; cursor: pointer; line-height: 1.25; }
+  #attrow .tip { background: linear-gradient(#37c97a, #229458); }
+  #attrow .col { background: linear-gradient(#8a6fd0, #6247a8); }
+  #attrow .walk { background: linear-gradient(#5a6a80, #425063); }
+  #attnote { margin-top: 8px; color: #cdd8e4; display: none; }
+  #attnote.show { display: block; }
+  #shieldchip { display: none; border-color: #37c97a; color: #8ff0b4; }
+  #shieldchip.on { display: inline-block; }
+
   .toast { position: absolute; left: 50%; top: 14%; transform: translateX(-50%); background: rgba(16,20,27,.92);
     border: 1px solid #3a4a63; padding: 8px 14px; border-radius: 10px; font-size: 14px; z-index: 40;
     animation: toastfade 1.6s forwards; pointer-events: none; white-space: nowrap; }
@@ -354,6 +374,7 @@
     <span class="hudchip" id="roundchip">Round 1/10</span>
     <span class="hudchip" id="streakchip">🔥 0</span>
     <span class="hudchip" id="drinkchip">🍺 0</span>
+    <span class="hudchip" id="shieldchip">🧖 towel</span>
     <span class="spacer"></span>
     <span class="hudchip" id="scorechip">0 pts</span>
     <span class="hudchip" id="lives">👖👖👖</span>
@@ -397,10 +418,20 @@
       <div id="row"></div>
       <div id="flash"></div>
       <div id="fx"></div>
+      <div id="attendantbox"></div>
       <div id="verdict"></div>
       <div id="lesson">
         <div class="ltitle"><span class="lpts" id="lpts"></span><span id="ltitle"></span></div>
         <div id="ltext"></div>
+        <div id="attrow">
+          <div class="attq">🧖 The attendant blocks your path to the sinks. Towel over his arm. Eyebrows raised.</div>
+          <div class="attbtns">
+            <button class="tip" id="att-tip">💵 Tip $2<br><small>−20 pts, towel blessing</small></button>
+            <button class="col" id="att-col">🧴 Free cologne<br><small>+25 pts, strong musk</small></button>
+            <button class="walk" id="att-walk">🚶 Walk past<br><small>risky…</small></button>
+          </div>
+        </div>
+        <div id="attnote"></div>
         <button id="nextbtn">NEXT →</button>
       </div>
     </div>
@@ -593,6 +624,55 @@ function urinalSVG() {
   </svg>`;
 }
 
+/* The attendant: vest, bowtie, towel over the arm, and a station of wares. */
+function attendantSVG() {
+  const skin = pick(["#e8b48a", "#c68b5e", "#8d5a3b", "#f0c9a5", "#6b4429"]);
+  return `<svg viewBox="0 0 130 150" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="42" cy="145" rx="24" ry="4.5" fill="rgba(0,0,0,.28)"/>
+    <!-- station table -->
+    <rect x="84" y="96" width="44" height="6" rx="2" fill="#7a5b3a"/>
+    <rect x="88" y="102" width="5" height="42" fill="#5d4429"/>
+    <rect x="119" y="102" width="5" height="42" fill="#5d4429"/>
+    <rect x="88" y="80" width="12" height="16" rx="2" fill="#f5f7f9"/>
+    <rect x="88" y="84" width="12" height="2" fill="#d5dbe1"/>
+    <rect x="88" y="89" width="12" height="2" fill="#d5dbe1"/>
+    <rect x="103" y="82" width="6" height="14" rx="2" fill="#8a6fd0"/>
+    <rect x="104.5" y="79" width="3" height="4" fill="#5c4694"/>
+    <rect x="111" y="84" width="6" height="12" rx="2" fill="#5ec3c9"/>
+    <path d="M119 96 a5 7 0 0 1 10 0 l-1 -12 a4 4 0 0 0 -8 0 z" fill="rgba(190,225,240,.8)" stroke="#9ab4c2"/>
+    <text x="120" y="94" font-size="7">💵</text>
+    <!-- attendant -->
+    <rect x="30" y="96" width="9" height="46" rx="4" fill="#1d2430"/>
+    <rect x="45" y="96" width="9" height="46" rx="4" fill="#1d2430"/>
+    <rect x="27" y="139" width="14" height="7" rx="3.5" fill="#111"/>
+    <rect x="43" y="139" width="14" height="7" rx="3.5" fill="#111"/>
+    <path d="M26 46 q0 -9 8 -10 l16 0 q8 1 8 10 l0 46 q0 8 -8 8 l-16 0 q-8 0 -8 -8 Z" fill="#f5f6f8"/>
+    <path d="M26 46 q0 -9 8 -10 l4 0 l0 64 l-4 0 q-8 0 -8 -8 Z" fill="#23262e"/>
+    <path d="M58 46 q0 -9 -8 -10 l-4 0 l0 64 l4 0 q8 0 8 -8 Z" fill="#23262e"/>
+    <circle cx="42" cy="52" r="1.6" fill="#c9a83a"/><circle cx="42" cy="62" r="1.6" fill="#c9a83a"/>
+    <path d="M37 38 l5 4 l5 -4 l-2 -2 l-6 0 Z" fill="#8a1f1f"/>
+    <!-- left arm folded with towel -->
+    <path d="M26 48 q-8 8 -6 18 q1 5 8 5 l16 0 l0 -8 l-12 0 q-3 -8 -6 -15 Z" fill="#23262e"/>
+    <rect x="20" y="66" width="26" height="14" rx="2" fill="#f5f7f9"/>
+    <rect x="20" y="70" width="26" height="2" fill="#d5dbe1"/>
+    <rect x="20" y="75" width="26" height="2" fill="#d5dbe1"/>
+    <!-- right arm presenting -->
+    <path d="M58 48 q10 6 10 16 q0 5 -6 6 l-6 -2 q3 -10 2 -20 Z" fill="#23262e"/>
+    <circle cx="63" cy="68" r="4" fill="${skin}"/>
+    <rect x="30" y="28" width="8" height="9" fill="${skin}"/>
+    <rect x="30" y="28" width="24" height="0" fill="none"/>
+    <circle cx="42" cy="18" r="12" fill="${skin}"/>
+    <ellipse cx="31" cy="20" rx="2.2" ry="3.2" fill="${skin}"/>
+    <ellipse cx="53" cy="20" rx="2.2" ry="3.2" fill="${skin}"/>
+    <path d="M30 15 Q42 4 54 15 L54 12 Q42 2 30 12 Z" fill="#2b2119"/>
+    <rect x="34.5" y="16.5" width="5" height="1.6" rx="0.8" fill="#2b2119"/>
+    <rect x="44.5" y="16.5" width="5" height="1.6" rx="0.8" fill="#2b2119"/>
+    <circle cx="37" cy="20" r="1.6" fill="#1d2430"/>
+    <circle cx="47" cy="20" r="1.6" fill="#1d2430"/>
+    <path d="M38 26 q4 3 8 0" stroke="#1d2430" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+
 function suitcaseSVG() {
   const c = pick(["#c0392b", "#2c5f8a", "#3b7a4a", "#7a4a8a", "#333"]);
   const cd = "rgba(0,0,0,.28)";
@@ -716,12 +796,12 @@ const ROUND_PLAN = [
   { theme: "coffee",  n: [4, 5],  occ: [1, 1], div: 0,   time: 9 },                               // 2
   { theme: "mall",    n: [5, 6],  occ: [2, 2], div: 0,   time: 9 },                               // 3
   { theme: "office",  n: [6, 7],  occ: [2, 2], div: 1,   time: 8 },                               // 4: dividers
-  { theme: "tech",    n: [6, 7],  occ: [2, 3], div: .4,  time: 8, glasses: true },                // 5: REC guy
+  { theme: "tech",    n: [6, 7],  occ: [2, 3], div: .4,  time: 8, glasses: true, attendant: .5 }, // 5: REC guy
   { theme: "divebar", n: [6, 8],  occ: [2, 3], div: 0,   time: 8, trough: true },                 // 6: trough
-  { theme: "airport", n: [7, 8],  occ: [3, 3], div: .3,  time: 7, traveler: true },               // 7: luggage
+  { theme: "airport", n: [7, 8],  occ: [3, 3], div: .3,  time: 7, traveler: true, attendant: .7 },// 7: luggage
   { theme: "station", n: [5, 6],  occ: [2, 3], div: 0,   time: 7, waitRound: true, traveler: .5 },// 8: walk away
   { theme: "stadium", n: [7, 9],  occ: [3, 4], div: 0,   time: 7, tub: true, glasses: .4 },       // 9: the shame tub
-  { theme: "festival",n: [10,10], occ: [4, 5], div: .3,  time: 6, glasses: .5, traveler: .4, trough: .25 }, // 10
+  { theme: "festival",n: [10,10], occ: [4, 5], div: .3,  time: 6, glasses: .5, traveler: .4, trough: .25, attendant: .5 }, // 10
 ];
 
 /* ---------- endless plan generator: infinite combinations ---------- */
@@ -744,6 +824,7 @@ function endlessPlan(r) {
     div: (trough || tub) ? 0 : .35,
     glasses: Math.min(.7, .12 + r * .05),
     traveler: tub ? 0 : traveler,
+    attendant: r >= 2 ? .25 : 0,
     time: Math.max(4.5, 9 - r * 0.3),
   };
 }
@@ -814,7 +895,8 @@ function makeRound(idx) {
       });
     }
 
-    round = { idx, theme, themeKey: plan.theme, plan, n, spots, dividers, layout, luggageAt, time: plan.time };
+    round = { idx, theme, themeKey: plan.theme, plan, n, spots, dividers, layout, luggageAt, time: plan.time,
+      attendant: layout === "wall" && chance(plan.attendant) };
     analyze(round);
 
     const isWait = round.bestRaw <= 1.0 && occupiedIdx.length > 0;
@@ -919,6 +1001,11 @@ function renderRound(round) {
       : round.dividers ? " — dividers installed"
       : round.theme.flavor ? ` — ${round.theme.flavor}` : "");
 
+  const ab = $("attendantbox");
+  ab.innerHTML = round.attendant
+    ? attendantSVG() + `<div class="chip">${pick(["towel? cologne? gum?", "tips appreciated 🙏", "welcome, welcome", "I've seen things…"])}</div>`
+    : "";
+
   const row = $("row"), rowfar = $("rowfar");
   row.innerHTML = ""; rowfar.innerHTML = "";
 
@@ -962,6 +1049,7 @@ function updateHUD() {
   dc.textContent = desperate() ? `🍺 ${G.drinks} 🚨` : `🍺 ${G.drinks} · +${G.drinks * 10}%`;
   dc.classList.toggle("on", G.drinks > 0);
   dc.classList.toggle("danger", desperate());
+  $("shieldchip").classList.toggle("on", !!G.shield);
   const wb = $("waitbtn");
   wb.classList.toggle("danger", desperate());
   wb.innerHTML = desperate()
@@ -1028,6 +1116,54 @@ function showLesson(title, text, pts) {
   $("lesson").classList.add("show");
   const r = G.cur;
   if (!r.isWaitRound) r.bestSpots.forEach(i => { const el = slotEl(i); if (el) el.classList.add("best-mark"); });
+}
+
+/* ---------- the attendant intercept ---------- */
+function showAttendant() {
+  $("attrow").classList.add("show");
+  $("attnote").classList.remove("show");
+  $("nextbtn").style.display = "none";
+}
+function attendantDone(note) {
+  $("attrow").classList.remove("show");
+  const n = $("attnote");
+  n.innerHTML = note; n.classList.add("show");
+  $("nextbtn").style.display = "";
+  updateHUD();
+}
+function attTip() {
+  G.score = Math.max(0, G.score - 20);
+  G.shield = true;
+  buzz(25); sfx.good();
+  attendantDone(`🧖 "A gentleman." He drapes a towel over your shoulder. ` +
+    `<b>Towel blessing active</b> — your next splash gets toweled off, pants intact.`);
+}
+function attCologne() {
+  G.score += 25;
+  G.musk = true;
+  buzz([20, 30, 20]); sfx.ok();
+  attendantDone(`🧴 Two sprays. Direct hit. <b>+25 pts</b>, but the musk is <i>substantial</i> — ` +
+    `next round's timer runs 12% faster while the cloud follows you.`);
+}
+function attWalk() {
+  if (Math.random() < 0.5) {
+    G.score = Math.max(0, G.score - 15);
+    buzz([60, 40, 60]); sfx.splash();
+    const fx = $("fx");
+    for (let k = 0; k < 8; k++) {
+      const d = document.createElement("div");
+      d.className = "droplet";
+      d.style.width = "8px"; d.style.height = "10px";
+      d.style.left = rand(2, 30) + "%"; d.style.top = rand(30, 55) + "%";
+      d.style.setProperty("--dx", rand(-20, 20) + "px");
+      fx.appendChild(d); setTimeout(() => d.remove(), 1400);
+    }
+    attendantDone(`🧴 He mists you anyway. From distance. With intent. <b>−15 pts.</b> ` +
+      `You smell like a limousine now.`);
+  } else {
+    attendantDone(`🚶 You power-walk past the station. He says "God bless" in a tone ` +
+      `that means the opposite. You feel his eyes until the door closes.`);
+  }
 }
 
 function spotName(r, i) {
@@ -1116,6 +1252,7 @@ function resolveChoice(i) {
       showLesson("Desperate times.",
         `No good options, but ${drinksAtPick} drinks past the point of no return, the door wasn't one either. ` +
         `You took the least-bad spot, stared straight ahead, and said nothing. Respect.`, pts);
+      if (r.attendant) showAttendant();
       updateHUD();
       return;
     }
@@ -1138,6 +1275,7 @@ function resolveChoice(i) {
     markSlot(i, "chosen-good");
     showLesson("Textbook etiquette. 👌",
       `Optimal pick: ${describeBest(r)}.${buzzNote} ${G.streak >= 3 ? `🔥 ${G.streak}-streak multiplier active!` : ""}`, pts);
+    if (r.attendant) showAttendant();
   } else if (sc.eff > 1.0) {
     G.streak = 0;
     const pts = Math.round(40 * buzzMult());
@@ -1149,6 +1287,7 @@ function resolveChoice(i) {
     showLesson("Fine. Technically fine.",
       `No splash zone, but the pros would take ${describeBest(r)}. Streak reset — and no reward drink, ` +
       `which honestly might be the smart play for your bladder.`, pts);
+    if (r.attendant) showAttendant();
   } else {
     relieve();
     const eyeContact = r.layout === "tub" &&
@@ -1162,7 +1301,19 @@ function resolveChoice(i) {
 }
 
 function fail(i, big, text) {
-  G.streak = 0; G.lives--; G.splashes++;
+  G.streak = 0;
+  if (G.shield) {
+    G.shield = false;
+    buzz([40, 30, 40]); sfx.ok();
+    verdict("TOWELED OFF! 🧖", "ok");
+    if (i >= 0) markSlot(i, "chosen-bad");
+    showLesson("The attendant's blessing pays out.",
+      text + ` But the attendant appears out of nowhere with a towel and <b>saves your pants</b>. ` +
+      `That's what the $2 was for. Blessing spent.`, 0);
+    updateHUD();
+    return;
+  }
+  G.lives--; G.splashes++;
   splashFX(false);
   verdict(big, "bad");
   if (i >= 0) markSlot(i, "chosen-bad");
@@ -1251,11 +1402,15 @@ function onTimeout() {
 function startRound() {
   G.locked = false;
   $("lesson").classList.remove("show");
+  $("attrow").classList.remove("show");
+  $("attnote").classList.remove("show");
+  $("nextbtn").style.display = "";
   $("verdict").className = "";
   G.cur = makeRound(G.round);
   renderRound(G.cur);
   updateHUD();
-  const factor = Math.max(0.5, 1 - 0.12 * G.drinks); // every drink makes the clock meaner
+  let factor = Math.max(0.5, 1 - 0.12 * G.drinks); // every drink makes the clock meaner
+  if (G.musk) { factor *= 0.88; G.musk = false; toast("🧴 The cologne cloud precedes you. Timer −12%."); }
   startTimer(G.cur.time * factor);
   if (desperate()) toast(`🚨 ${G.drinks} drinks deep — you CANNOT walk away from this one!`);
 }
@@ -1319,7 +1474,8 @@ function endGame(survived) {
 }
 
 function resetGame(mode) {
-  Object.assign(G, { mode: mode || G.mode, round: 0, score: 0, streak: 0, lives: 3, drinks: 0, pissed: false, splashes: 0, perfects: 0, locked: false });
+  Object.assign(G, { mode: mode || G.mode, round: 0, score: 0, streak: 0, lives: 3, drinks: 0, pissed: false,
+    shield: false, musk: false, splashes: 0, perfects: 0, locked: false });
   $("end").classList.add("hidden");
   $("start").classList.add("hidden");
   startRound();
@@ -1342,6 +1498,9 @@ $("menubtn").addEventListener("click", () => { $("end").classList.add("hidden");
 $("nextbtn").addEventListener("click", () => nextRound());
 $("waitbtn").addEventListener("click", () => onWait());
 $("locbtn").addEventListener("click", () => localizeStadium());
+$("att-tip").addEventListener("click", () => attTip());
+$("att-col").addEventListener("click", () => attCologne());
+$("att-walk").addEventListener("click", () => attWalk());
 </script>
 </body>
 </html>
