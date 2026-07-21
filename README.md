@@ -1,3 +1,37 @@
+# Games in this repo
+
+| Game | File | What it is |
+|---|---|---|
+| 🍄 Super Plumber Bros | `index.html` | Mobile-first level 1-1 platformer |
+| 🚹 The Urinal Test | `urinal-test.html` | 10 rounds of spatial etiquette under pressure |
+
+## 🚹 The Urinal Test
+
+A single-file browser game that tests the one skill they never teach in school:
+**picking the right urinal.** 10 rounds, 4–10 urinals each, escalating difficulty.
+
+- **The etiquette engine** scores every open spot: distance from occupants,
+  end-urinal bonus, divider mitigation. Optimal pick = *Perfect*; safe but
+  suboptimal = *Acceptable* (streak resets); adjacent when you had options =
+  **splashed** — haptic vibration, screen shake, droplet overlay, and you lose
+  one of 3 pairs of dry pants.
+- **Rounds vary**: some have dividers, some are old-school **troughs**
+  (dive bar, stadium), and airport/train-station rounds feature **travelers
+  whose rolling luggage blocks a spot** (pick it and you trip).
+- **The Meta smart-glasses guy** (🔴 REC) needs extra distance — dividers don't
+  help, you're on his livestream.
+- **The pro move**: some boards have no acceptable spot. The 🚪 *"Hold it &
+  walk away"* door is the correct answer — but bail on a solvable board and
+  you've chickened out.
+- **Bladder timer**, streak multipliers, synthesized sound effects, and a
+  one-line etiquette lesson after every choice. Final ranks from *Splash
+  Survivor* to *Urinal Grandmaster*.
+
+Open `urinal-test.html` in any browser — best on a phone, where wrong picks
+trigger real haptic feedback.
+
+---
+
 # Super Plumber Bros — Level 1 🍄
 
 A high-resolution, mobile-first homage to the classic first level — built as a

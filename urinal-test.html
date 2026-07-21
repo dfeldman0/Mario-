@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>The Urinal Test</title>
+<style>
+  :root {
+    --wall: #b7d4d8;
+    --wall2: #9fc3c8;
+    --floor: #8a8f98;
+    --porcelain: #f4f6f8;
+    --porcelain-shade: #d7dde3;
+    --accent: #2fb46b;
+    --danger: #e6483d;
+    --warn: #e6a23d;
+    --ink: #1d2430;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+    background: #10141b;
+    color: #eef2f6;
+    overflow: hidden;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #app { height: 100%; display: flex; flex-direction: column; max-width: 900px; margin: 0 auto; position: relative; }
+
+  /* ---------- screens ---------- */
+  .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; text-align: center; padding: 24px; background: #10141b; z-index: 50;
+    overflow-y: auto; }
+  .screen.hidden { display: none; }
+  .screen h1 { font-size: clamp(30px, 8vw, 52px); letter-spacing: 1px; margin-bottom: 4px; }
+  .screen h1 .drop { color: #57b8ff; }
+  .tagline { color: #9fb0c3; margin-bottom: 18px; font-size: clamp(14px, 3.5vw, 17px); }
+  .rules { background: #1a2130; border: 1px solid #2b3547; border-radius: 14px; padding: 14px 18px;
+    text-align: left; max-width: 480px; margin-bottom: 20px; font-size: clamp(13px, 3.4vw, 15px); line-height: 1.55; }
+  .rules b { color: #ffd76a; }
+  .rules li { margin: 6px 0 6px 18px; }
+  .bigbtn { font-family: inherit; font-size: clamp(17px, 4.5vw, 21px); font-weight: bold; color: #fff;
+    background: linear-gradient(#37c97a, #229458); border: none; border-radius: 12px;
+    padding: 14px 38px; cursor: pointer; box-shadow: 0 4px 0 #176b3e; }
+  .bigbtn:active { transform: translateY(3px); box-shadow: 0 1px 0 #176b3e; }
+  .subnote { margin-top: 14px; color: #66788d; font-size: 12px; }
+
+  /* ---------- HUD ---------- */
+  #hud { display: flex; align-items: center; gap: 10px; padding: 10px 12px 6px; font-size: clamp(13px, 3.4vw, 16px); }
+  #hud .spacer { flex: 1; }
+  .hudchip { background: #1a2130; border: 1px solid #2b3547; border-radius: 10px; padding: 5px 10px; white-space: nowrap; }
+  #lives { letter-spacing: 2px; }
+  #streakchip.hot { border-color: #e6a23d; color: #ffd76a; }
+
+  #themebar { text-align: center; font-size: clamp(12px, 3.2vw, 14px); color: #9fb0c3; padding: 2px 10px 6px; min-height: 22px; }
+  #themebar b { color: #eef2f6; }
+
+  /* bladder meter */
+  #bladderwrap { margin: 0 12px 8px; height: 14px; background: #1a2130; border: 1px solid #2b3547;
+    border-radius: 8px; overflow: hidden; position: relative; }
+  #bladder { height: 100%; width: 100%; background: linear-gradient(90deg, #57b8ff, #2f7fd4); transition: width .2s linear; }
+  #bladderwrap.low #bladder { background: linear-gradient(90deg, #ffb15c, #e6483d); }
+  #bladderwrap::after { content: "BLADDER"; position: absolute; inset: 0; font-size: 9px; letter-spacing: 3px;
+    display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.75); }
+
+  /* ---------- scene ---------- */
+  #scenewrap { flex: 1; position: relative; margin: 0 8px; min-height: 0; }
+  #scene { position: absolute; inset: 0; border-radius: 14px; overflow: hidden;
+    background:
+      linear-gradient(rgba(0,0,0,.05), rgba(0,0,0,0) 30%),
+      repeating-linear-gradient(0deg, var(--wall) 0 34px, var(--wall2) 34px 36px),
+      repeating-linear-gradient(90deg, transparent 0 58px, rgba(0,0,0,.06) 58px 60px);
+  }
+  #scene .floor { position: absolute; left: 0; right: 0; bottom: 0; height: 34%;
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 2px, transparent 2px 46px),
+      linear-gradient(#9aa0aa, #767c88);
+  }
+  #scene .floorline { position: absolute; left: 0; right: 0; bottom: 34%; height: 6px; background: rgba(0,0,0,.18); }
+  #backdrop { position: absolute; top: 9%; left: 0; right: 0; text-align: center;
+    font-size: clamp(22px, 7vw, 34px); opacity: .75; letter-spacing: 14px; }
+
+  #row { position: absolute; left: 0; right: 0; bottom: 8%; top: 18%; display: flex;
+    align-items: flex-end; justify-content: center; padding: 0 8px; }
+
+  .slot { position: relative; flex: 1 1 0; max-width: 110px; height: 100%; cursor: pointer; }
+  .slot .fixture { position: absolute; left: 50%; transform: translateX(-50%); bottom: 26%; width: 78%; max-width: 70px; }
+  .slot .person { position: absolute; left: 50%; transform: translateX(-50%); bottom: 5%; width: 96%; max-width: 96px; pointer-events: none; }
+  .person .chip { position: absolute; left: 50%; transform: translateX(-50%); bottom: 100%; margin-bottom: 4px; background: rgba(20,26,36,.88);
+    border: 1px solid #3a4a63; color: #ffd76a; border-radius: 8px; font-size: 10px; padding: 2px 6px;
+    white-space: nowrap; pointer-events: none; animation: bob 1.6s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translate(-50%,0); } 50% { transform: translate(-50%,-4px); } }
+
+  .slot.free:not(.blocked):hover .fixture, .slot.free:not(.blocked):active .fixture { filter: drop-shadow(0 0 8px rgba(87,184,255,.9)); }
+  .slot.free:not(.blocked)::after { content: ""; position: absolute; left: 50%; bottom: 8%; width: 34px; height: 10px;
+    transform: translateX(-50%); border-radius: 50%; background: rgba(87,184,255,.35); animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: .25; } 50% { opacity: .8; } }
+  .slot.chosen-good .fixture { filter: drop-shadow(0 0 10px rgba(47,180,107,1)); }
+  .slot.chosen-bad .fixture  { filter: drop-shadow(0 0 10px rgba(230,72,61,1)); }
+  .slot.best-mark::before { content: "✔ best"; position: absolute; top: 2%; left: 50%; transform: translateX(-50%);
+    color: #6fe3a1; font-size: 11px; font-weight: bold; text-shadow: 0 1px 2px #000; z-index: 5; }
+
+  .divider { flex: 0 0 7px; height: 62%; align-self: flex-end; margin-bottom: 10%;
+    background: linear-gradient(90deg, #c9ced6, #8d939e); border-radius: 4px 4px 0 0; box-shadow: 1px 0 2px rgba(0,0,0,.3); }
+
+  #trough { position: absolute; left: 4%; right: 4%; bottom: 26%; height: 15%; display: none;
+    background: linear-gradient(#eef1f4, #c3cad2); border: 3px solid #9aa2ad; border-bottom-width: 6px;
+    border-radius: 10px 10px 14px 14px; box-shadow: inset 0 6px 10px rgba(0,0,0,.15); }
+  #scene.trough #trough { display: block; }
+  #scene.trough .fixture { display: none; }
+  #scene.trough .slot.free:not(.blocked)::after { bottom: 30%; background: rgba(60,80,100,.4); }
+
+  /* ---------- door / wait ---------- */
+  #waitbtn { margin: 8px 12px 10px; font-family: inherit; font-size: clamp(13px, 3.6vw, 16px); font-weight: bold;
+    color: #eef2f6; background: #223047; border: 1px solid #3a4a63; border-radius: 12px; padding: 12px; cursor: pointer; }
+  #waitbtn:active { background: #2c3d5a; }
+
+  /* ---------- feedback ---------- */
+  #verdict { position: absolute; left: 50%; top: 34%; transform: translate(-50%,-50%) scale(.6); opacity: 0;
+    font-size: clamp(26px, 8vw, 44px); font-weight: 900; letter-spacing: 1px; text-shadow: 0 3px 6px rgba(0,0,0,.5);
+    pointer-events: none; z-index: 20; transition: transform .18s ease-out, opacity .18s; white-space: nowrap; }
+  #verdict.show { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+  #verdict.good { color: #6fe3a1; } #verdict.ok { color: #ffd76a; } #verdict.bad { color: #ff7a6f; }
+
+  #lesson { position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 25;
+    background: rgba(16,20,27,.94); border: 1px solid #3a4a63; border-radius: 12px; padding: 12px;
+    font-size: clamp(13px, 3.5vw, 15px); line-height: 1.45; display: none; }
+  #lesson.show { display: block; animation: rise .25s ease-out; }
+  @keyframes rise { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+  #lesson .ltitle { font-weight: bold; margin-bottom: 4px; }
+  #lesson .lpts { float: right; color: #6fe3a1; font-weight: bold; }
+  #lesson button { margin-top: 10px; width: 100%; font-family: inherit; font-weight: bold; font-size: 15px;
+    padding: 10px; border: none; border-radius: 10px; background: #2f7fd4; color: #fff; cursor: pointer; }
+
+  /* ---------- splash FX ---------- */
+  #fx { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 30; }
+  .droplet { position: absolute; border-radius: 50% 50% 60% 60%; background: radial-gradient(circle at 35% 30%, rgba(255,255,240,.95), rgba(240,220,120,.65) 60%, rgba(200,170,60,.5));
+    box-shadow: 0 0 6px rgba(240,220,120,.5); animation: drip 1.1s ease-in forwards; }
+  @keyframes drip { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(46vh) scale(.75); opacity: 0; } }
+  #flash { position: absolute; inset: 0; background: rgba(230,72,61,.28); opacity: 0; pointer-events: none; z-index: 28; }
+  #flash.go { animation: flashy .5s ease-out; }
+  @keyframes flashy { 0% { opacity: 1; } 100% { opacity: 0; } }
+  #app.shake { animation: shake .5s; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    15% { transform: translateX(-12px) rotate(-1deg); } 30% { transform: translateX(10px) rotate(1deg); }
+    45% { transform: translateX(-8px); } 60% { transform: translateX(7px); } 75% { transform: translateX(-4px); }
+  }
+
+  /* meta glasses LED */
+  .led { animation: blinkled 1s steps(2) infinite; }
+  @keyframes blinkled { 50% { opacity: .15; } }
+
+  .toast { position: absolute; left: 50%; top: 14%; transform: translateX(-50%); background: rgba(16,20,27,.92);
+    border: 1px solid #3a4a63; padding: 8px 14px; border-radius: 10px; font-size: 14px; z-index: 40;
+    animation: toastfade 1.4s forwards; pointer-events: none; white-space: nowrap; }
+  @keyframes toastfade { 0% { opacity: 0; transform: translate(-50%,8px); } 15%,75% { opacity: 1; transform: translate(-50%,0); } 100% { opacity: 0; } }
+
+  .rank { font-size: clamp(20px, 6vw, 30px); color: #ffd76a; margin: 8px 0 2px; font-weight: 900; }
+  .finalscore { font-size: clamp(16px, 4.5vw, 20px); margin-bottom: 16px; }
+  .statline { color: #9fb0c3; font-size: 14px; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- START SCREEN -->
+  <div id="start" class="screen">
+    <h1>THE URINAL <span class="drop">TEST</span> 🚹</h1>
+    <div class="tagline">10 rounds. One sacred code. Do you have what it takes?</div>
+    <div class="rules">
+      <b>The Rules of the Restroom:</b>
+      <li><b>Maximize distance</b> from every occupied urinal.</li>
+      <li><b>Ends are elite</b> — a wall never judges you.</li>
+      <li><b>Dividers</b> soften a bad neighbor. Soften. Not fix.</li>
+      <li>Guy in <b>Meta smart glasses</b> (🔴 REC)? Extra distance. Always. Dividers don't help.</li>
+      <li>Watch for <b>luggage</b> in airports & stations — suitcases block spots and ankles.</li>
+      <li>The <b>trough</b> is lawless, but the code still applies.</li>
+      <li>No decent option? A true master <b>holds it and walks away</b>. 🚪</li>
+    </div>
+    <button class="bigbtn" id="startbtn">ENTER THE RESTROOM</button>
+    <div class="subnote">📱 Best on a phone — wrong picks trigger haptic splash feedback.</div>
+  </div>
+
+  <!-- END SCREEN -->
+  <div id="end" class="screen hidden">
+    <h1 id="endtitle">RESULTS</h1>
+    <div class="rank" id="ranktext"></div>
+    <div class="finalscore" id="finaltext"></div>
+    <div class="statline" id="stattext"></div>
+    <button class="bigbtn" id="againbtn">WASH HANDS & RETRY</button>
+    <div class="subnote">You washed your hands, right? …Right?</div>
+  </div>
+
+  <!-- GAME -->
+  <div id="hud">
+    <span class="hudchip" id="roundchip">Round 1/10</span>
+    <span class="hudchip" id="streakchip">🔥 0</span>
+    <span class="spacer"></span>
+    <span class="hudchip" id="scorechip">0 pts</span>
+    <span class="hudchip" id="lives">👖👖👖</span>
+  </div>
+  <div id="themebar"></div>
+  <div id="bladderwrap"><div id="bladder"></div></div>
+
+  <div id="scenewrap">
+    <div id="scene">
+      <div id="backdrop"></div>
+      <div class="floorline"></div>
+      <div class="floor"></div>
+      <div id="trough"></div>
+      <div id="row"></div>
+      <div id="flash"></div>
+      <div id="fx"></div>
+      <div id="verdict"></div>
+      <div id="lesson">
+        <div class="ltitle"><span class="lpts" id="lpts"></span><span id="ltitle"></span></div>
+        <div id="ltext"></div>
+        <button id="nextbtn">NEXT →</button>
+      </div>
+    </div>
+  </div>
+
+  <button id="waitbtn">🚪 Hold it &amp; walk away <span style="color:#9fb0c3">(pro move… sometimes)</span></button>
+</div>
+
+<script>
+"use strict";
+/* =========================================================
+   THE URINAL TEST — a game of spatial etiquette
+   ========================================================= */
+
+const $ = id => document.getElementById(id);
+const rand = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+/* ---------- haptics ---------- */
+function buzz(pattern) { if (navigator.vibrate) { try { navigator.vibrate(pattern); } catch (e) {} } }
+
+/* ---------- tiny synth ---------- */
+let actx = null;
+function audio() {
+  if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+  if (actx && actx.state === "suspended") actx.resume();
+  return actx;
+}
+function tone(freq, dur, type, gainV, when) {
+  const ac = audio(); if (!ac) return;
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.type = type || "sine"; o.frequency.value = freq;
+  g.gain.setValueAtTime(gainV || 0.12, ac.currentTime + (when || 0));
+  g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + (when || 0) + dur);
+  o.connect(g); g.connect(ac.destination);
+  o.start(ac.currentTime + (when || 0)); o.stop(ac.currentTime + (when || 0) + dur + 0.05);
+}
+function noiseBurst(dur, cutoff, gainV) {
+  const ac = audio(); if (!ac) return;
+  const len = ac.sampleRate * dur, buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+  const src = ac.createBufferSource(); src.buffer = buf;
+  const f = ac.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = cutoff;
+  const g = ac.createGain(); g.gain.value = gainV;
+  src.connect(f); f.connect(g); g.connect(ac.destination); src.start();
+}
+const sfx = {
+  good() { tone(660, .12, "sine", .12); tone(990, .18, "sine", .12, .1); },
+  ok()   { tone(520, .15, "sine", .1); },
+  splash() { noiseBurst(.5, 900, .3); tone(180, .3, "sawtooth", .08); },
+  flush()  { noiseBurst(1.2, 1600, .18); },
+  chicken() { tone(300, .2, "square", .07); tone(240, .3, "square", .07, .18); },
+};
+
+/* ---------- personas ---------- */
+const SHIRTS = ["#d95d4e", "#4e7fd9", "#5aa85e", "#b06fd0", "#d9a24e", "#5ec3c9", "#7d8794"];
+const PERSONAS = {
+  regular:  { chip: null,          desc: "a regular guy" },
+  glasses:  { chip: "🔴 REC",      desc: "the Meta smart-glasses guy" },
+  phone:    { chip: "“yeah… yeah…”", desc: "a guy on a speakerphone call" },
+  headphones: { chip: "♪ ♫",       desc: "a guy vibing in headphones" },
+  traveler: { chip: "✈️ gate B12",  desc: "a traveler with rolling luggage" },
+};
+
+function personSVG(persona) {
+  const shirt = pick(SHIRTS);
+  const skin = pick(["#e8b48a", "#c68b5e", "#8d5a3b", "#f0c9a5", "#6b4429"]);
+  const pants = pick(["#3a4553", "#54606e", "#2e3a49", "#5b4a3a"]);
+  const hair = pick(["#2b2119", "#4a382a", "#111", "#6e6e6e", "#a5763a"]);
+  let extra = "";
+  if (persona === "glasses") {
+    // temple arms of smart glasses + blinking LED, seen from behind
+    extra = `<rect x="14" y="20" width="32" height="3.4" rx="1.7" fill="#111"/>
+             <circle class="led" cx="45" cy="21.7" r="2.6" fill="#ff2d2d"/>`;
+  } else if (persona === "phone") {
+    extra = `<rect x="44" y="14" width="7" height="14" rx="2" fill="#222"/>
+             <rect x="45.2" y="16" width="4.6" height="9" rx="1" fill="#57b8ff"/>`;
+  } else if (persona === "headphones") {
+    extra = `<path d="M16 16 Q30 2 44 16" stroke="#222" stroke-width="4" fill="none"/>
+             <rect x="12" y="14" width="7" height="11" rx="3" fill="#222"/>
+             <rect x="41" y="14" width="7" height="11" rx="3" fill="#222"/>`;
+  } else if (persona === "traveler") {
+    // neck pillow
+    extra = `<path d="M14 27 Q30 38 46 27 L46 33 Q30 44 14 33 Z" fill="#9aa8b8"/>`;
+  }
+  return `<svg viewBox="0 0 60 120" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="30" cy="116" rx="20" ry="4" fill="rgba(0,0,0,.25)"/>
+    <rect x="18" y="78" width="9" height="36" rx="4" fill="${pants}"/>
+    <rect x="33" y="78" width="9" height="36" rx="4" fill="${pants}"/>
+    <rect x="16" y="112" width="13" height="6" rx="3" fill="#222"/>
+    <rect x="31" y="112" width="13" height="6" rx="3" fill="#222"/>
+    <rect x="13" y="34" width="34" height="50" rx="10" fill="${shirt}"/>
+    <rect x="13" y="34" width="34" height="8" rx="4" fill="rgba(0,0,0,.12)"/>
+    <circle cx="30" cy="18" r="13" fill="${skin}"/>
+    <path d="M17 16 A13 13 0 0 1 43 16 L43 12 A13 13 0 0 0 17 12 Z" fill="${hair}"/>
+    <path d="M17 16 Q30 26 43 16 L43 10 Q30 4 17 10 Z" fill="${hair}"/>
+    ${extra}
+  </svg>`;
+}
+
+function urinalSVG() {
+  return `<svg viewBox="0 0 70 110" xmlns="http://www.w3.org/2000/svg">
+    <rect x="30" y="0" width="10" height="16" fill="#c3ccd4"/>
+    <rect x="24" y="12" width="22" height="9" rx="3" fill="#aeb8c2"/>
+    <path d="M12 22 h46 a4 4 0 0 1 4 4 v38 a27 27 0 0 1 -27 27 a27 27 0 0 1 -27 -27 v-38 a4 4 0 0 1 4 -4 z"
+      fill="var(--porcelain)" stroke="#b9c2cb" stroke-width="2"/>
+    <path d="M20 30 h30 a3 3 0 0 1 3 3 v28 a18 18 0 0 1 -18 18 a18 18 0 0 1 -18 -18 v-28 a3 3 0 0 1 3 -3 z"
+      fill="var(--porcelain-shade)"/>
+    <ellipse cx="35" cy="72" rx="7" ry="4" fill="#aab6c0"/>
+  </svg>`;
+}
+
+function suitcaseSVG() {
+  return `<svg viewBox="0 0 60 120" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="30" cy="114" rx="18" ry="4" fill="rgba(0,0,0,.25)"/>
+    <rect x="26" y="30" width="5" height="30" fill="#666"/>
+    <rect x="18" y="24" width="22" height="8" rx="4" fill="#666"/>
+    <rect x="10" y="52" width="40" height="56" rx="8" fill="#c0392b" stroke="#8e2a20" stroke-width="2"/>
+    <line x1="22" y1="52" x2="22" y2="108" stroke="#8e2a20" stroke-width="2"/>
+    <line x1="38" y1="52" x2="38" y2="108" stroke="#8e2a20" stroke-width="2"/>
+    <circle cx="18" cy="112" r="5" fill="#333"/><circle cx="42" cy="112" r="5" fill="#333"/>
+    <rect x="14" y="66" width="12" height="9" rx="2" fill="#f5d76e"/>
+  </svg>`;
+}
+
+/* ---------- themes ---------- */
+const THEMES = {
+  office:   { name: "Office Park Restroom", icon: "🏢", wall: "#b7d4d8", wall2: "#9fc3c8", backdrop: "🧻  🧼  🧻" },
+  coffee:   { name: "Hipster Coffee Shop", icon: "☕", wall: "#d8ccb7", wall2: "#c8bb9f", backdrop: "🪴  ☕  🪴" },
+  mall:     { name: "Shopping Mall", icon: "🛍️", wall: "#c9c9d8", wall2: "#b3b3c8", backdrop: "🛍️  🎈  🛍️" },
+  tech:     { name: "Tech Conference", icon: "🤖", wall: "#b7c2d8", wall2: "#9fadc8", backdrop: "🤖  📡  🤖" },
+  divebar:  { name: "Dive Bar (est. 1972)", icon: "🍺", wall: "#c4b49a", wall2: "#b0a084", backdrop: "🍺  🎯  🍺" },
+  airport:  { name: "Airport Terminal C", icon: "✈️", wall: "#b7d8cf", wall2: "#9fc8bd", backdrop: "✈️  🛄  ✈️" },
+  station:  { name: "Grand Central Station", icon: "🚆", wall: "#d8c9b7", wall2: "#c8b69f", backdrop: "🚆  🕰️  🚆" },
+  stadium:  { name: "Stadium — Halftime Rush", icon: "🏟️", wall: "#b7d8b9", wall2: "#9fc8a2", backdrop: "🏟️  🌭  ⚾" },
+  festival: { name: "Music Festival", icon: "🎸", wall: "#d8b7d0", wall2: "#c89fbe", backdrop: "🎸  🔊  🎤" },
+};
+
+/* ---------- round scripts (difficulty curve) ---------- */
+const ROUND_PLAN = [
+  { theme: "office",  n: [5, 5],  occ: [0, 0], div: 0,   time: 10 },                             // 1: empty tutorial
+  { theme: "coffee",  n: [4, 5],  occ: [1, 1], div: 0,   time: 9 },                              // 2
+  { theme: "mall",    n: [5, 6],  occ: [2, 2], div: 0,   time: 9 },                              // 3
+  { theme: "office",  n: [6, 7],  occ: [2, 2], div: 1,   time: 8 },                              // 4: dividers
+  { theme: "tech",    n: [6, 7],  occ: [2, 3], div: .4,  time: 8, glasses: true },               // 5: REC guy
+  { theme: "divebar", n: [6, 8],  occ: [2, 3], div: 0,   time: 8, trough: true },                // 6: trough
+  { theme: "airport", n: [7, 8],  occ: [3, 3], div: .3,  time: 7, traveler: true },              // 7: luggage
+  { theme: "station", n: [5, 6],  occ: [2, 3], div: 0,   time: 7, waitRound: true, traveler: .5 },// 8: walk away
+  { theme: "stadium", n: [8, 9],  occ: [3, 4], div: .5,  time: 6, glasses: .4, traveler: .3 },   // 9
+  { theme: "festival",n: [10,10], occ: [4, 5], div: .3,  time: 6, glasses: .5, traveler: .4, trough: .25 }, // 10
+];
+
+/* ---------- game state ---------- */
+const G = {
+  round: 0, score: 0, streak: 0, lives: 3,
+  splashes: 0, perfects: 0,
+  cur: null, timer: null, timeLeft: 0, locked: false,
+};
+
+/* ---------- round generation ---------- */
+function chance(v) { return v === true || Math.random() < (v || 0); }
+
+function makeRound(idx) {
+  const plan = ROUND_PLAN[idx];
+  const theme = THEMES[plan.theme];
+  for (let attempt = 0; attempt < 80; attempt++) {
+    const n = rand(plan.n[0], plan.n[1]);
+    const occCount = Math.min(rand(plan.occ[0], plan.occ[1]), n - 2);
+    const trough = chance(plan.trough);
+    const dividers = !trough && chance(plan.div);
+
+    const spots = Array.from({ length: n }, () => ({ occupant: null, blocked: false }));
+
+    if (plan.waitRound) {
+      // Occupy so that every free spot is adjacent to someone; no dividers.
+      const occIdx = n <= 5 ? [1, 3] : [1, 4];
+      occIdx.forEach(i => { if (i < n) spots[i].occupant = "regular"; });
+    } else {
+      const order = [...Array(n).keys()].sort(() => Math.random() - 0.5);
+      for (let k = 0; k < occCount; k++) spots[order[k]].occupant = "regular";
+    }
+
+    // assign personas
+    const occupiedIdx = spots.map((s, i) => s.occupant ? i : -1).filter(i => i >= 0);
+    if (occupiedIdx.length) {
+      if (chance(plan.glasses)) spots[pick(occupiedIdx)].persona = "glasses";
+      if (chance(plan.traveler)) {
+        const cand = occupiedIdx.filter(i => !spots[i].persona);
+        if (cand.length) spots[pick(cand)].persona = "traveler";
+      }
+      occupiedIdx.forEach(i => {
+        if (!spots[i].persona) spots[i].persona = Math.random() < 0.3 ? pick(["phone", "headphones"]) : "regular";
+      });
+    }
+
+    // traveler luggage blocks an adjacent free spot
+    let luggageAt = -1;
+    occupiedIdx.forEach(i => {
+      if (spots[i].persona === "traveler" && luggageAt < 0) {
+        const sides = [i - 1, i + 1].filter(j => j >= 0 && j < n && !spots[j].occupant);
+        if (sides.length) { luggageAt = pick(sides); spots[luggageAt].blocked = true; }
+      }
+    });
+
+    const round = { idx, theme, plan, n, spots, dividers, trough, luggageAt, time: plan.time };
+    analyze(round);
+
+    const isWait = round.bestRaw <= 1.0 && occupiedIdx.length > 0;
+    if (plan.waitRound && !isWait) continue;
+    if (!plan.waitRound && isWait) continue;
+    if (!plan.waitRound && round.selectable.length < 2 && idx > 0) continue;
+    return round;
+  }
+  return makeRound(idx); // extremely unlikely
+}
+
+/* ---------- etiquette engine ---------- */
+function comfortOf(round, i) {
+  const { spots, n, dividers } = round;
+  let minRaw = 99, adjGlasses = false, hasAdjacent = false;
+  for (let j = 0; j < n; j++) {
+    if (!spots[j].occupant) continue;
+    let d = Math.abs(i - j);
+    if (spots[j].persona === "glasses") d -= 0.5; // his presence is... larger
+    if (Math.abs(i - j) === 1) { hasAdjacent = true; if (spots[j].persona === "glasses") adjGlasses = true; }
+    if (d < minRaw) minRaw = d;
+  }
+  let eff = minRaw;
+  if (adjGlasses) eff = Math.min(eff, 0.5);
+  else if (minRaw === 1 && hasAdjacent && dividers) eff = 1.5; // divider softens a direct neighbor
+  const isEnd = (i === 0 || i === n - 1);
+  return { raw: minRaw, eff, comfort: eff + (isEnd ? 0.25 : 0), isEnd };
+}
+
+function analyze(round) {
+  round.scores = round.spots.map((s, i) =>
+    (!s.occupant && !s.blocked) ? comfortOf(round, i) : null);
+  round.selectable = round.scores.map((s, i) => s ? i : -1).filter(i => i >= 0);
+  round.bestComfort = Math.max(...round.selectable.map(i => round.scores[i].comfort), -1);
+  round.bestRaw = Math.max(...round.selectable.map(i => round.scores[i].eff), -1);
+  round.bestSpots = round.selectable.filter(i => round.scores[i].comfort >= round.bestComfort - 0.01);
+  round.isWaitRound = round.bestRaw <= 1.0 && round.spots.some(s => s.occupant);
+}
+
+/* ---------- rendering ---------- */
+function renderRound(round) {
+  const scene = $("scene");
+  scene.classList.toggle("trough", round.trough);
+  document.documentElement.style.setProperty("--wall", round.theme.wall);
+  document.documentElement.style.setProperty("--wall2", round.theme.wall2);
+  $("backdrop").textContent = round.theme.backdrop;
+  $("themebar").innerHTML = `${round.theme.icon} <b>${round.theme.name}</b>` +
+    (round.trough ? " — old-school trough" : round.dividers ? " — dividers installed" : "");
+
+  const row = $("row");
+  row.innerHTML = "";
+  round.spots.forEach((s, i) => {
+    const slot = document.createElement("div");
+    slot.className = "slot";
+    slot.dataset.i = i;
+    let inner = `<div class="fixture">${urinalSVG()}</div>`;
+    if (round.trough) inner = "";
+    if (s.occupant) {
+      slot.classList.add("occupied");
+      const chip = PERSONAS[s.persona].chip;
+      inner += `<div class="person">${personSVG(s.persona)}` +
+        (chip ? `<div class="chip">${chip}</div>` : "") + `</div>`;
+    } else if (s.blocked) {
+      slot.classList.add("blocked");
+      inner += `<div class="person">${suitcaseSVG()}</div>`;
+    } else {
+      slot.classList.add("free");
+    }
+    slot.innerHTML = inner;
+    slot.addEventListener("click", () => onSlot(i));
+    row.appendChild(slot);
+    if (round.dividers && i < round.n - 1) {
+      const d = document.createElement("div");
+      d.className = "divider";
+      row.appendChild(d);
+    }
+  });
+}
+
+function updateHUD() {
+  $("roundchip").textContent = `Round ${G.round + 1}/10`;
+  $("scorechip").textContent = `${G.score} pts`;
+  $("lives").textContent = "👖".repeat(G.lives) + "💦".repeat(3 - G.lives);
+  $("streakchip").textContent = `🔥 ${G.streak}`;
+  $("streakchip").classList.toggle("hot", G.streak >= 3);
+}
+
+function toast(msg) {
+  const t = document.createElement("div");
+  t.className = "toast"; t.textContent = msg;
+  $("scene").appendChild(t);
+  setTimeout(() => t.remove(), 1500);
+}
+
+/* ---------- timer ---------- */
+function startTimer(sec) {
+  stopTimer();
+  G.timeLeft = sec;
+  const wrap = $("bladderwrap");
+  const bar = $("bladder");
+  bar.style.width = "100%"; wrap.classList.remove("low");
+  G.timer = setInterval(() => {
+    G.timeLeft -= 0.1;
+    const p = Math.max(0, G.timeLeft / sec * 100);
+    bar.style.width = p + "%";
+    if (p < 30) wrap.classList.add("low");
+    if (G.timeLeft <= 0) { stopTimer(); onTimeout(); }
+  }, 100);
+}
+function stopTimer() { if (G.timer) { clearInterval(G.timer); G.timer = null; } }
+
+/* ---------- FX ---------- */
+function splashFX() {
+  buzz([80, 40, 120, 40, 200]);
+  sfx.splash();
+  $("app").classList.remove("shake"); void $("app").offsetWidth; $("app").classList.add("shake");
+  $("flash").classList.remove("go"); void $("flash").offsetWidth; $("flash").classList.add("go");
+  const fx = $("fx");
+  for (let k = 0; k < 26; k++) {
+    const d = document.createElement("div");
+    d.className = "droplet";
+    const size = rand(6, 22);
+    d.style.width = size + "px"; d.style.height = (size * 1.25) + "px";
+    d.style.left = rand(0, 96) + "%";
+    d.style.top = rand(-5, 45) + "%";
+    d.style.animationDelay = (Math.random() * 0.25) + "s";
+    fx.appendChild(d);
+    setTimeout(() => d.remove(), 1600);
+  }
+}
+function verdict(text, cls) {
+  const v = $("verdict");
+  v.textContent = text; v.className = cls;
+  void v.offsetWidth; v.classList.add("show");
+}
+
+/* ---------- outcome handling ---------- */
+function showLesson(title, text, pts) {
+  $("ltitle").textContent = title;
+  $("ltext").innerHTML = text;
+  $("lpts").textContent = pts > 0 ? `+${pts}` : (pts < 0 ? `${pts}` : "");
+  $("lesson").classList.add("show");
+  // reveal best answer(s)
+  const r = G.cur;
+  if (!r.isWaitRound) {
+    r.bestSpots.forEach(i => $("row").children[r.dividers ? i * 2 : i].classList.add("best-mark"));
+  }
+}
+
+function describeBest(r) {
+  if (r.isWaitRound) return "every open spot was shoulder-to-shoulder — the door was the only dignified exit";
+  const b = r.bestSpots[0];
+  const s = r.scores[b];
+  const pos = b === 0 ? "the far left end" : b === r.n - 1 ? "the far right end" : `spot #${b + 1}`;
+  let why = [];
+  if (s.raw >= 99) why.push("empty room — claim an end so future arrivals have somewhere to go");
+  else why.push(`${s.raw >= 2 ? Math.floor(s.raw) + " urinals of buffer" : "the biggest buffer available"}`);
+  if (s.isEnd) why.push("wall on one side");
+  if (r.dividers && s.raw === 1) why.push("divider coverage");
+  return `${pos} (${why.join(", ")})`;
+}
+
+function resolveChoice(i) {
+  const r = G.cur;
+  const sc = r.scores[i];
+  const speedBonus = Math.min(50, Math.round(G.timeLeft * 5));
+
+  if (r.isWaitRound) {
+    // choosing ANY urinal in a wait round = fail
+    fail(i, "SPLASHED!", `There was no good option — <b>walking away</b> was the play. ` +
+      `You wedged in next to ${neighborDesc(r, i)} and paid the price.`);
+    return;
+  }
+
+  if (sc.comfort >= r.bestComfort - 0.01) {
+    G.streak++;
+    const mult = 1 + Math.min(0.5, (G.streak - 1) * 0.1);
+    const pts = Math.round((100 + speedBonus) * mult);
+    G.score += pts; G.perfects++;
+    buzz(30); sfx.good();
+    verdict("PERFECT!", "good");
+    markSlot(i, "chosen-good");
+    showLesson("Textbook etiquette. 👌",
+      `Optimal pick: ${describeBest(r)}. ${G.streak >= 3 ? `🔥 ${G.streak}-streak multiplier active!` : ""}`, pts);
+  } else if (sc.eff > 1.0) {
+    G.streak = 0;
+    const pts = 40;
+    G.score += pts;
+    buzz([15, 30, 15]); sfx.ok();
+    verdict("ACCEPTABLE", "ok");
+    markSlot(i, "chosen-good");
+    showLesson("Fine. Technically fine.",
+      `No splash zone, but the pros would take ${describeBest(r)}. Streak reset.`, pts);
+  } else {
+    fail(i, "SPLASHED!", `Directly next to ${neighborDesc(r, i)}?! ` +
+      `The right call was ${describeBest(r)}.`);
+  }
+  updateHUD();
+}
+
+function neighborDesc(r, i) {
+  for (const j of [i - 1, i + 1]) {
+    if (j >= 0 && j < r.n && r.spots[j].occupant) {
+      const p = r.spots[j].persona;
+      if (p === "glasses") return "the smart-glasses guy — <b>you're on his livestream now</b>";
+      return PERSONAS[p].desc;
+    }
+  }
+  return "another patron";
+}
+
+function fail(i, big, text) {
+  G.streak = 0; G.lives--; G.splashes++;
+  splashFX();
+  verdict(big, "bad");
+  if (i >= 0) markSlot(i, "chosen-bad");
+  showLesson("Etiquette violation. 💦", text + ` <b>−1 pair of dry pants.</b>`, 0);
+  updateHUD();
+}
+
+function markSlot(i, cls) {
+  const r = G.cur;
+  const el = $("row").children[r.dividers ? i * 2 : i];
+  if (el) el.classList.add(cls);
+}
+
+/* ---------- input ---------- */
+function onSlot(i) {
+  if (G.locked) return;
+  const r = G.cur;
+  const s = r.spots[i];
+  if (s.occupant) {
+    buzz(20);
+    toast(`Occupied by ${PERSONAS[s.persona].desc}, chief. 👀`);
+    return;
+  }
+  G.locked = true;
+  stopTimer();
+  if (s.blocked) {
+    fail(i, "TRIPPED!", `You went over the rolling luggage like a bowling pin. ` +
+      `In airports and stations, <b>a suitcase claims the spot next to its owner.</b> ` +
+      `The right call was ${describeBest(r)}.`);
+    updateHUD();
+    return;
+  }
+  resolveChoice(i);
+}
+
+function onWait() {
+  if (G.locked) return;
+  G.locked = true;
+  stopTimer();
+  const r = G.cur;
+  if (r.isWaitRound) {
+    G.streak++;
+    const pts = 150;
+    G.score += pts; G.perfects++;
+    buzz([30, 60, 30]); sfx.flush();
+    verdict("PRO MOVE 🚪", "good");
+    showLesson("Grandmaster patience.",
+      `Every open spot meant standing shoulder-to-shoulder${r.spots.some(s => s.persona === "glasses") ? " (one of them was <b>recording</b>)" : ""}. ` +
+      `Walking away costs nothing but time. Legends hold it.`, pts);
+  } else {
+    G.streak = 0;
+    buzz([200]); sfx.chicken();
+    verdict("CHICKENED OUT 🐔", "ok");
+    showLesson("You bailed on a solvable board.",
+      `There was a perfectly comfortable spot: ${describeBest(r)}. ` +
+      `Your bladder will remember this betrayal. No points.`, 0);
+  }
+  updateHUD();
+}
+
+function onTimeout() {
+  if (G.locked) return;
+  G.locked = true;
+  fail(-1, "TOO SLOW!", `You stood in the doorway doing math until it was too late. ` +
+    `Decisiveness is half the code — the answer was ${describeBest(G.cur)}.`);
+}
+
+/* ---------- flow ---------- */
+function startRound() {
+  G.locked = false;
+  $("lesson").classList.remove("show");
+  $("verdict").className = "";
+  G.cur = makeRound(G.round);
+  renderRound(G.cur);
+  updateHUD();
+  startTimer(G.cur.time);
+}
+
+function nextRound() {
+  if (G.lives <= 0) { endGame(false); return; }
+  G.round++;
+  if (G.round >= ROUND_PLAN.length) { endGame(true); return; }
+  startRound();
+}
+
+function rankFor(score, survived) {
+  if (!survived) return ["💦 SPLASH CASUALTY", "The restroom claimed another victim."];
+  if (score >= 1400) return ["🧘 URINAL GRANDMASTER", "Monks study your spacing."];
+  if (score >= 1000) return ["🎓 RESTROOM STRATEGIST", "You see the whole board."];
+  if (score >= 650)  return ["📘 CERTIFIED STALL SCHOLAR", "Solid fundamentals, occasional splash."];
+  return ["🩹 SPLASH SURVIVOR", "You made it. Barely. Wash everything."];
+}
+
+function endGame(survived) {
+  stopTimer();
+  const [rank, blurb] = rankFor(G.score, survived);
+  $("endtitle").textContent = survived ? "TEST COMPLETE 🧼" : "GAME OVER 💦";
+  $("ranktext").textContent = rank;
+  $("finaltext").textContent = `${G.score} points — ${blurb}`;
+  $("stattext").textContent =
+    `${G.perfects} perfect picks · ${G.splashes} splash${G.splashes === 1 ? "" : "es"} · reached round ${Math.min(G.round + 1, 10)}/10`;
+  $("end").classList.remove("hidden");
+  if (survived) sfx.flush();
+}
+
+function resetGame() {
+  Object.assign(G, { round: 0, score: 0, streak: 0, lives: 3, splashes: 0, perfects: 0, locked: false });
+  $("end").classList.add("hidden");
+  $("start").classList.add("hidden");
+  startRound();
+}
+
+/* ---------- wire up ---------- */
+$("startbtn").addEventListener("click", () => { audio(); buzz(20); resetGame(); });
+$("againbtn").addEventListener("click", () => { buzz(20); resetGame(); });
+$("nextbtn").addEventListener("click", () => nextRound());
+$("waitbtn").addEventListener("click", () => onWait());
+</script>
+</body>
+</html>
