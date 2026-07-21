@@ -8,23 +8,35 @@
 ## 🚹 The Urinal Test
 
 A single-file browser game that tests the one skill they never teach in school:
-**picking the right urinal.** 10 rounds, 4–10 urinals each, escalating difficulty.
+**picking the right urinal.** Two modes: **The Gauntlet** (10 scripted rounds)
+and **Endless Rush** (procedurally generated rounds until the rush claims you).
 
 - **The etiquette engine** scores every open spot: distance from occupants,
-  end-urinal bonus, divider mitigation. Optimal pick = *Perfect*; safe but
-  suboptimal = *Acceptable* (streak resets); adjacent when you had options =
-  **splashed** — haptic vibration, screen shake, droplet overlay, and you lose
-  one of 3 pairs of dry pants.
-- **Rounds vary**: some have dividers, some are old-school **troughs**
-  (dive bar, stadium), and airport/train-station rounds feature **travelers
-  whose rolling luggage blocks a spot** (pick it and you trip).
+  end bonus, divider mitigation. Optimal = *Perfect*; safe but suboptimal =
+  *Acceptable* (streak resets); adjacent when you had options = **splashed** —
+  haptic vibration, screen shake, droplet overlay, −1 of 3 pairs of dry pants.
+- **Three fixture types**: wall urinals (with or without dividers), the
+  wall-mounted **old-school trough** (running water, everyone faces the wall),
+  and the free-standing clawfoot **shame tub** — people stand all around it
+  facing each other, and **direct eye contact across the water** is the
+  unforgivable sin.
 - **The Meta smart-glasses guy** (🔴 REC) needs extra distance — dividers don't
-  help, you're on his livestream.
-- **The pro move**: some boards have no acceptable spot. The 🚪 *"Hold it &
-  walk away"* door is the correct answer — but bail on a solvable board and
-  you've chickened out.
-- **Bladder timer**, streak multipliers, synthesized sound effects, and a
-  one-line etiquette lesson after every choice. Final ranks from *Splash
+  help, you're on his livestream. **Travelers' rolling luggage** blocks spots
+  in airports & stations (pick one and you trip).
+- **The drink economy**: perfect picks *earn* beers/cold brew — each is +10%
+  score buzz *and* one more thing in your bladder. Every drink speeds up the
+  round timer; at 🍺×3 you're **desperate** — walk away (or dawdle) and you
+  **piss yourself: instant game over** ("🌊 Puddle Maker"). Going while
+  desperate vents 2 drinks, and deliberately taking an *Acceptable* spot to
+  skip the reward drink is legitimate bladder management.
+- **The pro move**: some boards have no acceptable spot — the 🚪 *"Hold it &
+  walk away"* door is correct… if you can hold it. While desperate, gritting
+  your teeth at the least-bad spot is the right answer instead.
+- **📍 Play your home ballpark**: opt-in geolocation (on-device only) finds
+  the nearest of all 30 MLB parks and turns stadium rounds into *your* park —
+  Wrigley's ivy, Fenway's Monster, team-colored walls, the works.
+- Streak multipliers, synthesized sound effects, a one-line etiquette lesson
+  after every choice, endless-mode best-run tracking, ranks from *Splash
   Survivor* to *Urinal Grandmaster*.
 
 Open `urinal-test.html` in any browser — best on a phone, where wrong picks

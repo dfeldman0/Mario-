@@ -8,13 +8,8 @@
   :root {
     --wall: #b7d4d8;
     --wall2: #9fc3c8;
-    --floor: #8a8f98;
-    --porcelain: #f4f6f8;
-    --porcelain-shade: #d7dde3;
-    --accent: #2fb46b;
-    --danger: #e6483d;
-    --warn: #e6a23d;
-    --ink: #1d2430;
+    --floor1: #9aa0aa;
+    --floor2: #767c88;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
@@ -31,28 +26,42 @@
 
   /* ---------- screens ---------- */
   .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
-    justify-content: center; text-align: center; padding: 24px; background: #10141b; z-index: 50;
-    overflow-y: auto; }
+    justify-content: center; text-align: center; padding: 24px;
+    background:
+      radial-gradient(ellipse at 50% -10%, rgba(87,184,255,.14), transparent 55%),
+      #10141b;
+    z-index: 50; overflow-y: auto; }
   .screen.hidden { display: none; }
-  .screen h1 { font-size: clamp(30px, 8vw, 52px); letter-spacing: 1px; margin-bottom: 4px; }
+  .screen h1 { font-size: clamp(28px, 7.5vw, 50px); letter-spacing: 1px; margin-bottom: 4px;
+    text-shadow: 0 4px 18px rgba(87,184,255,.35); }
   .screen h1 .drop { color: #57b8ff; }
-  .tagline { color: #9fb0c3; margin-bottom: 18px; font-size: clamp(14px, 3.5vw, 17px); }
-  .rules { background: #1a2130; border: 1px solid #2b3547; border-radius: 14px; padding: 14px 18px;
-    text-align: left; max-width: 480px; margin-bottom: 20px; font-size: clamp(13px, 3.4vw, 15px); line-height: 1.55; }
+  .tagline { color: #9fb0c3; margin-bottom: 14px; font-size: clamp(13px, 3.4vw, 16px); }
+  .rules { background: #1a2130; border: 1px solid #2b3547; border-radius: 14px; padding: 12px 16px;
+    text-align: left; max-width: 500px; margin-bottom: 16px; font-size: clamp(12px, 3.2vw, 14px); line-height: 1.5; }
   .rules b { color: #ffd76a; }
-  .rules li { margin: 6px 0 6px 18px; }
-  .bigbtn { font-family: inherit; font-size: clamp(17px, 4.5vw, 21px); font-weight: bold; color: #fff;
+  .rules li { margin: 5px 0 5px 18px; }
+  .bigbtn { font-family: inherit; font-size: clamp(15px, 4vw, 19px); font-weight: bold; color: #fff;
     background: linear-gradient(#37c97a, #229458); border: none; border-radius: 12px;
-    padding: 14px 38px; cursor: pointer; box-shadow: 0 4px 0 #176b3e; }
+    padding: 13px 28px; cursor: pointer; box-shadow: 0 4px 0 #176b3e; min-width: 260px; }
   .bigbtn:active { transform: translateY(3px); box-shadow: 0 1px 0 #176b3e; }
-  .subnote { margin-top: 14px; color: #66788d; font-size: 12px; }
+  .bigbtn.alt { background: linear-gradient(#57b8ff, #2f7fd4); box-shadow: 0 4px 0 #1d548e; margin-top: 12px; }
+  .bigbtn.alt:active { box-shadow: 0 1px 0 #1d548e; }
+  .bigbtn.loc { background: linear-gradient(#8a6fd0, #6247a8); box-shadow: 0 4px 0 #46327a; margin-top: 12px; font-size: clamp(13px, 3.4vw, 16px); }
+  .bigbtn.loc:active { box-shadow: 0 1px 0 #46327a; }
+  #locline { color: #b8a5e8; font-size: 13px; margin-top: 8px; min-height: 16px; max-width: 90%; }
+  .subnote { margin-top: 12px; color: #66788d; font-size: 12px; }
+  #bestline { color: #57b8ff; font-size: 13px; margin-top: 10px; min-height: 16px; }
 
   /* ---------- HUD ---------- */
-  #hud { display: flex; align-items: center; gap: 10px; padding: 10px 12px 6px; font-size: clamp(13px, 3.4vw, 16px); }
+  #hud { display: flex; align-items: center; gap: 8px; padding: 10px 12px 6px; font-size: clamp(12px, 3.2vw, 15px); }
   #hud .spacer { flex: 1; }
-  .hudchip { background: #1a2130; border: 1px solid #2b3547; border-radius: 10px; padding: 5px 10px; white-space: nowrap; }
+  .hudchip { background: linear-gradient(#212a3c, #182031); border: 1px solid #2b3547; border-radius: 10px; padding: 5px 9px; white-space: nowrap; }
   #lives { letter-spacing: 2px; }
   #streakchip.hot { border-color: #e6a23d; color: #ffd76a; }
+  #drinkchip { display: none; }
+  #drinkchip.on { display: inline-block; }
+  #drinkchip.danger { border-color: #e6483d; color: #ff8a80; animation: dangerpulse 0.8s ease-in-out infinite; }
+  @keyframes dangerpulse { 50% { box-shadow: 0 0 10px rgba(230,72,61,.7); } }
 
   #themebar { text-align: center; font-size: clamp(12px, 3.2vw, 14px); color: #9fb0c3; padding: 2px 10px 6px; min-height: 22px; }
   #themebar b { color: #eef2f6; }
@@ -69,53 +78,144 @@
   #scenewrap { flex: 1; position: relative; margin: 0 8px; min-height: 0; }
   #scene { position: absolute; inset: 0; border-radius: 14px; overflow: hidden;
     background:
-      linear-gradient(rgba(0,0,0,.05), rgba(0,0,0,0) 30%),
+      linear-gradient(rgba(255,255,255,.10), rgba(0,0,0,0) 26%),
+      linear-gradient(rgba(0,0,0,0) 55%, rgba(0,0,0,.10) 66%),
       repeating-linear-gradient(0deg, var(--wall) 0 34px, var(--wall2) 34px 36px),
-      repeating-linear-gradient(90deg, transparent 0 58px, rgba(0,0,0,.06) 58px 60px);
+      repeating-linear-gradient(90deg, transparent 0 58px, rgba(0,0,0,.07) 58px 60px);
   }
+  /* ceiling + lights */
+  #scene .ceiling { position: absolute; top: 0; left: 0; right: 0; height: 6.5%;
+    background: linear-gradient(#39404c, #262c36); border-bottom: 3px solid #1b2028; z-index: 2; }
+  #scene .lamp { position: absolute; top: 2.2%; width: 15%; height: 2.2%; border-radius: 5px;
+    background: linear-gradient(#ffffff, #cfe6ff); box-shadow: 0 0 22px 8px rgba(220,240,255,.55); z-index: 3; }
+  #scene .lightpool { position: absolute; top: 5%; width: 34%; height: 52%; pointer-events: none; z-index: 1;
+    background: radial-gradient(ellipse at 50% 0%, rgba(255,255,245,.15), transparent 70%); }
+  /* floor */
   #scene .floor { position: absolute; left: 0; right: 0; bottom: 0; height: 34%;
     background:
-      repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 2px, transparent 2px 46px),
-      linear-gradient(#9aa0aa, #767c88);
+      radial-gradient(ellipse at 25% 0%, rgba(255,255,255,.10), transparent 55%),
+      radial-gradient(ellipse at 75% 0%, rgba(255,255,255,.10), transparent 55%),
+      repeating-linear-gradient(115deg, rgba(0,0,0,.07) 0 3px, transparent 3px 52px),
+      repeating-linear-gradient(65deg, rgba(0,0,0,.07) 0 3px, transparent 3px 52px),
+      linear-gradient(var(--floor1), var(--floor2));
   }
-  #scene .floorline { position: absolute; left: 0; right: 0; bottom: 34%; height: 6px; background: rgba(0,0,0,.18); }
-  #backdrop { position: absolute; top: 9%; left: 0; right: 0; text-align: center;
+  #scene .floorline { position: absolute; left: 0; right: 0; bottom: 34%; height: 7px; z-index: 1;
+    background: linear-gradient(#565d68, #3d434c); }
+  #backdrop { position: absolute; top: 10%; left: 0; right: 0; text-align: center;
     font-size: clamp(22px, 7vw, 34px); opacity: .75; letter-spacing: 14px; }
 
   #row { position: absolute; left: 0; right: 0; bottom: 8%; top: 18%; display: flex;
-    align-items: flex-end; justify-content: center; padding: 0 8px; }
+    align-items: flex-end; justify-content: center; padding: 0 8px; z-index: 4; }
 
-  .slot { position: relative; flex: 1 1 0; max-width: 110px; height: 100%; cursor: pointer; }
-  .slot .fixture { position: absolute; left: 50%; transform: translateX(-50%); bottom: 26%; width: 78%; max-width: 70px; }
-  .slot .person { position: absolute; left: 50%; transform: translateX(-50%); bottom: 5%; width: 96%; max-width: 96px; pointer-events: none; }
+  .slot { position: relative; flex: 1 1 0; max-width: 110px; height: 100%; cursor: pointer;
+    animation: slotin .35s backwards; }
+  @keyframes slotin { from { opacity: 0; transform: translateY(14px); } }
+  .slot .fixture { position: absolute; left: 50%; transform: translateX(-50%); bottom: 26%; width: 82%; max-width: 74px;
+    filter: drop-shadow(0 5px 5px rgba(0,0,0,.28)); }
+  .slot .person { position: absolute; left: 50%; transform: translateX(-50%); bottom: 5%; width: 96%; max-width: 96px; pointer-events: none; z-index: 5; }
+  .person svg { transform-origin: 50% 92%; animation: sway 3.2s ease-in-out infinite alternate; }
+  @keyframes sway { from { transform: rotate(-1.1deg); } to { transform: rotate(1.1deg); } }
   .person .chip { position: absolute; left: 50%; transform: translateX(-50%); bottom: 100%; margin-bottom: 4px; background: rgba(20,26,36,.88);
     border: 1px solid #3a4a63; color: #ffd76a; border-radius: 8px; font-size: 10px; padding: 2px 6px;
     white-space: nowrap; pointer-events: none; animation: bob 1.6s ease-in-out infinite; }
   @keyframes bob { 0%,100% { transform: translate(-50%,0); } 50% { transform: translate(-50%,-4px); } }
 
-  .slot.free:not(.blocked):hover .fixture, .slot.free:not(.blocked):active .fixture { filter: drop-shadow(0 0 8px rgba(87,184,255,.9)); }
+  .slot.free:not(.blocked):hover .fixture, .slot.free:not(.blocked):active .fixture {
+    filter: drop-shadow(0 5px 5px rgba(0,0,0,.28)) drop-shadow(0 0 9px rgba(87,184,255,.95)); }
   .slot.free:not(.blocked)::after { content: ""; position: absolute; left: 50%; bottom: 8%; width: 34px; height: 10px;
     transform: translateX(-50%); border-radius: 50%; background: rgba(87,184,255,.35); animation: pulse 1.4s ease-in-out infinite; }
   @keyframes pulse { 0%,100% { opacity: .25; } 50% { opacity: .8; } }
-  .slot.chosen-good .fixture { filter: drop-shadow(0 0 10px rgba(47,180,107,1)); }
-  .slot.chosen-bad .fixture  { filter: drop-shadow(0 0 10px rgba(230,72,61,1)); }
+  .slot.chosen-good .fixture { filter: drop-shadow(0 0 12px rgba(47,180,107,1)); }
+  .slot.chosen-bad .fixture  { filter: drop-shadow(0 0 12px rgba(230,72,61,1)); }
   .slot.best-mark::before { content: "✔ best"; position: absolute; top: 2%; left: 50%; transform: translateX(-50%);
-    color: #6fe3a1; font-size: 11px; font-weight: bold; text-shadow: 0 1px 2px #000; z-index: 5; }
+    color: #6fe3a1; font-size: 11px; font-weight: bold; text-shadow: 0 1px 2px #000; z-index: 8; }
+  #scene.tub .slot.chosen-good, #scene.trough .slot.chosen-good { outline: 3px solid rgba(47,180,107,.85); outline-offset: -3px; border-radius: 12px; }
+  #scene.tub .slot.chosen-bad, #scene.trough .slot.chosen-bad { outline: 3px solid rgba(230,72,61,.85); outline-offset: -3px; border-radius: 12px; }
 
-  .divider { flex: 0 0 7px; height: 62%; align-self: flex-end; margin-bottom: 10%;
-    background: linear-gradient(90deg, #c9ced6, #8d939e); border-radius: 4px 4px 0 0; box-shadow: 1px 0 2px rgba(0,0,0,.3); }
+  .divider { flex: 0 0 8px; height: 62%; align-self: flex-end; margin-bottom: 10%; position: relative;
+    background: linear-gradient(90deg, #dee3ea, #aab1bb 55%, #868d98); border-radius: 5px 5px 0 0;
+    box-shadow: 2px 2px 3px rgba(0,0,0,.3); }
+  .divider::after { content: ""; position: absolute; top: 12%; bottom: 12%; left: -3px; width: 3px;
+    background: linear-gradient(#9aa2ad, #6c737e); border-radius: 2px 0 0 2px; }
 
-  #trough { position: absolute; left: 4%; right: 4%; bottom: 26%; height: 15%; display: none;
-    background: linear-gradient(#eef1f4, #c3cad2); border: 3px solid #9aa2ad; border-bottom-width: 6px;
-    border-radius: 10px 10px 14px 14px; box-shadow: inset 0 6px 10px rgba(0,0,0,.15); }
+  /* ---------- wall-mounted trough ---------- */
+  #trough { position: absolute; left: 3%; right: 3%; top: 0; bottom: 0; display: none; z-index: 2; pointer-events: none; }
   #scene.trough #trough { display: block; }
   #scene.trough .fixture { display: none; }
-  #scene.trough .slot.free:not(.blocked)::after { bottom: 30%; background: rgba(60,80,100,.4); }
+  #scene.trough .slot.free:not(.blocked)::after { bottom: 40%; width: 26px; height: 12px; z-index: 6;
+    background: transparent; border: 3px solid rgba(240,250,255,.75); box-shadow: 0 0 8px rgba(160,220,255,.8); }
+  #scene.trough .person { bottom: 27%; }
+  #troughfront { position: absolute; left: 3%; right: 3%; top: 0; bottom: 0; display: none; z-index: 5; pointer-events: none; }
+  #scene.trough #troughfront { display: block; }
+  .t-back { position: absolute; left: 0; right: 0; bottom: 30%; height: 15%;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 2px, transparent 2px 7px),
+      linear-gradient(#e9edf1 0%, #c4ccd4 30%, #aab3bc 70%, #cfd6dd 100%);
+    border-top: 3px solid #f5f8fa; box-shadow: 0 3px 8px rgba(0,0,0,.25); }
+  .t-back::after { content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(90deg, transparent 0 19%, rgba(0,0,0,.14) 19% 19.6%); }
+  .t-pipe { position: absolute; left: -0.6%; right: -0.6%; bottom: 45%; height: 2.2%; border-radius: 4px;
+    background: linear-gradient(#fafcfe, #b9c2cb 45%, #8d97a1 75%, #c8d0d7);
+    box-shadow: 0 2px 4px rgba(0,0,0,.3); }
+  .t-pipe::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 5px;
+    background: repeating-linear-gradient(90deg, transparent 0 9%, #98a2ac 9% 10.2%); }
+  .trickle { position: absolute; width: 2.5px; bottom: 36%; height: 9%;
+    background: linear-gradient(rgba(190,225,255,0), rgba(190,225,255,.65) 25%, rgba(220,240,255,.85));
+    animation: trick 1.1s ease-in-out infinite; }
+  @keyframes trick { 0%,100% { opacity: .45; } 50% { opacity: .95; } }
+  .t-channel { position: absolute; left: -1.2%; right: -1.2%; bottom: 28%; height: 8%;
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,.35)); }
+  .t-water { position: absolute; left: 2%; right: 2%; top: 0; height: 34%;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,.35) 0 14px, rgba(160,205,240,.25) 14px 30px),
+      linear-gradient(#9cc4e0, #7fa9c8);
+    border-radius: 3px; animation: shimmer 1.6s linear infinite; }
+  @keyframes shimmer { from { background-position: 0 0, 0 0; } to { background-position: 30px 0, 0 0; } }
+  .t-front { position: absolute; left: 0; right: 0; top: 30%; bottom: 0; border-radius: 0 0 10px 10px;
+    background:
+      repeating-linear-gradient(90deg, transparent 0 11%, rgba(0,0,0,.16) 11% 11.7%),
+      linear-gradient(#dfe5ea 0%, #b6bec7 55%, #8f98a2 100%);
+    border-top: 2px solid #f2f6f9; }
+
+  /* ---------- the shame tub (clawfoot — yes, really) ---------- */
+  #tub { position: absolute; left: 12%; right: 12%; top: 47%; height: 20%; display: none; z-index: 3; pointer-events: none;
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,.35)); }
+  #scene.tub #tub { display: block; }
+  #scene.tub .fixture { display: none; }
+  .tub-basin { position: absolute; inset: 0; border-radius: 50%;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(255,255,255,.9), transparent 45%),
+      linear-gradient(#f7f9fb, #d3dbe2 55%, #a3adb7);
+    border: 3px solid #97a1ab; }
+  .tub-water { position: absolute; left: 6%; right: 6%; top: 14%; height: 46%; border-radius: 50%;
+    background:
+      repeating-linear-gradient(100deg, rgba(255,255,255,.3) 0 12px, rgba(150,200,235,.22) 12px 26px),
+      radial-gradient(ellipse at 50% 40%, #b6d5ea, #7fa8c6);
+    animation: shimmer 1.8s linear infinite;
+    box-shadow: inset 0 5px 10px rgba(0,0,0,.3); }
+  .tub-drain { position: absolute; left: 50%; top: 32%; width: 5%; height: 9%; transform: translateX(-50%);
+    border-radius: 50%; background: radial-gradient(#5b666f, #39424a); }
+  .tub-foot { position: absolute; bottom: -9%; width: 7%; height: 16%;
+    background: linear-gradient(#8d97a1, #5c656e); border-radius: 20% 20% 50% 50%; }
+  .tub-foot.l { left: 13%; transform: skewX(8deg); }
+  .tub-foot.r { right: 13%; transform: skewX(-8deg); }
+  #scene.tub #row { top: 52%; bottom: 2%; }
+  #scene.tub #row .person { max-width: 112px; width: 104%; bottom: 2%; }
+  #rowfar { position: absolute; left: 5%; right: 5%; top: 17%; height: 29%; display: none;
+    align-items: flex-end; justify-content: center; padding: 0 8px; z-index: 2; }
+  #scene.tub #rowfar { display: flex; }
+  #rowfar .slot { max-width: 88px; }
+  #rowfar .person { max-width: 68px; bottom: 0; }
+  #rowfar .slot.free:not(.blocked)::after { bottom: -6%; }
+  #scene.tub .slot.free:not(.blocked)::after { width: 28px; border: 3px solid rgba(240,250,255,.7);
+    background: transparent; box-shadow: 0 0 8px rgba(160,220,255,.7); height: 11px; }
+  #scene.tub #row .slot.free:not(.blocked)::after { bottom: 6%; }
 
   /* ---------- door / wait ---------- */
   #waitbtn { margin: 8px 12px 10px; font-family: inherit; font-size: clamp(13px, 3.6vw, 16px); font-weight: bold;
     color: #eef2f6; background: #223047; border: 1px solid #3a4a63; border-radius: 12px; padding: 12px; cursor: pointer; }
   #waitbtn:active { background: #2c3d5a; }
+  #waitbtn.danger { background: #47222a; border-color: #a03a3a; color: #ff9a90; }
 
   /* ---------- feedback ---------- */
   #verdict { position: absolute; left: 50%; top: 34%; transform: translate(-50%,-50%) scale(.6); opacity: 0;
@@ -136,9 +236,12 @@
 
   /* ---------- splash FX ---------- */
   #fx { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 30; }
-  .droplet { position: absolute; border-radius: 50% 50% 60% 60%; background: radial-gradient(circle at 35% 30%, rgba(255,255,240,.95), rgba(240,220,120,.65) 60%, rgba(200,170,60,.5));
-    box-shadow: 0 0 6px rgba(240,220,120,.5); animation: drip 1.1s ease-in forwards; }
-  @keyframes drip { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(46vh) scale(.75); opacity: 0; } }
+  .droplet { position: absolute; border-radius: 50% 50% 60% 60%;
+    background: radial-gradient(circle at 35% 30%, rgba(255,255,240,.95), rgba(240,220,120,.65) 60%, rgba(200,170,60,.5));
+    box-shadow: 0 0 6px rgba(240,220,120,.5); animation: drip 1.1s cubic-bezier(.3,.1,.7,1) forwards; }
+  @keyframes drip {
+    0% { transform: translate(0,0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--dx, 0px), 52vh) scale(.7) rotate(20deg); opacity: 0; } }
   #flash { position: absolute; inset: 0; background: rgba(230,72,61,.28); opacity: 0; pointer-events: none; z-index: 28; }
   #flash.go { animation: flashy .5s ease-out; }
   @keyframes flashy { 0% { opacity: 1; } 100% { opacity: 0; } }
@@ -155,7 +258,7 @@
 
   .toast { position: absolute; left: 50%; top: 14%; transform: translateX(-50%); background: rgba(16,20,27,.92);
     border: 1px solid #3a4a63; padding: 8px 14px; border-radius: 10px; font-size: 14px; z-index: 40;
-    animation: toastfade 1.4s forwards; pointer-events: none; white-space: nowrap; }
+    animation: toastfade 1.6s forwards; pointer-events: none; white-space: nowrap; }
   @keyframes toastfade { 0% { opacity: 0; transform: translate(-50%,8px); } 15%,75% { opacity: 1; transform: translate(-50%,0); } 100% { opacity: 0; } }
 
   .rank { font-size: clamp(20px, 6vw, 30px); color: #ffd76a; margin: 8px 0 2px; font-weight: 900; }
@@ -164,23 +267,48 @@
 </style>
 </head>
 <body>
+<!-- shared SVG gradients -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="porcG" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#eef2f5"/>
+      <stop offset=".8" stop-color="#d4dce3"/><stop offset="1" stop-color="#b9c4cd"/>
+    </linearGradient>
+    <linearGradient id="bowlG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c7d1d9"/><stop offset=".6" stop-color="#dde4ea"/><stop offset="1" stop-color="#b5c0c9"/>
+    </linearGradient>
+    <linearGradient id="steelG" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f8fafc"/><stop offset=".4" stop-color="#c7d0d8"/>
+      <stop offset=".7" stop-color="#96a2ac"/><stop offset="1" stop-color="#d9e0e6"/>
+    </linearGradient>
+    <linearGradient id="denimG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="rgba(255,255,255,.16)"/><stop offset="1" stop-color="rgba(0,0,0,.14)"/>
+    </linearGradient>
+  </defs>
+</svg>
+
 <div id="app">
 
   <!-- START SCREEN -->
   <div id="start" class="screen">
     <h1>THE URINAL <span class="drop">TEST</span> 🚹</h1>
-    <div class="tagline">10 rounds. One sacred code. Do you have what it takes?</div>
+    <div class="tagline">One sacred code. Infinite bathrooms. Do you have what it takes?</div>
     <div class="rules">
       <b>The Rules of the Restroom:</b>
-      <li><b>Maximize distance</b> from every occupied urinal.</li>
-      <li><b>Ends are elite</b> — a wall never judges you.</li>
+      <li><b>Maximize distance</b> from every occupied spot. <b>Ends are elite.</b></li>
       <li><b>Dividers</b> soften a bad neighbor. Soften. Not fix.</li>
-      <li>Guy in <b>Meta smart glasses</b> (🔴 REC)? Extra distance. Always. Dividers don't help.</li>
-      <li>Watch for <b>luggage</b> in airports & stations — suitcases block spots and ankles.</li>
-      <li>The <b>trough</b> is lawless, but the code still applies.</li>
-      <li>No decent option? A true master <b>holds it and walks away</b>. 🚪</li>
+      <li>Guy in <b>Meta smart glasses</b> (🔴 REC)? Extra distance. Dividers don't help.</li>
+      <li><b>Luggage</b> blocks spots in airports & stations. Suitcases take ankles.</li>
+      <li>The <b>trough</b> is lawless. The <b>shame tub</b> is worse — <b>never face a man across the water</b>. 👁️</li>
+      <li>Perfect picks <b>earn drinks</b> 🍺☕ — each one is <b>+10% score buzz</b>… and one more thing in your bladder.</li>
+      <li>At 🍺×3 you're <b>desperate</b>: the clock flies and <b>walking away means catastrophe</b>. Going while desperate vents 2 drinks.</li>
+      <li>No decent option (and sober-ish)? A master <b>holds it and walks away</b>. 🚪</li>
     </div>
-    <button class="bigbtn" id="startbtn">ENTER THE RESTROOM</button>
+    <button class="bigbtn" id="startbtn">🏆 THE GAUNTLET — 10 rounds</button>
+    <button class="bigbtn alt" id="endlessbtn">♾️ ENDLESS RUSH</button>
+    <button class="bigbtn loc" id="locbtn">📍 PLAY YOUR HOME BALLPARK</button>
+    <div id="locline"></div>
+    <div id="bestline"></div>
     <div class="subnote">📱 Best on a phone — wrong picks trigger haptic splash feedback.</div>
   </div>
 
@@ -190,7 +318,8 @@
     <div class="rank" id="ranktext"></div>
     <div class="finalscore" id="finaltext"></div>
     <div class="statline" id="stattext"></div>
-    <button class="bigbtn" id="againbtn">WASH HANDS & RETRY</button>
+    <button class="bigbtn" id="againbtn">WASH HANDS &amp; RETRY</button>
+    <button class="bigbtn alt" id="menubtn">🚪 BACK TO MENU</button>
     <div class="subnote">You washed your hands, right? …Right?</div>
   </div>
 
@@ -198,6 +327,7 @@
   <div id="hud">
     <span class="hudchip" id="roundchip">Round 1/10</span>
     <span class="hudchip" id="streakchip">🔥 0</span>
+    <span class="hudchip" id="drinkchip">🍺 0</span>
     <span class="spacer"></span>
     <span class="hudchip" id="scorechip">0 pts</span>
     <span class="hudchip" id="lives">👖👖👖</span>
@@ -207,10 +337,36 @@
 
   <div id="scenewrap">
     <div id="scene">
+      <div class="ceiling"></div>
+      <div class="lamp" style="left:12%"></div>
+      <div class="lamp" style="left:42.5%"></div>
+      <div class="lamp" style="left:73%"></div>
+      <div class="lightpool" style="left:3%"></div>
+      <div class="lightpool" style="left:33%"></div>
+      <div class="lightpool" style="left:63%"></div>
       <div id="backdrop"></div>
       <div class="floorline"></div>
       <div class="floor"></div>
-      <div id="trough"></div>
+      <div id="trough">
+        <div class="t-back"></div>
+        <div class="t-pipe"></div>
+        <div class="trickle" style="left:9%"></div>
+        <div class="trickle" style="left:27%; animation-delay:.3s"></div>
+        <div class="trickle" style="left:46%; animation-delay:.7s"></div>
+        <div class="trickle" style="left:64%; animation-delay:.15s"></div>
+        <div class="trickle" style="left:83%; animation-delay:.5s"></div>
+      </div>
+      <div id="troughfront">
+        <div class="t-channel"><div class="t-water"></div><div class="t-front"></div></div>
+      </div>
+      <div id="tub">
+        <div class="tub-foot l"></div>
+        <div class="tub-foot r"></div>
+        <div class="tub-basin"></div>
+        <div class="tub-water"></div>
+        <div class="tub-drain"></div>
+      </div>
+      <div id="rowfar"></div>
       <div id="row"></div>
       <div id="flash"></div>
       <div id="fx"></div>
@@ -230,10 +386,12 @@
 "use strict";
 /* =========================================================
    THE URINAL TEST — a game of spatial etiquette
+   Layouts: wall urinals · wall-mounted trough · the shame tub
    ========================================================= */
 
 const $ = id => document.getElementById(id);
 const rand = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const rnd = (a, b) => a + Math.random() * (b - a);
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
 /* ---------- haptics ---------- */
@@ -270,129 +428,321 @@ const sfx = {
   splash() { noiseBurst(.5, 900, .3); tone(180, .3, "sawtooth", .08); },
   flush()  { noiseBurst(1.2, 1600, .18); },
   chicken() { tone(300, .2, "square", .07); tone(240, .3, "square", .07, .18); },
+  disaster() { noiseBurst(1.5, 700, .35); tone(150, .8, "sawtooth", .1); tone(110, 1.2, "sawtooth", .09, .4); },
 };
 
 /* ---------- personas ---------- */
-const SHIRTS = ["#d95d4e", "#4e7fd9", "#5aa85e", "#b06fd0", "#d9a24e", "#5ec3c9", "#7d8794"];
+const SHIRTS = ["#d95d4e", "#4e7fd9", "#5aa85e", "#b06fd0", "#d9a24e", "#5ec3c9", "#7d8794", "#c04a6b", "#4a6b3a"];
 const PERSONAS = {
-  regular:  { chip: null,          desc: "a regular guy" },
-  glasses:  { chip: "🔴 REC",      desc: "the Meta smart-glasses guy" },
+  regular:  { chip: null,            desc: "a regular guy" },
+  glasses:  { chip: "🔴 REC",        desc: "the Meta smart-glasses guy" },
   phone:    { chip: "“yeah… yeah…”", desc: "a guy on a speakerphone call" },
-  headphones: { chip: "♪ ♫",       desc: "a guy vibing in headphones" },
-  traveler: { chip: "✈️ gate B12",  desc: "a traveler with rolling luggage" },
+  headphones: { chip: "♪ ♫",         desc: "a guy vibing in headphones" },
+  traveler: { chip: "✈️ gate B12",   desc: "a traveler with rolling luggage" },
 };
 
-function personSVG(persona) {
+/* Detailed guy: varied build, hair, outfit, stance. facing: 'back' | 'front' */
+function personSVG(persona, facing) {
+  facing = facing || "back";
+  const front = facing === "front";
   const shirt = pick(SHIRTS);
-  const skin = pick(["#e8b48a", "#c68b5e", "#8d5a3b", "#f0c9a5", "#6b4429"]);
-  const pants = pick(["#3a4553", "#54606e", "#2e3a49", "#5b4a3a"]);
-  const hair = pick(["#2b2119", "#4a382a", "#111", "#6e6e6e", "#a5763a"]);
+  const skin = pick(["#e8b48a", "#c68b5e", "#8d5a3b", "#f0c9a5", "#6b4429", "#a9764f"]);
+  const pants = pick(["#3a4553", "#54606e", "#2e3a49", "#5b4a3a", "#37517a"]);
+  const shoe = pick(["#222", "#3a2c20", "#e8e8e8", "#553333"]);
+  const hairC = pick(["#2b2119", "#4a382a", "#111", "#6e6e6e", "#a5763a", "#8a8a8a"]);
+  const torsoW = rand(32, 40);
+  const x0 = 35 - torsoW / 2;
+  const headR = rand(11, 13);
+  const stance = rand(2, 6);
+
+  const style = persona === "traveler" ? "cap" : pick(["full", "full", "buzz", "curly", "bald", "cap", "afro"]);
+  let hair = "";
+  if (style === "full") {
+    hair = front
+      ? `<path d="M${35-headR} 18 Q35 ${18-headR-3} ${35+headR} 18 L${35+headR} 14 Q35 ${5} ${35-headR} 14 Z" fill="${hairC}"/>`
+      : `<path d="M${35-headR} 22 Q35 ${22+headR*0.8} ${35+headR} 22 L${35+headR} 15 Q35 6 ${35-headR} 15 Z" fill="${hairC}"/>`;
+  } else if (style === "buzz") {
+    hair = `<path d="M${35-headR} 16 Q35 ${5} ${35+headR} 16 L${35+headR} 13 Q35 3 ${35-headR} 13 Z" fill="${hairC}" opacity=".8"/>`;
+  } else if (style === "curly") {
+    hair = `<circle cx="${35-headR*0.6}" cy="11" r="5" fill="${hairC}"/><circle cx="35" cy="8" r="6" fill="${hairC}"/>
+            <circle cx="${35+headR*0.6}" cy="11" r="5" fill="${hairC}"/>`;
+  } else if (style === "afro") {
+    hair = `<circle cx="35" cy="12" r="${headR+4}" fill="${hairC}"/>`;
+  } else if (style === "cap") {
+    const capC = pick(["#b03a30", "#2c4a72", "#3a3a3a", "#2f6b46"]);
+    hair = `<path d="M${35-headR-1} 15 Q35 ${3} ${35+headR+1} 15 L${35+headR+1} 18 L${35-headR-1} 18 Z" fill="${capC}"/>` +
+      (front ? `<ellipse cx="35" cy="17.5" rx="${headR+3}" ry="3" fill="${capC}" opacity=".9"/>` : `<circle cx="35" cy="7" r="2" fill="${capC}"/>`);
+  }
+
+  // face (front-facing only): eye contact fuel
+  let face = "";
+  if (front) {
+    const brow = `<rect x="${35-headR*0.62}" y="17.5" width="5" height="1.6" rx="0.8" fill="${hairC}"/>
+                  <rect x="${35+headR*0.62-5}" y="17.5" width="5" height="1.6" rx="0.8" fill="${hairC}"/>`;
+    face = `${brow}
+      <circle cx="${35-headR*0.42}" cy="21" r="1.7" fill="#1d2430"/>
+      <circle cx="${35+headR*0.42}" cy="21" r="1.7" fill="#1d2430"/>
+      <path d="M${35-3} 27 q3 ${Math.random()<.5?-2:1.5} 6 0" stroke="#1d2430" stroke-width="1.4" fill="none" stroke-linecap="round"/>`;
+  }
+
   let extra = "";
   if (persona === "glasses") {
-    // temple arms of smart glasses + blinking LED, seen from behind
-    extra = `<rect x="14" y="20" width="32" height="3.4" rx="1.7" fill="#111"/>
-             <circle class="led" cx="45" cy="21.7" r="2.6" fill="#ff2d2d"/>`;
+    extra = front
+      ? `<rect x="${35-headR+0.5}" y="18.5" width="${headR-2.5}" height="6" rx="2" fill="#15181c"/>
+         <rect x="${35+2}" y="18.5" width="${headR-2.5}" height="6" rx="2" fill="#15181c"/>
+         <rect x="${35-1.5}" y="20" width="3" height="2" fill="#15181c"/>
+         <circle class="led" cx="${35-headR+2}" cy="19.8" r="1.6" fill="#ff2d2d"/>`
+      : `<rect x="${35-headR-3}" y="20" width="${2*headR+6}" height="3.4" rx="1.7" fill="#111"/>
+         <circle class="led" cx="${35+headR+2}" cy="21.7" r="2.6" fill="#ff2d2d"/>`;
   } else if (persona === "phone") {
-    extra = `<rect x="44" y="14" width="7" height="14" rx="2" fill="#222"/>
-             <rect x="45.2" y="16" width="4.6" height="9" rx="1" fill="#57b8ff"/>`;
+    extra = `<rect x="${35+headR-1}" y="14" width="7" height="14" rx="2" fill="#222"/>
+             <rect x="${35+headR+0.2}" y="16" width="4.6" height="9" rx="1" fill="#57b8ff"/>`;
   } else if (persona === "headphones") {
-    extra = `<path d="M16 16 Q30 2 44 16" stroke="#222" stroke-width="4" fill="none"/>
-             <rect x="12" y="14" width="7" height="11" rx="3" fill="#222"/>
-             <rect x="41" y="14" width="7" height="11" rx="3" fill="#222"/>`;
+    extra = `<path d="M${35-headR} 16 Q35 ${2} ${35+headR} 16" stroke="#222" stroke-width="4" fill="none"/>
+             <rect x="${35-headR-4}" y="14" width="7" height="11" rx="3" fill="#222"/>
+             <rect x="${35+headR-3}" y="14" width="7" height="11" rx="3" fill="#222"/>`;
   } else if (persona === "traveler") {
-    // neck pillow
-    extra = `<path d="M14 27 Q30 38 46 27 L46 33 Q30 44 14 33 Z" fill="#9aa8b8"/>`;
+    extra = `<path d="M${x0+2} 33 Q35 44 ${x0+torsoW-2} 33 L${x0+torsoW-2} 39 Q35 50 ${x0+2} 39 Z" fill="#9aa8b8"/>`;
   }
-  return `<svg viewBox="0 0 60 120" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="30" cy="116" rx="20" ry="4" fill="rgba(0,0,0,.25)"/>
-    <rect x="18" y="78" width="9" height="36" rx="4" fill="${pants}"/>
-    <rect x="33" y="78" width="9" height="36" rx="4" fill="${pants}"/>
-    <rect x="16" y="112" width="13" height="6" rx="3" fill="#222"/>
-    <rect x="31" y="112" width="13" height="6" rx="3" fill="#222"/>
-    <rect x="13" y="34" width="34" height="50" rx="10" fill="${shirt}"/>
-    <rect x="13" y="34" width="34" height="8" rx="4" fill="rgba(0,0,0,.12)"/>
-    <circle cx="30" cy="18" r="13" fill="${skin}"/>
-    <path d="M17 16 A13 13 0 0 1 43 16 L43 12 A13 13 0 0 0 17 12 Z" fill="${hair}"/>
-    <path d="M17 16 Q30 26 43 16 L43 10 Q30 4 17 10 Z" fill="${hair}"/>
-    ${extra}
+
+  const arms = `
+    <path d="M${x0+2} 44 q-7 10 -4 22 q1.5 5 6 4 l3 -2 q-4 -12 0 -21 Z" fill="${shirt}" stroke="rgba(0,0,0,.12)"/>
+    <path d="M${x0+torsoW-2} 44 q7 10 4 22 q-1.5 5 -6 4 l-3 -2 q4 -12 0 -21 Z" fill="${shirt}" stroke="rgba(0,0,0,.12)"/>`;
+
+  const backDetail = front ? "" :
+    `<path d="M${x0+3} 40 q${torsoW/2-3} 8 ${torsoW-6} 0 l0 5 q-${torsoW/2-3} 7 -${torsoW-6} 0 Z" fill="rgba(0,0,0,.18)"/>`;
+  const collar = front
+    ? `<path d="M${35-7} 37 L35 44 L${35+7} 37 Z" fill="rgba(0,0,0,.15)"/>` : "";
+
+  return `<svg viewBox="0 0 70 150" xmlns="http://www.w3.org/2000/svg" style="animation-duration:${rnd(2.6,4).toFixed(2)}s; animation-delay:-${rnd(0,2).toFixed(2)}s">
+    <ellipse cx="35" cy="145" rx="22" ry="4.5" fill="rgba(0,0,0,.28)"/>
+    <rect x="${35-stance-8}" y="96" width="10" height="46" rx="4.5" fill="${pants}"/>
+    <rect x="${35+stance-2}" y="96" width="10" height="46" rx="4.5" fill="${pants}"/>
+    <rect x="${35-stance-8}" y="96" width="10" height="46" rx="4.5" fill="url(#denimG)"/>
+    <rect x="${35+stance-2}" y="96" width="10" height="46" rx="4.5" fill="url(#denimG)"/>
+    <rect x="${35-stance-10}" y="139" width="15" height="7" rx="3.5" fill="${shoe}"/>
+    <rect x="${35+stance-3}" y="139" width="15" height="7" rx="3.5" fill="${shoe}"/>
+    <path d="M${x0} 46 q0 -9 8 -10 l${torsoW-16} 0 q8 1 8 10 l0 46 q0 8 -8 8 l-${torsoW-16} 0 q-8 0 -8 -8 Z" fill="${shirt}"/>
+    <path d="M${x0} 46 q0 -9 8 -10 l${torsoW-16} 0 q8 1 8 10 l0 10 q-12 5 -${torsoW} 0 Z" fill="rgba(0,0,0,.13)"/>
+    ${backDetail}${collar}${arms}
+    <rect x="31" y="28" width="8" height="9" fill="${skin}"/>
+    <circle cx="35" cy="18" r="${headR}" fill="${skin}"/>
+    <ellipse cx="${35-headR+1}" cy="20" rx="2.2" ry="3.2" fill="${skin}"/>
+    <ellipse cx="${35+headR-1}" cy="20" rx="2.2" ry="3.2" fill="${skin}"/>
+    ${hair}${face}${extra}
   </svg>`;
 }
 
+/* Porcelain urinal with chrome flush valve and, yes, a urinal cake. */
 function urinalSVG() {
-  return `<svg viewBox="0 0 70 110" xmlns="http://www.w3.org/2000/svg">
-    <rect x="30" y="0" width="10" height="16" fill="#c3ccd4"/>
-    <rect x="24" y="12" width="22" height="9" rx="3" fill="#aeb8c2"/>
-    <path d="M12 22 h46 a4 4 0 0 1 4 4 v38 a27 27 0 0 1 -27 27 a27 27 0 0 1 -27 -27 v-38 a4 4 0 0 1 4 -4 z"
-      fill="var(--porcelain)" stroke="#b9c2cb" stroke-width="2"/>
-    <path d="M20 30 h30 a3 3 0 0 1 3 3 v28 a18 18 0 0 1 -18 18 a18 18 0 0 1 -18 -18 v-28 a3 3 0 0 1 3 -3 z"
-      fill="var(--porcelain-shade)"/>
-    <ellipse cx="35" cy="72" rx="7" ry="4" fill="#aab6c0"/>
+  return `<svg viewBox="0 0 80 132" xmlns="http://www.w3.org/2000/svg">
+    <rect x="36" y="0" width="8" height="14" rx="2" fill="url(#steelG)"/>
+    <rect x="30" y="10" width="20" height="12" rx="5" fill="url(#steelG)"/>
+    <rect x="22" y="13" width="9" height="4" rx="2" fill="url(#steelG)"/>
+    <rect x="37" y="20" width="6" height="8" fill="url(#steelG)"/>
+    <path d="M14 28 h52 a5 5 0 0 1 5 5 v40 a31 31 0 0 1 -31 31 a31 31 0 0 1 -31 -31 v-40 a5 5 0 0 1 5 -5 z"
+      fill="url(#porcG)" stroke="#a7b2bc" stroke-width="2"/>
+    <path d="M60 30 a4 4 0 0 1 8 2 v40 a29 29 0 0 1 -14 25 a31 31 0 0 0 6 -25 z" fill="rgba(0,0,0,.08)"/>
+    <path d="M22 36 h36 a4 4 0 0 1 4 4 v31 a22 22 0 0 1 -22 22 a22 22 0 0 1 -22 -22 v-31 a4 4 0 0 1 4 -4 z"
+      fill="url(#bowlG)"/>
+    <path d="M24 38 h32 a2 2 0 0 1 2 2 v6 q-18 6 -36 0 v-6 a2 2 0 0 1 2 -2 z" fill="rgba(255,255,255,.55)"/>
+    <ellipse cx="40" cy="84" rx="9" ry="5" fill="#8d98a2"/>
+    <ellipse cx="40" cy="83.2" rx="6.5" ry="3.4" fill="#6e7982"/>
+    <circle cx="40" cy="82.6" r="3.4" fill="#e88aa0"/>
+    <ellipse cx="30" cy="46" rx="7" ry="14" fill="rgba(255,255,255,.35)" transform="rotate(-14 30 46)"/>
   </svg>`;
 }
 
 function suitcaseSVG() {
-  return `<svg viewBox="0 0 60 120" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="30" cy="114" rx="18" ry="4" fill="rgba(0,0,0,.25)"/>
-    <rect x="26" y="30" width="5" height="30" fill="#666"/>
-    <rect x="18" y="24" width="22" height="8" rx="4" fill="#666"/>
-    <rect x="10" y="52" width="40" height="56" rx="8" fill="#c0392b" stroke="#8e2a20" stroke-width="2"/>
-    <line x1="22" y1="52" x2="22" y2="108" stroke="#8e2a20" stroke-width="2"/>
-    <line x1="38" y1="52" x2="38" y2="108" stroke="#8e2a20" stroke-width="2"/>
-    <circle cx="18" cy="112" r="5" fill="#333"/><circle cx="42" cy="112" r="5" fill="#333"/>
-    <rect x="14" y="66" width="12" height="9" rx="2" fill="#f5d76e"/>
+  const c = pick(["#c0392b", "#2c5f8a", "#3b7a4a", "#7a4a8a", "#333"]);
+  const cd = "rgba(0,0,0,.28)";
+  return `<svg viewBox="0 0 60 130" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="30" cy="124" rx="19" ry="4" fill="rgba(0,0,0,.28)"/>
+    <rect x="26" y="34" width="5" height="30" fill="url(#steelG)"/>
+    <rect x="17" y="28" width="23" height="8" rx="4" fill="#555"/>
+    <rect x="9" y="58" width="42" height="58" rx="9" fill="${c}" stroke="${cd}" stroke-width="2"/>
+    <rect x="9" y="58" width="42" height="12" rx="9" fill="rgba(255,255,255,.14)"/>
+    <line x1="22" y1="58" x2="22" y2="116" stroke="${cd}" stroke-width="2.5"/>
+    <line x1="38" y1="58" x2="38" y2="116" stroke="${cd}" stroke-width="2.5"/>
+    <circle cx="17" cy="120" r="5.5" fill="#2a2a2a"/><circle cx="17" cy="120" r="2" fill="#666"/>
+    <circle cx="43" cy="120" r="5.5" fill="#2a2a2a"/><circle cx="43" cy="120" r="2" fill="#666"/>
+    <rect x="13" y="74" width="13" height="10" rx="2" fill="#f5d76e" stroke="#c9a83a"/>
+    <rect x="41" y="90" width="8" height="14" rx="2" fill="rgba(255,255,255,.25)"/>
   </svg>`;
 }
 
 /* ---------- themes ---------- */
 const THEMES = {
-  office:   { name: "Office Park Restroom", icon: "🏢", wall: "#b7d4d8", wall2: "#9fc3c8", backdrop: "🧻  🧼  🧻" },
-  coffee:   { name: "Hipster Coffee Shop", icon: "☕", wall: "#d8ccb7", wall2: "#c8bb9f", backdrop: "🪴  ☕  🪴" },
-  mall:     { name: "Shopping Mall", icon: "🛍️", wall: "#c9c9d8", wall2: "#b3b3c8", backdrop: "🛍️  🎈  🛍️" },
-  tech:     { name: "Tech Conference", icon: "🤖", wall: "#b7c2d8", wall2: "#9fadc8", backdrop: "🤖  📡  🤖" },
-  divebar:  { name: "Dive Bar (est. 1972)", icon: "🍺", wall: "#c4b49a", wall2: "#b0a084", backdrop: "🍺  🎯  🍺" },
-  airport:  { name: "Airport Terminal C", icon: "✈️", wall: "#b7d8cf", wall2: "#9fc8bd", backdrop: "✈️  🛄  ✈️" },
-  station:  { name: "Grand Central Station", icon: "🚆", wall: "#d8c9b7", wall2: "#c8b69f", backdrop: "🚆  🕰️  🚆" },
-  stadium:  { name: "Stadium — Halftime Rush", icon: "🏟️", wall: "#b7d8b9", wall2: "#9fc8a2", backdrop: "🏟️  🌭  ⚾" },
-  festival: { name: "Music Festival", icon: "🎸", wall: "#d8b7d0", wall2: "#c89fbe", backdrop: "🎸  🔊  🎤" },
+  office:   { name: "Office Park Restroom", icon: "🏢", wall: "#b7d4d8", wall2: "#9fc3c8", floor1: "#9aa0aa", floor2: "#767c88", backdrop: "🧻  🧼  🧻" },
+  coffee:   { name: "Hipster Coffee Shop", icon: "☕", wall: "#d8ccb7", wall2: "#c8bb9f", floor1: "#8a7a68", floor2: "#6d5f50", backdrop: "🪴  ☕  🪴", drinks: 1, drinkMsg: "One large cold brew, extra large… ☕" },
+  mall:     { name: "Shopping Mall", icon: "🛍️", wall: "#c9c9d8", wall2: "#b3b3c8", floor1: "#a3a3b3", floor2: "#82828f", backdrop: "🛍️  🎈  🛍️" },
+  tech:     { name: "Tech Conference", icon: "🤖", wall: "#b7c2d8", wall2: "#9fadc8", floor1: "#8f97ab", floor2: "#6f7789", backdrop: "🤖  📡  🤖" },
+  divebar:  { name: "Dive Bar (est. 1972)", icon: "🍺", wall: "#c4b49a", wall2: "#b0a084", floor1: "#7a6f5c", floor2: "#5d5445", backdrop: "🍺  🎯  🍺", drinks: 2, drinkMsg: "A couple of cold ones at the bar… 🍺🍺" },
+  airport:  { name: "Airport Terminal C", icon: "✈️", wall: "#b7d8cf", wall2: "#9fc8bd", floor1: "#98a5a8", floor2: "#788486", backdrop: "✈️  🛄  ✈️" },
+  station:  { name: "Grand Central Station", icon: "🚆", wall: "#d8c9b7", wall2: "#c8b69f", floor1: "#948877", floor2: "#746a5c", backdrop: "🚆  🕰️  🚆" },
+  stadium:  { name: "Stadium — Halftime Rush", icon: "🏟️", wall: "#b7d8b9", wall2: "#9fc8a2", floor1: "#8fa091", floor2: "#6f8071", backdrop: "🏟️  🌭  ⚾", drinks: 1, drinkMsg: "Stadium tallboy acquired… 🍺" },
+  festival: { name: "Music Festival", icon: "🎸", wall: "#d8b7d0", wall2: "#c89fbe", floor1: "#9d8a99", floor2: "#7c6b78", backdrop: "🎸  🔊  🎤", drinks: 2, drinkMsg: "Two overpriced festival beers… 🍺🍺" },
 };
 
-/* ---------- round scripts (difficulty curve) ---------- */
+/* ---------- MLB ballpark localization (opt-in, on-device only) ---------- */
+const MLB_PARKS = [
+  { park: "Angel Stadium", team: "Angels", lat: 33.8003, lon: -117.8827, c: "#ba0021", flavor: "the Big A is watching" },
+  { park: "Daikin Park", team: "Astros", lat: 29.7573, lon: -95.3555, c: "#eb6e1f", flavor: "no banging on the divider" },
+  { park: "Sutter Health Park", team: "Athletics", lat: 38.5802, lon: -121.5133, c: "#003831", flavor: "temporary home, permanent code" },
+  { park: "Tropicana Field", team: "Rays", lat: 27.7683, lon: -82.6534, c: "#092c5c", flavor: "under the dome, everyone hears" },
+  { park: "Yankee Stadium", team: "Yankees", lat: 40.8296, lon: -73.9262, c: "#0c2340", flavor: "27 rings of pressure" },
+  { park: "Progressive Field", team: "Guardians", lat: 41.4962, lon: -81.6852, c: "#00385d", flavor: "guard your spacing" },
+  { park: "Comerica Park", team: "Tigers", lat: 42.3390, lon: -83.0485, c: "#0c2340", flavor: "the tigers can smell fear" },
+  { park: "Kauffman Stadium", team: "Royals", lat: 39.0517, lon: -94.4803, c: "#004687", flavor: "fountains outside, pressure inside" },
+  { park: "Target Field", team: "Twins", lat: 44.9817, lon: -93.2776, c: "#002b5c", flavor: "Minnesota nice ends at the door" },
+  { park: "Rate Field", team: "White Sox", lat: 41.8299, lon: -87.6338, c: "#27251f", flavor: "South Side rules apply" },
+  { park: "Wrigley Field", team: "Cubs", lat: 41.9484, lon: -87.6553, c: "#0e3386", flavor: "the ivy is judging you" },
+  { park: "Great American Ball Park", team: "Reds", lat: 39.0975, lon: -84.5066, c: "#c6011f", flavor: "great American responsibility" },
+  { park: "American Family Field", team: "Brewers", lat: 43.0280, lon: -87.9712, c: "#12284b", flavor: "brats and beers catching up fast" },
+  { park: "PNC Park", team: "Pirates", lat: 40.4469, lon: -80.0057, c: "#fdb827", flavor: "prettiest park, same old rules" },
+  { park: "Busch Stadium", team: "Cardinals", lat: 38.6226, lon: -90.1928, c: "#c41e3a", flavor: "the best fans expect the best picks" },
+  { park: "Coors Field", team: "Rockies", lat: 39.7559, lon: -104.9942, c: "#33006f", flavor: "everything flows faster at altitude" },
+  { park: "Dodger Stadium", team: "Dodgers", lat: 34.0739, lon: -118.2400, c: "#005a9c", flavor: "go now, beat the traffic" },
+  { park: "Petco Park", team: "Padres", lat: 32.7076, lon: -117.1570, c: "#2f241d", flavor: "the fish tacos were a choice" },
+  { park: "Oracle Park", team: "Giants", lat: 37.7786, lon: -122.3893, c: "#fd5a1e", flavor: "McCovey Cove is not an option" },
+  { park: "Chase Field", team: "D-backs", lat: 33.4453, lon: -112.0667, c: "#a71930", flavor: "the pool is NOT a trough" },
+  { park: "T-Mobile Park", team: "Mariners", lat: 47.5914, lon: -122.3325, c: "#0c2c56", flavor: "stay calm under the retractable roof" },
+  { park: "Globe Life Field", team: "Rangers", lat: 32.7473, lon: -97.0842, c: "#003278", flavor: "everything's bigger, including the line" },
+  { park: "Fenway Park", team: "Red Sox", lat: 42.3467, lon: -71.0972, c: "#bd3039", flavor: "the Green Monster looms" },
+  { park: "Camden Yards", team: "Orioles", lat: 39.2839, lon: -76.6217, c: "#df4601", flavor: "Boog's BBQ was a mistake" },
+  { park: "Rogers Centre", team: "Blue Jays", lat: 43.6414, lon: -79.3894, c: "#134a8e", flavor: "politeness will not save you" },
+  { park: "Truist Park", team: "Braves", lat: 33.8907, lon: -84.4677, c: "#ce1141", flavor: "the Battery is watching" },
+  { park: "loanDepot park", team: "Marlins", lat: 25.7781, lon: -80.2196, c: "#00a3e0", flavor: "humidity changes nothing" },
+  { park: "Citi Field", team: "Mets", lat: 40.7571, lon: -73.8458, c: "#002d72", flavor: "ya gotta believe in spacing" },
+  { park: "Citizens Bank Park", team: "Phillies", lat: 39.9061, lon: -75.1665, c: "#e81828", flavor: "Philly WILL boo a bad pick" },
+  { park: "Nationals Park", team: "Nationals", lat: 38.8730, lon: -77.0074, c: "#ab0003", flavor: "a capital offense awaits" },
+];
+function mixWhite(hex, t) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  const m = v => Math.round(v + (255 - v) * t);
+  return `rgb(${m(r)},${m(g)},${m(b)})`;
+}
+function haversineKm(a, b, c, d) {
+  const R = 6371, toR = x => x * Math.PI / 180;
+  const dLat = toR(c - a), dLon = toR(d - b);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(toR(a)) * Math.cos(toR(c)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+function applyPark(p, km) {
+  const s = THEMES.stadium;
+  s.name = `${p.park} — 7th-Inning Rush`;
+  s.icon = "⚾";
+  s.wall = mixWhite(p.c, 0.72);
+  s.wall2 = mixWhite(p.c, 0.58);
+  s.backdrop = `⚾  🌭  ⚾`;
+  s.flavor = p.flavor;
+  const line = km != null
+    ? `⚾ Home park set: ${p.park} (${p.team}), ~${Math.round(km)} km away — "${p.flavor}"`
+    : `⚾ Home park: ${p.park} (${p.team}) — "${p.flavor}"`;
+  $("locline").textContent = line;
+  $("locbtn").textContent = "📍 " + p.park.toUpperCase() + " LOADED ✓";
+}
+function localizeStadium() {
+  if (!navigator.geolocation) { $("locline").textContent = "Location isn't available in this browser."; return; }
+  $("locline").textContent = "📡 Finding your ballpark…";
+  navigator.geolocation.getCurrentPosition(pos => {
+    const { latitude, longitude } = pos.coords;
+    let best = null, bestKm = Infinity;
+    for (const p of MLB_PARKS) {
+      const km = haversineKm(latitude, longitude, p.lat, p.lon);
+      if (km < bestKm) { bestKm = km; best = p; }
+    }
+    applyPark(best, bestKm);
+    try { localStorage.setItem("ut_park", JSON.stringify({ park: best.park, km: Math.round(bestKm) })); } catch (e) {}
+  }, err => {
+    $("locline").textContent = err.code === 1
+      ? "Location denied — playing the generic stadium. (No hard feelings.)"
+      : "Couldn't get a location fix — generic stadium it is.";
+  }, { timeout: 9000, maximumAge: 600000 });
+}
+try {
+  const saved = JSON.parse(localStorage.getItem("ut_park") || "null");
+  if (saved) {
+    const p = MLB_PARKS.find(x => x.park === saved.park);
+    if (p) applyPark(p, saved.km);
+  }
+} catch (e) {}
+
+/* ---------- gauntlet round scripts (difficulty curve) ---------- */
 const ROUND_PLAN = [
-  { theme: "office",  n: [5, 5],  occ: [0, 0], div: 0,   time: 10 },                             // 1: empty tutorial
-  { theme: "coffee",  n: [4, 5],  occ: [1, 1], div: 0,   time: 9 },                              // 2
-  { theme: "mall",    n: [5, 6],  occ: [2, 2], div: 0,   time: 9 },                              // 3
-  { theme: "office",  n: [6, 7],  occ: [2, 2], div: 1,   time: 8 },                              // 4: dividers
-  { theme: "tech",    n: [6, 7],  occ: [2, 3], div: .4,  time: 8, glasses: true },               // 5: REC guy
-  { theme: "divebar", n: [6, 8],  occ: [2, 3], div: 0,   time: 8, trough: true },                // 6: trough
-  { theme: "airport", n: [7, 8],  occ: [3, 3], div: .3,  time: 7, traveler: true },              // 7: luggage
+  { theme: "office",  n: [5, 5],  occ: [0, 0], div: 0,   time: 10 },                              // 1: empty tutorial
+  { theme: "coffee",  n: [4, 5],  occ: [1, 1], div: 0,   time: 9 },                               // 2
+  { theme: "mall",    n: [5, 6],  occ: [2, 2], div: 0,   time: 9 },                               // 3
+  { theme: "office",  n: [6, 7],  occ: [2, 2], div: 1,   time: 8 },                               // 4: dividers
+  { theme: "tech",    n: [6, 7],  occ: [2, 3], div: .4,  time: 8, glasses: true },                // 5: REC guy
+  { theme: "divebar", n: [6, 8],  occ: [2, 3], div: 0,   time: 8, trough: true },                 // 6: trough
+  { theme: "airport", n: [7, 8],  occ: [3, 3], div: .3,  time: 7, traveler: true },               // 7: luggage
   { theme: "station", n: [5, 6],  occ: [2, 3], div: 0,   time: 7, waitRound: true, traveler: .5 },// 8: walk away
-  { theme: "stadium", n: [8, 9],  occ: [3, 4], div: .5,  time: 6, glasses: .4, traveler: .3 },   // 9
+  { theme: "stadium", n: [7, 9],  occ: [3, 4], div: 0,   time: 7, tub: true, glasses: .4 },       // 9: the shame tub
   { theme: "festival",n: [10,10], occ: [4, 5], div: .3,  time: 6, glasses: .5, traveler: .4, trough: .25 }, // 10
 ];
 
+/* ---------- endless plan generator: infinite combinations ---------- */
+function endlessPlan(r) {
+  const waitRound = r >= 3 && Math.random() < 0.15;
+  const roll = Math.random();
+  const tub = !waitRound && r >= 2 && roll < 0.18;
+  const trough = !waitRound && !tub && roll < 0.40;
+  const theme = tub ? pick(["stadium", "festival", "divebar"])
+    : trough ? pick(["divebar", "stadium", "festival", "station"])
+    : pick(Object.keys(THEMES));
+  const traveler = (theme === "airport" || theme === "station") ? .65 : .18;
+  if (waitRound) return { theme, n: [5, 6], occ: [2, 2], div: 0, time: Math.max(5, 8 - r * .15), waitRound: true, traveler };
+  const lo = Math.min(9, (tub ? 6 : 4) + Math.floor(r / 3));
+  const hi = Math.min(10, (tub ? 7 : 5) + Math.floor(r / 2));
+  return {
+    theme, trough, tub,
+    n: [lo, hi],
+    occ: [1 + Math.floor(r / 5), 2 + Math.floor(r / 3)],
+    div: (trough || tub) ? 0 : .35,
+    glasses: Math.min(.7, .12 + r * .05),
+    traveler: tub ? 0 : traveler,
+    time: Math.max(4.5, 9 - r * 0.3),
+  };
+}
+
 /* ---------- game state ---------- */
 const G = {
-  round: 0, score: 0, streak: 0, lives: 3,
+  mode: "gauntlet",
+  round: 0, score: 0, streak: 0, lives: 3, drinks: 0, pissed: false,
   splashes: 0, perfects: 0,
   cur: null, timer: null, timeLeft: 0, locked: false,
 };
+function desperate() { return G.drinks >= 3; }
 
 /* ---------- round generation ---------- */
 function chance(v) { return v === true || Math.random() < (v || 0); }
 
+function planFor(idx) { return G.mode === "gauntlet" ? ROUND_PLAN[idx] : endlessPlan(idx); }
+
 function makeRound(idx) {
-  const plan = ROUND_PLAN[idx];
+  const plan = planFor(idx);
   const theme = THEMES[plan.theme];
-  for (let attempt = 0; attempt < 80; attempt++) {
+  let round = null;
+  for (let attempt = 0; attempt < 120; attempt++) {
     const n = rand(plan.n[0], plan.n[1]);
-    const occCount = Math.min(rand(plan.occ[0], plan.occ[1]), n - 2);
-    const trough = chance(plan.trough);
-    const dividers = !trough && chance(plan.div);
+    const occCount = Math.max(0, Math.min(rand(plan.occ[0], plan.occ[1]), n - 2));
+    const tub = chance(plan.tub);
+    const trough = !tub && chance(plan.trough);
+    const layout = tub ? "tub" : trough ? "trough" : "wall";
+    const dividers = layout === "wall" && chance(plan.div);
 
     const spots = Array.from({ length: n }, () => ({ occupant: null, blocked: false }));
+    if (layout === "tub") {
+      const nFar = Math.ceil(n / 2);
+      spots.forEach((s, i) => {
+        s.side = i < nFar ? 0 : 1;
+        s.pos = i < nFar ? i : i - nFar;
+      });
+    }
 
     if (plan.waitRound) {
-      // Occupy so that every free spot is adjacent to someone; no dividers.
       const occIdx = n <= 5 ? [1, 3] : [1, 4];
       occIdx.forEach(i => { if (i < n) spots[i].occupant = "regular"; });
     } else {
@@ -400,7 +750,6 @@ function makeRound(idx) {
       for (let k = 0; k < occCount; k++) spots[order[k]].occupant = "regular";
     }
 
-    // assign personas
     const occupiedIdx = spots.map((s, i) => s.occupant ? i : -1).filter(i => i >= 0);
     if (occupiedIdx.length) {
       if (chance(plan.glasses)) spots[pick(occupiedIdx)].persona = "glasses";
@@ -413,16 +762,18 @@ function makeRound(idx) {
       });
     }
 
-    // traveler luggage blocks an adjacent free spot
+    // traveler luggage blocks an adjacent free spot (linear layouts only)
     let luggageAt = -1;
-    occupiedIdx.forEach(i => {
-      if (spots[i].persona === "traveler" && luggageAt < 0) {
-        const sides = [i - 1, i + 1].filter(j => j >= 0 && j < n && !spots[j].occupant);
-        if (sides.length) { luggageAt = pick(sides); spots[luggageAt].blocked = true; }
-      }
-    });
+    if (layout !== "tub") {
+      occupiedIdx.forEach(i => {
+        if (spots[i].persona === "traveler" && luggageAt < 0) {
+          const sides = [i - 1, i + 1].filter(j => j >= 0 && j < n && !spots[j].occupant);
+          if (sides.length) { luggageAt = pick(sides); spots[luggageAt].blocked = true; }
+        }
+      });
+    }
 
-    const round = { idx, theme, plan, n, spots, dividers, trough, luggageAt, time: plan.time };
+    round = { idx, theme, themeKey: plan.theme, plan, n, spots, dividers, layout, luggageAt, time: plan.time };
     analyze(round);
 
     const isWait = round.bestRaw <= 1.0 && occupiedIdx.length > 0;
@@ -431,24 +782,42 @@ function makeRound(idx) {
     if (!plan.waitRound && round.selectable.length < 2 && idx > 0) continue;
     return round;
   }
-  return makeRound(idx); // extremely unlikely
+  return round; // fallback: correctness keys off analyze(), so any layout still plays fair
 }
 
 /* ---------- etiquette engine ---------- */
+function distBetween(r, i, j) {
+  if (r.layout !== "tub") return Math.abs(i - j);
+  const a = r.spots[i], b = r.spots[j];
+  if (a.side === b.side) return Math.abs(a.pos - b.pos);
+  // across the tub: direct eye contact is barely better than shoulder-to-shoulder
+  return a.pos === b.pos ? 0.75 : Math.abs(a.pos - b.pos) + 0.5;
+}
+
 function comfortOf(round, i) {
   const { spots, n, dividers } = round;
   let minRaw = 99, adjGlasses = false, hasAdjacent = false;
   for (let j = 0; j < n; j++) {
     if (!spots[j].occupant) continue;
-    let d = Math.abs(i - j);
+    let d = distBetween(round, i, j);
+    const sideBySide = round.layout === "tub"
+      ? (spots[i].side === spots[j].side && Math.abs(spots[i].pos - spots[j].pos) === 1)
+      : Math.abs(i - j) === 1;
     if (spots[j].persona === "glasses") d -= 0.5; // his presence is... larger
-    if (Math.abs(i - j) === 1) { hasAdjacent = true; if (spots[j].persona === "glasses") adjGlasses = true; }
+    if (sideBySide) { hasAdjacent = true; if (spots[j].persona === "glasses") adjGlasses = true; }
     if (d < minRaw) minRaw = d;
   }
   let eff = minRaw;
   if (adjGlasses) eff = Math.min(eff, 0.5);
   else if (minRaw === 1 && hasAdjacent && dividers) eff = 1.5; // divider softens a direct neighbor
-  const isEnd = (i === 0 || i === n - 1);
+  let isEnd;
+  if (round.layout === "tub") {
+    const s = spots[i];
+    const sideLen = spots.filter(x => x.side === s.side).length;
+    isEnd = s.pos === 0 || s.pos === sideLen - 1;
+  } else {
+    isEnd = (i === 0 || i === n - 1);
+  }
   return { raw: minRaw, eff, comfort: eff + (isEnd ? 0.25 : 0), isEnd };
 }
 
@@ -463,27 +832,39 @@ function analyze(round) {
 }
 
 /* ---------- rendering ---------- */
+function slotEl(i) { return $("scene").querySelector(`.slot[data-i="${i}"]`); }
+
 function renderRound(round) {
   const scene = $("scene");
-  scene.classList.toggle("trough", round.trough);
-  document.documentElement.style.setProperty("--wall", round.theme.wall);
-  document.documentElement.style.setProperty("--wall2", round.theme.wall2);
+  scene.classList.toggle("trough", round.layout === "trough");
+  scene.classList.toggle("tub", round.layout === "tub");
+  const rootStyle = document.documentElement.style;
+  rootStyle.setProperty("--wall", round.theme.wall);
+  rootStyle.setProperty("--wall2", round.theme.wall2);
+  rootStyle.setProperty("--floor1", round.theme.floor1);
+  rootStyle.setProperty("--floor2", round.theme.floor2);
   $("backdrop").textContent = round.theme.backdrop;
   $("themebar").innerHTML = `${round.theme.icon} <b>${round.theme.name}</b>` +
-    (round.trough ? " — old-school trough" : round.dividers ? " — dividers installed" : "");
+    (round.layout === "trough" ? " — old-school trough"
+      : round.layout === "tub" ? " — ⚠️ the shame tub"
+      : round.dividers ? " — dividers installed"
+      : round.theme.flavor ? ` — ${round.theme.flavor}` : "");
 
-  const row = $("row");
-  row.innerHTML = "";
+  const row = $("row"), rowfar = $("rowfar");
+  row.innerHTML = ""; rowfar.innerHTML = "";
+
   round.spots.forEach((s, i) => {
     const slot = document.createElement("div");
     slot.className = "slot";
     slot.dataset.i = i;
-    let inner = `<div class="fixture">${urinalSVG()}</div>`;
-    if (round.trough) inner = "";
+    slot.style.animationDelay = (i * 0.04) + "s";
+    const far = round.layout === "tub" && s.side === 0;
+    const facing = far ? "front" : "back";
+    let inner = round.layout === "wall" ? `<div class="fixture">${urinalSVG()}</div>` : "";
     if (s.occupant) {
       slot.classList.add("occupied");
       const chip = PERSONAS[s.persona].chip;
-      inner += `<div class="person">${personSVG(s.persona)}` +
+      inner += `<div class="person">${personSVG(s.persona, facing)}` +
         (chip ? `<div class="chip">${chip}</div>` : "") + `</div>`;
     } else if (s.blocked) {
       slot.classList.add("blocked");
@@ -493,7 +874,7 @@ function renderRound(round) {
     }
     slot.innerHTML = inner;
     slot.addEventListener("click", () => onSlot(i));
-    row.appendChild(slot);
+    (far ? rowfar : row).appendChild(slot);
     if (round.dividers && i < round.n - 1) {
       const d = document.createElement("div");
       d.className = "divider";
@@ -503,18 +884,27 @@ function renderRound(round) {
 }
 
 function updateHUD() {
-  $("roundchip").textContent = `Round ${G.round + 1}/10`;
+  $("roundchip").textContent = G.mode === "gauntlet" ? `Round ${G.round + 1}/10` : `Round ${G.round + 1} ♾️`;
   $("scorechip").textContent = `${G.score} pts`;
-  $("lives").textContent = "👖".repeat(G.lives) + "💦".repeat(3 - G.lives);
+  $("lives").textContent = "👖".repeat(G.lives) + "💦".repeat(Math.max(0, 3 - G.lives));
   $("streakchip").textContent = `🔥 ${G.streak}`;
   $("streakchip").classList.toggle("hot", G.streak >= 3);
+  const dc = $("drinkchip");
+  dc.textContent = desperate() ? `🍺 ${G.drinks} 🚨` : `🍺 ${G.drinks} · +${G.drinks * 10}%`;
+  dc.classList.toggle("on", G.drinks > 0);
+  dc.classList.toggle("danger", desperate());
+  const wb = $("waitbtn");
+  wb.classList.toggle("danger", desperate());
+  wb.innerHTML = desperate()
+    ? `🚪 Hold it &amp; walk away <span style="color:#ff9a90">(⚠️ ${G.drinks} drinks deep — you CANNOT hold it)</span>`
+    : `🚪 Hold it &amp; walk away <span style="color:#9fb0c3">(pro move… sometimes)</span>`;
 }
 
 function toast(msg) {
   const t = document.createElement("div");
   t.className = "toast"; t.textContent = msg;
   $("scene").appendChild(t);
-  setTimeout(() => t.remove(), 1500);
+  setTimeout(() => t.remove(), 1700);
 }
 
 /* ---------- timer ---------- */
@@ -535,22 +925,24 @@ function startTimer(sec) {
 function stopTimer() { if (G.timer) { clearInterval(G.timer); G.timer = null; } }
 
 /* ---------- FX ---------- */
-function splashFX() {
-  buzz([80, 40, 120, 40, 200]);
-  sfx.splash();
+function splashFX(big) {
+  buzz(big ? [400, 80, 400, 80, 600] : [80, 40, 120, 40, 200]);
+  if (big) sfx.disaster(); else sfx.splash();
   $("app").classList.remove("shake"); void $("app").offsetWidth; $("app").classList.add("shake");
   $("flash").classList.remove("go"); void $("flash").offsetWidth; $("flash").classList.add("go");
   const fx = $("fx");
-  for (let k = 0; k < 26; k++) {
+  const count = big ? 55 : 28;
+  for (let k = 0; k < count; k++) {
     const d = document.createElement("div");
     d.className = "droplet";
-    const size = rand(6, 22);
+    const size = rand(6, big ? 30 : 22);
     d.style.width = size + "px"; d.style.height = (size * 1.25) + "px";
     d.style.left = rand(0, 96) + "%";
     d.style.top = rand(-5, 45) + "%";
-    d.style.animationDelay = (Math.random() * 0.25) + "s";
+    d.style.setProperty("--dx", rand(-60, 60) + "px");
+    d.style.animationDelay = (Math.random() * (big ? 0.6 : 0.25)) + "s";
     fx.appendChild(d);
-    setTimeout(() => d.remove(), 1600);
+    setTimeout(() => d.remove(), 2200);
   }
 }
 function verdict(text, cls) {
@@ -565,65 +957,51 @@ function showLesson(title, text, pts) {
   $("ltext").innerHTML = text;
   $("lpts").textContent = pts > 0 ? `+${pts}` : (pts < 0 ? `${pts}` : "");
   $("lesson").classList.add("show");
-  // reveal best answer(s)
   const r = G.cur;
-  if (!r.isWaitRound) {
-    r.bestSpots.forEach(i => $("row").children[r.dividers ? i * 2 : i].classList.add("best-mark"));
+  if (!r.isWaitRound) r.bestSpots.forEach(i => { const el = slotEl(i); if (el) el.classList.add("best-mark"); });
+}
+
+function spotName(r, i) {
+  if (r.layout === "tub") {
+    const s = r.spots[i];
+    return `the ${s.side === 0 ? "far" : "near"} side, spot #${s.pos + 1}`;
   }
+  return i === 0 ? "the far left end" : i === r.n - 1 ? "the far right end" : `spot #${i + 1}`;
 }
 
 function describeBest(r) {
   if (r.isWaitRound) return "every open spot was shoulder-to-shoulder — the door was the only dignified exit";
   const b = r.bestSpots[0];
   const s = r.scores[b];
-  const pos = b === 0 ? "the far left end" : b === r.n - 1 ? "the far right end" : `spot #${b + 1}`;
   let why = [];
   if (s.raw >= 99) why.push("empty room — claim an end so future arrivals have somewhere to go");
-  else why.push(`${s.raw >= 2 ? Math.floor(s.raw) + " urinals of buffer" : "the biggest buffer available"}`);
-  if (s.isEnd) why.push("wall on one side");
+  else why.push(`${s.raw >= 2 ? Math.floor(s.raw) + " spots of buffer" : "the biggest buffer available"}`);
+  if (s.isEnd) why.push(r.layout === "tub" ? "corner position" : "wall on one side");
   if (r.dividers && s.raw === 1) why.push("divider coverage");
-  return `${pos} (${why.join(", ")})`;
-}
-
-function resolveChoice(i) {
-  const r = G.cur;
-  const sc = r.scores[i];
-  const speedBonus = Math.min(50, Math.round(G.timeLeft * 5));
-
-  if (r.isWaitRound) {
-    // choosing ANY urinal in a wait round = fail
-    fail(i, "SPLASHED!", `There was no good option — <b>walking away</b> was the play. ` +
-      `You wedged in next to ${neighborDesc(r, i)} and paid the price.`);
-    return;
-  }
-
-  if (sc.comfort >= r.bestComfort - 0.01) {
-    G.streak++;
-    const mult = 1 + Math.min(0.5, (G.streak - 1) * 0.1);
-    const pts = Math.round((100 + speedBonus) * mult);
-    G.score += pts; G.perfects++;
-    buzz(30); sfx.good();
-    verdict("PERFECT!", "good");
-    markSlot(i, "chosen-good");
-    showLesson("Textbook etiquette. 👌",
-      `Optimal pick: ${describeBest(r)}. ${G.streak >= 3 ? `🔥 ${G.streak}-streak multiplier active!` : ""}`, pts);
-  } else if (sc.eff > 1.0) {
-    G.streak = 0;
-    const pts = 40;
-    G.score += pts;
-    buzz([15, 30, 15]); sfx.ok();
-    verdict("ACCEPTABLE", "ok");
-    markSlot(i, "chosen-good");
-    showLesson("Fine. Technically fine.",
-      `No splash zone, but the pros would take ${describeBest(r)}. Streak reset.`, pts);
-  } else {
-    fail(i, "SPLASHED!", `Directly next to ${neighborDesc(r, i)}?! ` +
-      `The right call was ${describeBest(r)}.`);
-  }
-  updateHUD();
+  return `${spotName(r, b)} (${why.join(", ")})`;
 }
 
 function neighborDesc(r, i) {
+  // eye contact across the tub trumps everything
+  if (r.layout === "tub") {
+    const me = r.spots[i];
+    for (let j = 0; j < r.n; j++) {
+      const o = r.spots[j];
+      if (o.occupant && o.side !== me.side && o.pos === me.pos) {
+        return o.persona === "glasses"
+          ? "the smart-glasses guy — <b>direct eye contact, on camera, across the water</b>"
+          : `${PERSONAS[o.persona].desc} — <b>direct eye contact across the water</b>`;
+      }
+    }
+    for (let j = 0; j < r.n; j++) {
+      const o = r.spots[j];
+      if (o.occupant && o.side === me.side && Math.abs(o.pos - me.pos) === 1) {
+        if (o.persona === "glasses") return "the smart-glasses guy — <b>you're on his livestream now</b>";
+        return PERSONAS[o.persona].desc;
+      }
+    }
+    return "another patron";
+  }
   for (const j of [i - 1, i + 1]) {
     if (j >= 0 && j < r.n && r.spots[j].occupant) {
       const p = r.spots[j].persona;
@@ -634,9 +1012,89 @@ function neighborDesc(r, i) {
   return "another patron";
 }
 
+/* Going while desperate vents pressure; otherwise the day's intake stays with you. */
+function relieve() {
+  if (desperate()) {
+    G.drinks = Math.max(0, G.drinks - 2);
+    setTimeout(() => toast("😮‍💨 Emergency relief: −2 drinks"), 900);
+  }
+}
+/* Perfect picks earn a reward drink: +10% score buzz each… and one more thing in the tank. */
+function earnDrink() {
+  const beerVenue = !!THEMES[G.cur.themeKey].drinks;
+  G.drinks++;
+  const icon = beerVenue ? "🍺" : "☕";
+  setTimeout(() => toast(`${icon} Reward drink earned! Buzz +10% score… and +1 bladder.`), 1400);
+}
+function buzzMult() { return 1 + 0.1 * G.drinks; }
+
+function resolveChoice(i) {
+  const r = G.cur;
+  const sc = r.scores[i];
+  const speedBonus = Math.min(50, Math.round(G.timeLeft * 5));
+
+  if (r.isWaitRound) {
+    if (desperate() && sc.comfort >= r.bestComfort - 0.01) {
+      // no good spots, but with a full bladder the least-bad pick is survival
+      const drinksAtPick = G.drinks;
+      G.streak++;
+      const pts = Math.round(80 * buzzMult());
+      G.score += pts; G.perfects++;
+      relieve();
+      buzz([30, 20, 30]); sfx.ok();
+      verdict("GRITTED TEETH 😬", "ok");
+      markSlot(i, "chosen-good");
+      showLesson("Desperate times.",
+        `No good options, but ${drinksAtPick} drinks past the point of no return, the door wasn't one either. ` +
+        `You took the least-bad spot, stared straight ahead, and said nothing. Respect.`, pts);
+      updateHUD();
+      return;
+    }
+    relieve(); // you went — messily
+    fail(i, "SPLASHED!", `There was no good option — <b>walking away</b> was the play. ` +
+      `You wedged in next to ${neighborDesc(r, i)} and paid the price.`);
+    return;
+  }
+
+  if (sc.comfort >= r.bestComfort - 0.01) {
+    G.streak++;
+    const mult = 1 + Math.min(0.5, (G.streak - 1) * 0.1);
+    const pts = Math.round((100 + speedBonus) * mult * buzzMult());
+    const buzzNote = G.drinks > 0 ? ` 🍺 +${G.drinks * 10}% buzz bonus!` : "";
+    G.score += pts; G.perfects++;
+    relieve();
+    earnDrink();
+    buzz(30); sfx.good();
+    verdict("PERFECT!", "good");
+    markSlot(i, "chosen-good");
+    showLesson("Textbook etiquette. 👌",
+      `Optimal pick: ${describeBest(r)}.${buzzNote} ${G.streak >= 3 ? `🔥 ${G.streak}-streak multiplier active!` : ""}`, pts);
+  } else if (sc.eff > 1.0) {
+    G.streak = 0;
+    const pts = Math.round(40 * buzzMult());
+    G.score += pts;
+    relieve();
+    buzz([15, 30, 15]); sfx.ok();
+    verdict("ACCEPTABLE", "ok");
+    markSlot(i, "chosen-good");
+    showLesson("Fine. Technically fine.",
+      `No splash zone, but the pros would take ${describeBest(r)}. Streak reset — and no reward drink, ` +
+      `which honestly might be the smart play for your bladder.`, pts);
+  } else {
+    relieve();
+    const eyeContact = r.layout === "tub" &&
+      r.spots.some(o => o.occupant && o.side !== r.spots[i].side && o.pos === r.spots[i].pos);
+    fail(i, eyeContact ? "EYE CONTACT! 👁️" : "SPLASHED!",
+      (eyeContact ? `You faced ${neighborDesc(r, i)}. At the shame tub, that is the one unforgivable sin. `
+                  : `Directly next to ${neighborDesc(r, i)}?! `) +
+      `The right call was ${describeBest(r)}.`);
+  }
+  updateHUD();
+}
+
 function fail(i, big, text) {
   G.streak = 0; G.lives--; G.splashes++;
-  splashFX();
+  splashFX(false);
   verdict(big, "bad");
   if (i >= 0) markSlot(i, "chosen-bad");
   showLesson("Etiquette violation. 💦", text + ` <b>−1 pair of dry pants.</b>`, 0);
@@ -644,9 +1102,20 @@ function fail(i, big, text) {
 }
 
 function markSlot(i, cls) {
-  const r = G.cur;
-  const el = $("row").children[r.dividers ? i * 2 : i];
+  const el = slotEl(i);
   if (el) el.classList.add(cls);
+}
+
+/* ---------- the ultimate disaster ---------- */
+function pissSelf(reason) {
+  G.locked = true;
+  stopTimer();
+  G.lives = 0; G.pissed = true; G.pissReason = reason;
+  splashFX(true);
+  verdict("OH NO.", "bad");
+  setTimeout(() => splashFX(true), 450);
+  setTimeout(() => endGame(false), 1600);
+  updateHUD();
 }
 
 /* ---------- input ---------- */
@@ -673,6 +1142,11 @@ function onSlot(i) {
 
 function onWait() {
   if (G.locked) return;
+  if (desperate()) {
+    // you had WAY too much to drink. The door was never an option.
+    pissSelf("walkaway");
+    return;
+  }
   G.locked = true;
   stopTimer();
   const r = G.cur;
@@ -684,20 +1158,21 @@ function onWait() {
     verdict("PRO MOVE 🚪", "good");
     showLesson("Grandmaster patience.",
       `Every open spot meant standing shoulder-to-shoulder${r.spots.some(s => s.persona === "glasses") ? " (one of them was <b>recording</b>)" : ""}. ` +
-      `Walking away costs nothing but time. Legends hold it.`, pts);
+      `Walking away costs nothing but time — <b>as long as your bladder can cash that check</b>. Legends hold it.`, pts);
   } else {
     G.streak = 0;
     buzz([200]); sfx.chicken();
     verdict("CHICKENED OUT 🐔", "ok");
     showLesson("You bailed on a solvable board.",
       `There was a perfectly comfortable spot: ${describeBest(r)}. ` +
-      `Your bladder will remember this betrayal. No points.`, 0);
+      `Your bladder will remember this betrayal. No points, and you still haven't gone.`, 0);
   }
   updateHUD();
 }
 
 function onTimeout() {
   if (G.locked) return;
+  if (desperate()) { pissSelf("timeout"); return; }
   G.locked = true;
   fail(-1, "TOO SLOW!", `You stood in the doorway doing math until it was too late. ` +
     `Decisiveness is half the code — the answer was ${describeBest(G.cur)}.`);
@@ -711,17 +1186,33 @@ function startRound() {
   G.cur = makeRound(G.round);
   renderRound(G.cur);
   updateHUD();
-  startTimer(G.cur.time);
+  const factor = Math.max(0.5, 1 - 0.12 * G.drinks); // every drink makes the clock meaner
+  startTimer(G.cur.time * factor);
+  if (desperate()) toast(`🚨 ${G.drinks} drinks deep — you CANNOT walk away from this one!`);
 }
 
 function nextRound() {
   if (G.lives <= 0) { endGame(false); return; }
+  // leaving the venue: whatever you drank there catches up with you
+  const t = THEMES[G.cur.themeKey];
+  if (t.drinks) {
+    G.drinks += t.drinks;
+    setTimeout(() => toast(t.drinkMsg), 350);
+  }
   G.round++;
-  if (G.round >= ROUND_PLAN.length) { endGame(true); return; }
+  if (G.mode === "gauntlet" && G.round >= ROUND_PLAN.length) { endGame(true); return; }
   startRound();
 }
 
 function rankFor(score, survived) {
+  if (G.pissed) return ["🌊 PUDDLE MAKER", "Should've gone when you had the chance."];
+  if (G.mode === "endless") {
+    const r = G.round + 1;
+    if (r >= 18) return ["🧘 URINAL GRANDMASTER", "Monks study your spacing."];
+    if (r >= 12) return ["🎓 RESTROOM STRATEGIST", "You see the whole board."];
+    if (r >= 7)  return ["📘 CERTIFIED STALL SCHOLAR", "Solid fundamentals, occasional splash."];
+    return ["🩹 SPLASH SURVIVOR", "The rush claimed you early. Wash everything."];
+  }
   if (!survived) return ["💦 SPLASH CASUALTY", "The restroom claimed another victim."];
   if (score >= 1400) return ["🧘 URINAL GRANDMASTER", "Monks study your spacing."];
   if (score >= 1000) return ["🎓 RESTROOM STRATEGIST", "You see the whole board."];
@@ -732,27 +1223,56 @@ function rankFor(score, survived) {
 function endGame(survived) {
   stopTimer();
   const [rank, blurb] = rankFor(G.score, survived);
-  $("endtitle").textContent = survived ? "TEST COMPLETE 🧼" : "GAME OVER 💦";
+  const roundsReached = G.round + 1;
+  if (G.pissed) {
+    $("endtitle").textContent = "YOU PISSED YOURSELF 💦💦💦";
+  } else if (G.mode === "endless") {
+    $("endtitle").textContent = "THE RUSH GOT YOU 💦";
+  } else {
+    $("endtitle").textContent = survived ? "TEST COMPLETE 🧼" : "GAME OVER 💦";
+  }
+  if (G.mode === "endless") {
+    try {
+      const best = Number(localStorage.getItem("ut_bestEndless") || 0);
+      if (roundsReached > best) localStorage.setItem("ut_bestEndless", roundsReached);
+      const bestScore = Number(localStorage.getItem("ut_bestEndlessScore") || 0);
+      if (G.score > bestScore) localStorage.setItem("ut_bestEndlessScore", G.score);
+    } catch (e) {}
+  }
   $("ranktext").textContent = rank;
   $("finaltext").textContent = `${G.score} points — ${blurb}`;
   $("stattext").textContent =
-    `${G.perfects} perfect picks · ${G.splashes} splash${G.splashes === 1 ? "" : "es"} · reached round ${Math.min(G.round + 1, 10)}/10`;
+    (G.pissed ? `${G.drinks} drinks proved fatal · ` : "") +
+    `${G.perfects} perfect picks · ${G.splashes} splash${G.splashes === 1 ? "" : "es"} · ` +
+    (G.mode === "endless" ? `survived to round ${roundsReached}` : `reached round ${Math.min(roundsReached, 10)}/10`);
   $("end").classList.remove("hidden");
-  if (survived) sfx.flush();
+  if (survived && G.mode === "gauntlet") sfx.flush();
 }
 
-function resetGame() {
-  Object.assign(G, { round: 0, score: 0, streak: 0, lives: 3, splashes: 0, perfects: 0, locked: false });
+function resetGame(mode) {
+  Object.assign(G, { mode: mode || G.mode, round: 0, score: 0, streak: 0, lives: 3, drinks: 0, pissed: false, splashes: 0, perfects: 0, locked: false });
   $("end").classList.add("hidden");
   $("start").classList.add("hidden");
   startRound();
 }
 
+function showBestLine() {
+  try {
+    const best = Number(localStorage.getItem("ut_bestEndless") || 0);
+    const bestScore = Number(localStorage.getItem("ut_bestEndlessScore") || 0);
+    $("bestline").textContent = best ? `♾️ Endless best: round ${best} · ${bestScore} pts` : "";
+  } catch (e) {}
+}
+showBestLine();
+
 /* ---------- wire up ---------- */
-$("startbtn").addEventListener("click", () => { audio(); buzz(20); resetGame(); });
+$("startbtn").addEventListener("click", () => { audio(); buzz(20); resetGame("gauntlet"); });
+$("endlessbtn").addEventListener("click", () => { audio(); buzz(20); resetGame("endless"); });
 $("againbtn").addEventListener("click", () => { buzz(20); resetGame(); });
+$("menubtn").addEventListener("click", () => { $("end").classList.add("hidden"); $("start").classList.remove("hidden"); showBestLine(); });
 $("nextbtn").addEventListener("click", () => nextRound());
 $("waitbtn").addEventListener("click", () => onWait());
+$("locbtn").addEventListener("click", () => localizeStadium());
 </script>
 </body>
 </html>
