@@ -478,20 +478,41 @@
   #stalldoor.knocking { animation: knock .5s ease-in-out 2; }
   @keyframes knock { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
 
-  /* ---------- ballpark photo interstitial ---------- */
-  #parkphoto { position: absolute; inset: 0; z-index: 34; display: none; overflow: hidden; border-radius: 14px; }
+  /* ---------- ballpark photo interstitial: sharp band over blurred ambience, tap to enter ---------- */
+  #parkphoto { position: absolute; inset: 0; z-index: 34; display: none; overflow: hidden; border-radius: 14px; cursor: pointer; }
   #parkphoto.show { display: block; }
-  .pp-img { position: absolute; inset: 0; background-size: cover; background-position: center;
-    animation: ppzoom 2.6s ease-out forwards; }
-  @keyframes ppzoom { from { transform: scale(1.1); } to { transform: scale(1); } }
-  .pp-shade { position: absolute; inset: 0;
-    background: linear-gradient(rgba(10,13,19,.15) 30%, rgba(10,13,19,.85)); }
-  .pp-text { position: absolute; left: 0; right: 0; bottom: 9%; text-align: center; animation: ppup .6s ease-out; }
+  .pp-img { position: absolute; inset: -4%; background-size: cover; background-position: center;
+    filter: blur(16px) brightness(.5) saturate(1.15); transform: scale(1.12); }
+  .pp-photo { position: absolute; left: 0; right: 0; top: 13%; height: 46%;
+    background-size: contain; background-position: center; background-repeat: no-repeat;
+    border-top: 1px solid rgba(255,255,255,.25); border-bottom: 1px solid rgba(255,255,255,.25);
+    box-shadow: 0 10px 40px rgba(0,0,0,.6);
+    animation: ppsettle 1.1s cubic-bezier(.2,.8,.3,1) both; }
+  @keyframes ppsettle { from { transform: scale(1.045); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .pp-shade { position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(rgba(10,13,19,.35) 0%, rgba(10,13,19,0) 18%, rgba(10,13,19,0) 55%, rgba(10,13,19,.72)); }
+  .pp-text { position: absolute; left: 0; right: 0; bottom: 15%; text-align: center; animation: ppup .7s .15s ease-out both; }
   @keyframes ppup { from { transform: translateY(18px); opacity: 0; } }
   .pp-now { letter-spacing: 6px; font-size: clamp(11px, 3vw, 14px); color: #cfe8ff; }
-  .pp-name { font-weight: 900; font-size: clamp(24px, 7.5vw, 40px); letter-spacing: 1px;
-    text-shadow: 0 3px 10px rgba(0,0,0,.8); margin: 2px 0; }
-  .pp-sub { color: #ffd76a; font-size: clamp(12px, 3.4vw, 15px); font-weight: bold; }
+  .pp-name { font-weight: 900; font-size: clamp(26px, 8vw, 42px); letter-spacing: 1px;
+    text-shadow: 0 3px 12px rgba(0,0,0,.9); margin: 3px 0; }
+  .pp-sub { color: #ffd76a; font-size: clamp(12px, 3.4vw, 15px); font-weight: bold; text-shadow: 0 2px 6px rgba(0,0,0,.8); }
+  .pp-round { color: #dde8f2; font-size: clamp(12px, 3.4vw, 15px); margin-top: 8px; line-height: 1.5;
+    text-shadow: 0 2px 6px rgba(0,0,0,.8); padding: 0 20px; }
+  .pp-tap { position: absolute; left: 0; right: 0; bottom: 4.5%; text-align: center; font-weight: 900;
+    font-size: clamp(14px, 4vw, 17px); color: #fff; letter-spacing: 2px;
+    text-shadow: 0 2px 8px rgba(0,0,0,.9); opacity: 0; animation: tapin .5s .9s both, pulse 1.3s 1.4s ease-in-out infinite; }
+  @keyframes tapin { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  /* the doors swing open */
+  #doorwipe { position: absolute; inset: 0; z-index: 37; display: none; pointer-events: none; overflow: hidden; border-radius: 14px; }
+  #doorwipe.show { display: block; }
+  #doorwipe .dw { position: absolute; top: 0; bottom: 0; width: 51%;
+    background: linear-gradient(90deg, #2b2119, #4d3822 60%, #2b2119); box-shadow: 0 0 30px rgba(0,0,0,.8); }
+  #doorwipe .dwl { left: 0; } #doorwipe .dwr { right: 0; }
+  #doorwipe.open .dwl { animation: dwL .5s cubic-bezier(.5,0,.8,.4) forwards; }
+  #doorwipe.open .dwr { animation: dwR .5s cubic-bezier(.5,0,.8,.4) forwards; }
+  @keyframes dwL { to { transform: translateX(-103%); } }
+  @keyframes dwR { to { transform: translateX(103%); } }
 
   /* ---------- center-stage announcements ---------- */
   #announce { position: absolute; left: 50%; top: 38%; transform: translate(-50%,-50%) scale(.7);
@@ -736,9 +757,17 @@
       </div>
       <div id="parkphoto">
         <div class="pp-img"></div>
+        <div class="pp-photo"></div>
         <div class="pp-shade"></div>
-        <div class="pp-text"><div class="pp-now">NOW ENTERING</div><div class="pp-name"></div><div class="pp-sub">⚾ find the head, hero</div></div>
+        <div class="pp-text">
+          <div class="pp-now">NOW ENTERING</div>
+          <div class="pp-name"></div>
+          <div class="pp-sub">⚾ find the head, hero</div>
+          <div class="pp-round"></div>
+        </div>
+        <div class="pp-tap">TAP TO ENTER 🚪</div>
       </div>
+      <div id="doorwipe"><div class="dw dwl"></div><div class="dw dwr"></div></div>
       <div id="announce"><div class="aicon"></div><div class="atitle"></div><div class="asub"></div></div>
       <div id="verdict"></div>
       <div id="lesson">
@@ -2037,6 +2066,7 @@ function stopTimer() {
   if (G.timer) { clearInterval(G.timer); G.timer = null; }
   if (G.introT) { clearTimeout(G.introT); G.introT = null; }
   G.pausedForHide = false;
+  G.ppAdvance = null;
   $("parkphoto").classList.remove("show"); // never strand overlays over a live board
   $("announce").classList.remove("show");
 }
@@ -2567,35 +2597,64 @@ function startRound() {
   // the clock does NOT start until every overlay is gone — read first, sweat second
   const stages = [];
   const p = G.cur.themeKey === "stadium" ? THEMES.stadium.parkRef : null;
-  if (p) stages.push({ ms: 2300, run: () => {
-    if (announceT) clearTimeout(announceT);
-    $("announce").classList.remove("show"); // the photo IS the announcement
-    const pp = $("parkphoto");
-    pp.querySelector(".pp-img").style.backgroundImage = `url('${parkPhotoURL(p)}')`;
-    pp.querySelector(".pp-name").textContent = p.park.toUpperCase();
-    pp.querySelector(".pp-sub").textContent = `⚾ ${p.flavor} — find the head, hero`;
-    pp.classList.remove("show"); void pp.offsetWidth; pp.classList.add("show");
-    sfx.flush();
-  }, end: () => $("parkphoto").classList.remove("show") });
   const clockNote = G.cur.clock ? `🕐 ${G.cur.clock} — ` : "";
-  stages.push({ ms: hazards.length ? 1900 : 1500, run: () =>
-    announce(G.cur.theme.icon, G.cur.theme.name, `${clockNote}${roundLabel} — ${layoutNote}${hazardNote}${chantNote}${muskNote}`, hazards.length ? 1850 : 1450),
-    end: () => {} });
+  const infoLine = `${clockNote}${roundLabel} — ${layoutNote}${hazardNote}${chantNote}${muskNote}`;
+  if (p) {
+    // the photo IS the whole announcement — and it holds until you tap
+    stages.push({ ms: 9000, tap: true, run: () => {
+      if (announceT) clearTimeout(announceT);
+      $("announce").classList.remove("show");
+      const pp = $("parkphoto");
+      const url = parkPhotoURL(p);
+      pp.querySelector(".pp-img").style.backgroundImage = `url('${url}')`;
+      pp.querySelector(".pp-photo").style.backgroundImage = `url('${url}')`;
+      pp.querySelector(".pp-name").textContent = p.park.toUpperCase();
+      pp.querySelector(".pp-sub").textContent = `⚾ ${p.flavor}`;
+      pp.querySelector(".pp-round").textContent = infoLine;
+      pp.classList.remove("show"); void pp.offsetWidth; pp.classList.add("show");
+      G.ppShownAt = performance.now();
+    }, end: () => $("parkphoto").classList.remove("show") });
+  } else {
+    stages.push({ ms: hazards.length ? 1900 : 1500, run: () =>
+      announce(G.cur.theme.icon, G.cur.theme.name, infoLine, hazards.length ? 1850 : 1450),
+      end: () => {} });
+  }
   if (desperate()) stages.push({ ms: 1800, run: () =>
     announce("🚨", "YOU'RE DESPERATE", `${G.drinks} drinks deep — the clock will FLY. Run out of time and it's over.`, 1750, "warn"),
     end: () => {} });
   let si = 0;
   const runStage = () => {
+    G.ppAdvance = null;
     if (si >= stages.length) { G.introT = null; startTimer(secs); return; }
     const st = stages[si++];
     st.run();
-    G.introT = setTimeout(() => { st.end(); runStage(); }, st.ms);
+    const advance = () => { st.end(); runStage(); };
+    if (st.tap) G.ppAdvance = advance; // tap-to-enter; timeout below is the AFK fallback
+    G.introT = setTimeout(advance, st.ms);
   };
   runStage();
 }
 
+/* tap on the interstitial: swing the doors open and walk in */
+function enterThroughDoors() {
+  if (!G.ppAdvance || performance.now() - (G.ppShownAt || 0) < 600) return;
+  const go = G.ppAdvance;
+  G.ppAdvance = null;
+  if (G.introT) { clearTimeout(G.introT); G.introT = null; }
+  const dw = $("doorwipe");
+  dw.classList.remove("open"); dw.classList.add("show");
+  sfx.flush(); buzz(25);
+  setTimeout(() => {
+    $("parkphoto").classList.remove("show");
+    dw.classList.add("open");
+    go(); // room + remaining stages begin as the doors part
+  }, 90);
+  setTimeout(() => { dw.classList.remove("show", "open"); }, 650);
+}
+
 /* tap anywhere (not a spot) during the intro overlays to skip straight to the clock */
 function skipIntro() {
+  if (G.ppAdvance) return; // the interstitial has its own tap-to-enter ritual
   if (!G.introT || G.locked) return;
   clearTimeout(G.introT); G.introT = null;
   $("parkphoto").classList.remove("show");
@@ -3299,6 +3358,7 @@ $("rulenext").addEventListener("click", () => {
 });
 $("ruletrack").addEventListener("scroll", () => updateRuleUI(), { passive: true });
 $("scene").addEventListener("click", () => skipIntro());
+$("parkphoto").addEventListener("click", e => { e.stopPropagation(); enterThroughDoors(); });
 $("btn3d").addEventListener("click", async () => {
   const turningOn = !threeOn();
   try { localStorage.setItem("ut_3d", turningOn ? "1" : "0"); } catch (e) {}
