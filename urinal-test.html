@@ -135,15 +135,26 @@
     background: linear-gradient(#ffffff, #cfe6ff); box-shadow: 0 0 22px 8px rgba(220,240,255,.55); z-index: 3; }
   #scene .lightpool { position: absolute; top: 5%; width: 34%; height: 52%; pointer-events: none; z-index: 1;
     background: radial-gradient(ellipse at 50% 0%, rgba(255,255,245,.15), transparent 70%); }
-  /* floor */
-  #scene .floor { position: absolute; left: 0; right: 0; bottom: 0; height: 34%;
+  /* floor: a real receding plane — tiles converge toward the wall */
+  #scene .floor { position: absolute; left: 0; right: 0; bottom: 0; height: 34%; overflow: hidden;
+    background: linear-gradient(var(--floor1), var(--floor2)); }
+  #scene .floor .plane { position: absolute; left: -30%; right: -30%; top: 0; height: 300%;
+    transform-origin: 50% 0; transform: perspective(520px) rotateX(54deg);
     background:
-      radial-gradient(ellipse at 25% 0%, rgba(255,255,255,.10), transparent 55%),
-      radial-gradient(ellipse at 75% 0%, rgba(255,255,255,.10), transparent 55%),
-      repeating-linear-gradient(115deg, rgba(0,0,0,.07) 0 3px, transparent 3px 52px),
-      repeating-linear-gradient(65deg, rgba(0,0,0,.07) 0 3px, transparent 3px 52px),
-      linear-gradient(var(--floor1), var(--floor2));
-  }
+      repeating-linear-gradient(0deg, rgba(0,0,0,.16) 0 3px, transparent 3px 72px),
+      repeating-linear-gradient(90deg, rgba(0,0,0,.16) 0 3px, transparent 3px 72px),
+      linear-gradient(var(--floor1), var(--floor2)); }
+  #scene .floor .floorglow { position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 25% 0%, rgba(255,255,255,.13), transparent 55%),
+      radial-gradient(ellipse at 75% 0%, rgba(255,255,255,.13), transparent 55%);
+    animation: breathe 5.5s ease-in-out infinite alternate; }
+  @keyframes breathe { from { opacity: .75; } to { opacity: 1; } }
+  #scene .lightpool { animation: breathe 6.5s ease-in-out infinite alternate; }
+
+  /* camera dolly: every round starts like you just walked in */
+  #scene.dollying { animation: dollyIn 1.5s cubic-bezier(.22,.9,.32,1) both; }
+  @keyframes dollyIn { from { transform: scale(1.09) translateY(1.4%); } to { transform: none; } }
   #scene .floorline { position: absolute; left: 0; right: 0; bottom: 34%; height: 7px; z-index: 1;
     background: linear-gradient(#565d68, #3d434c); }
   #backdrop { position: absolute; top: 10%; left: 0; right: 0; text-align: center;
@@ -374,6 +385,7 @@
 
   /* ---------- splash FX ---------- */
   #fx { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 30; }
+  #fxc { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 31; }
   .droplet { position: absolute; border-radius: 50% 50% 60% 60%;
     background: radial-gradient(circle at 35% 30%, rgba(255,255,240,.95), rgba(240,220,120,.65) 60%, rgba(200,170,60,.5));
     box-shadow: 0 0 6px rgba(240,220,120,.5); animation: drip 1.1s cubic-bezier(.3,.1,.7,1) forwards; }
@@ -546,7 +558,7 @@
       <div id="backdrop"></div>
       <div id="parkdeco"></div>
       <div class="floorline"></div>
-      <div class="floor"></div>
+      <div class="floor"><div class="plane"></div><div class="floorglow"></div></div>
       <div id="trough">
         <div class="t-back"></div>
         <div class="t-pipe"></div>
@@ -570,6 +582,7 @@
       <div id="row"></div>
       <div id="flash"></div>
       <div id="fx"></div>
+      <canvas id="fxc"></canvas>
       <div id="attendantbox"></div>
       <div id="stalldoor">
         <div class="sign">🚻 STALL</div>
@@ -1578,6 +1591,8 @@ function runTimer() {
     const p = Math.max(0, G.timeLeft / G.timerTotal * 100);
     bar.style.width = p + "%";
     if (p < 30) wrap.classList.add("low");
+    // ambient restroom: the occasional distant drip
+    if (Math.random() < 0.012) { tone(rnd(500, 900), .09, "sine", .02); tone(rnd(280, 460), .12, "sine", .015, .08); }
     if (G.timeLeft <= 0) { stopTimer(); onTimeout(); }
   }, 100);
 }
@@ -1587,26 +1602,100 @@ function stopTimer() {
   $("parkphoto").classList.remove("show"); // never strand the interstitial over a live board
 }
 
-/* ---------- FX ---------- */
+/* ---------- FX: canvas particle engine (gravity, floor splats, sparkles) ---------- */
+const FXC = { parts: [], running: false, dpr: 1 };
+function fxcResize() {
+  const cv = $("fxc"), r = cv.getBoundingClientRect();
+  FXC.dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.max(1, Math.round(r.width * FXC.dpr));
+  cv.height = Math.max(1, Math.round(r.height * FXC.dpr));
+}
+function fxcLoop() {
+  const cv = $("fxc"), x = cv.getContext("2d");
+  const W = cv.width, H = cv.height, floorY = H * 0.70;
+  x.clearRect(0, 0, W, H);
+  const alive = [];
+  for (const p of FXC.parts) {
+    p.life -= 1;
+    if (p.kind === "drop") {
+      p.vy += 0.55 * FXC.dpr;
+      p.x += p.vx; p.y += p.vy;
+      if (p.y >= floorY + rnd(0, H * 0.22)) {
+        // splat: becomes a spreading puddle on the tile
+        FXC.parts.push({ kind: "splat", x: p.x, y: Math.min(p.y, H * 0.96), r: p.r * 0.9, life: 46, max: 46, hue: p.hue });
+        sfxTick(p.r);
+        continue;
+      }
+      x.beginPath();
+      x.fillStyle = `rgba(${p.hue}, ${0.5 + 0.4 * (p.life / p.max)})`;
+      x.ellipse(p.x, p.y, p.r, p.r * 1.35, Math.atan2(p.vy, p.vx) + Math.PI / 2, 0, Math.PI * 2);
+      x.fill();
+      if (p.life > 0) alive.push(p);
+    } else if (p.kind === "splat") {
+      const t = 1 - p.life / p.max;
+      x.beginPath();
+      x.fillStyle = `rgba(${p.hue}, ${0.4 * (1 - t)})`;
+      x.ellipse(p.x, p.y, p.r * (1 + t * 2.6), p.r * 0.38 * (1 + t * 1.6), 0, 0, Math.PI * 2);
+      x.fill();
+      if (p.life > 0) alive.push(p);
+    } else if (p.kind === "spark") {
+      p.vy += 0.18 * FXC.dpr;
+      p.x += p.vx; p.y += p.vy;
+      const t = p.life / p.max;
+      x.beginPath();
+      x.fillStyle = `rgba(255, 216, 106, ${t})`;
+      x.arc(p.x, p.y, p.r * t, 0, Math.PI * 2);
+      x.fill();
+      if (p.life > 0 && p.y < H) alive.push(p);
+    }
+  }
+  FXC.parts = alive;
+  if (FXC.parts.length) requestAnimationFrame(fxcLoop);
+  else { FXC.running = false; x.clearRect(0, 0, W, H); }
+}
+function fxcKick() { if (!FXC.running) { FXC.running = true; fxcResize(); requestAnimationFrame(fxcLoop); } }
+let lastTick = 0;
+function sfxTick(r) { // tiny per-splat plip, throttled
+  const now = performance.now();
+  if (now - lastTick < 90) return;
+  lastTick = now;
+  tone(rnd(300, 700), .06, "sine", .025);
+}
+function spawnDrops(big) {
+  fxcResize();
+  const cv = $("fxc"), W = cv.width, H = cv.height;
+  const n = big ? 70 : 38;
+  for (let k = 0; k < n; k++) {
+    FXC.parts.push({
+      kind: "drop",
+      x: rnd(0, W), y: rnd(-H * 0.05, H * 0.42),
+      vx: rnd(-2.2, 2.2) * FXC.dpr, vy: rnd(-1, 3.5) * FXC.dpr,
+      r: rnd(2.5, big ? 9 : 6.5) * FXC.dpr,
+      life: 200, max: 200,
+      hue: "240,220,120",
+    });
+  }
+  fxcKick();
+}
+function sparkleAt(i) {
+  const el = slotEl(i); if (!el) return;
+  fxcResize();
+  const cv = $("fxc"), sr = $("scene").getBoundingClientRect(), er = el.getBoundingClientRect();
+  const cx = (er.left + er.width / 2 - sr.left) * FXC.dpr;
+  const cy = (er.top + er.height * 0.62 - sr.top) * FXC.dpr;
+  for (let k = 0; k < 22; k++) {
+    const a = rnd(0, Math.PI * 2), sp = rnd(1.5, 5) * FXC.dpr;
+    FXC.parts.push({ kind: "spark", x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 2 * FXC.dpr,
+      r: rnd(2, 4.5) * FXC.dpr, life: rand(26, 46), max: 46 });
+  }
+  fxcKick();
+}
 function splashFX(big) {
   buzz(big ? [400, 80, 400, 80, 600] : [80, 40, 120, 40, 200]);
   if (big) sfx.disaster(); else sfx.splash();
   $("app").classList.remove("shake"); void $("app").offsetWidth; $("app").classList.add("shake");
   $("flash").classList.remove("go"); void $("flash").offsetWidth; $("flash").classList.add("go");
-  const fx = $("fx");
-  const count = big ? 55 : 28;
-  for (let k = 0; k < count; k++) {
-    const d = document.createElement("div");
-    d.className = "droplet";
-    const size = rand(6, big ? 30 : 22);
-    d.style.width = size + "px"; d.style.height = (size * 1.25) + "px";
-    d.style.left = rand(0, 96) + "%";
-    d.style.top = rand(-5, 45) + "%";
-    d.style.setProperty("--dx", rand(-60, 60) + "px");
-    d.style.animationDelay = (Math.random() * (big ? 0.6 : 0.25)) + "s";
-    fx.appendChild(d);
-    setTimeout(() => d.remove(), 2200);
-  }
+  spawnDrops(big);
 }
 function verdict(text, cls) {
   const v = $("verdict");
@@ -1801,6 +1890,7 @@ function resolveChoice(i) {
     buzz(30); sfx.good();
     verdict("PERFECT!", "good");
     markSlot(i, "chosen-good");
+    sparkleAt(i);
     showLesson("Textbook etiquette. 👌",
       `Optimal pick: ${describeBest(r)}.${buzzNote} ${G.streak >= 3 ? `🔥 ${G.streak}-streak multiplier active!` : ""}`, pts);
     if (r.attendant) showAttendant(); else showDrinkOffer();
@@ -1984,6 +2074,10 @@ function startRound() {
   G.cur = makeRound(G.round);
   renderRound(G.cur);
   updateHUD();
+  // camera dolly: walk into the room
+  const sc = $("scene");
+  sc.classList.remove("dollying"); void sc.offsetWidth; sc.classList.add("dollying");
+  setTimeout(() => sc.classList.remove("dollying"), 1600);
   let factor = Math.max(0.5, 1 - 0.12 * G.drinks); // every drink makes the clock meaner
   let muskNote = "";
   if (G.musk) { factor *= 0.88; G.musk = false; muskNote = " · 🧴 cologne cloud: −12% time"; }
