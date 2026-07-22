@@ -148,6 +148,87 @@
   .subnote { margin-top: 12px; color: #66788d; font-size: 12px; }
   #bestline { color: #57b8ff; font-size: 13px; margin-top: 10px; min-height: 16px; }
 
+  /* ---------- score feedback ---------- */
+  #scorechip { border-color: #8a6a1d; color: #ffd76a; font-weight: bold; }
+  #scorechip.bump { animation: scorebump .6s ease; }
+  @keyframes scorebump { 0% { transform: scale(1); } 30% { transform: scale(1.4); box-shadow: 0 0 16px rgba(255,215,106,.85); } 100% { transform: scale(1); } }
+  .scorefly { position: absolute; left: 50%; top: 32%; z-index: 30; font-weight: 900;
+    font-size: clamp(30px, 9vw, 46px); text-shadow: 0 3px 10px rgba(0,0,0,.65); pointer-events: none;
+    animation: scorefly 1.15s ease-out forwards; }
+  .scorefly.ok { color: #6fe3a1; }
+  .scorefly.big { color: #6fe3a1; font-size: clamp(40px, 12vw, 60px); }
+  .scorefly.mid { color: #ffd76a; }
+  .scorefly.bad { color: #ff8a80; }
+  @keyframes scorefly { 0% { opacity: 0; transform: translate(-50%, 18px) scale(.55); }
+    16% { opacity: 1; transform: translate(-50%, 0) scale(1.15); }
+    30% { transform: translate(-50%, -4px) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -74px) scale(.9); } }
+
+  /* ---------- drink menu buttons ---------- */
+  #lesson .attbtns .dk-beer { background: linear-gradient(#e6a23d, #b87a1f); }
+  #lesson .attbtns .dk-coffee { background: linear-gradient(#8a6a52, #64493a); }
+  #lesson .attbtns .dk-espresso { background: linear-gradient(#d0605a, #a03a38); }
+  #lesson .attbtns .tip { background: linear-gradient(#37c97a, #229458); }
+  #lesson .attbtns .col { background: linear-gradient(#8a6fd0, #6247a8); }
+  #lesson .attbtns .walk { background: linear-gradient(#5a6a80, #425063); }
+  .attbtns button small { font-weight: normal; display: block; margin-top: 2px; opacity: .92; }
+
+  /* ---------- start screen: attract mode, ticker, staged buttons ---------- */
+  #start > * { flex-shrink: 0; }
+  #start { padding-bottom: 52px; justify-content: flex-start; }
+  #start h1 { margin-top: auto; }
+  #start .subnote { margin-bottom: auto; }
+  #start { 
+    background:
+      radial-gradient(ellipse at 50% -10%, rgba(87,184,255,.16), transparent 55%),
+      repeating-linear-gradient(0deg, transparent 0 34px, rgba(87,184,255,.05) 34px 35px),
+      repeating-linear-gradient(90deg, transparent 0 44px, rgba(87,184,255,.04) 44px 45px),
+      #10141b; }
+  #start h1 { animation: titleglow 3s ease-in-out infinite; }
+  #start h1 .drop { animation: neonflick 4.5s linear infinite; }
+  @keyframes titleglow { 0%, 100% { text-shadow: 0 4px 18px rgba(87,184,255,.35); }
+    50% { text-shadow: 0 4px 26px rgba(87,184,255,.8), 0 0 44px rgba(87,184,255,.35); } }
+  .h1drip { display: inline-block; margin-left: 4px; animation: h1drip 2.8s ease-in infinite; }
+  @keyframes h1drip { 0%, 52% { transform: translateY(-10px) scale(.6); opacity: 0; }
+    62% { opacity: 1; transform: translateY(0) scale(1); }
+    90% { transform: translateY(12px) scale(1.05); opacity: 1; }
+    100% { transform: translateY(20px) scale(.4); opacity: 0; } }
+  #attract { position: relative; width: min(92%, 370px); height: 106px; margin: 0 0 14px; flex: 0 0 auto;
+    background: linear-gradient(rgba(255,255,255,.05), rgba(0,0,0,.16)), #1a2130;
+    border: 1px solid #2b3547; border-radius: 14px; overflow: hidden; }
+  #attract .at-row { position: absolute; inset: 8px 10px 5px; display: flex; align-items: flex-end; gap: 2px; }
+  #attract .at-slot { position: relative; flex: 1; height: 100%; }
+  #attract .at-slot svg:first-child { position: absolute; left: 50%; transform: translateX(-50%); bottom: 24%; width: 82%; }
+  #attract .at-person { position: absolute; left: 50%; transform: translateX(-50%); bottom: 0; width: 96%; z-index: 2; }
+  #attract .at-ring { position: absolute; left: 50%; transform: translateX(-50%); bottom: 3%; width: 26px; height: 10px;
+    border-radius: 50%; border: 3px solid #2fb46b; background: rgba(47,180,107,.25);
+    box-shadow: 0 0 10px rgba(47,180,107,.9); animation: pulse 1.2s ease-in-out infinite; }
+  #attract .at-walker { position: absolute; bottom: 0; left: -12%; font-size: 27px; z-index: 3;
+    animation: atwalk 5.4s ease-in-out infinite; }
+  #attract .at-q { position: absolute; bottom: 36px; left: -12%; font-size: 16px; font-weight: 900; color: #ffd76a;
+    text-shadow: 0 2px 4px #000; z-index: 3; animation: atq 5.4s ease-in-out infinite; }
+  @keyframes atwalk { 0% { left: -12%; opacity: 0; } 7% { opacity: 1; } 36% { left: 41%; }
+    54% { left: 41%; } 84% { left: 78%; opacity: 1; } 94% { left: 78%; opacity: 0; } 100% { left: 78%; opacity: 0; } }
+  @keyframes atq { 0%, 34% { left: 45%; opacity: 0; } 40%, 52% { left: 45%; opacity: 1; }
+    58%, 100% { left: 45%; opacity: 0; } }
+  .bigbtn small { display: block; font-weight: normal; font-size: .66em; opacity: .85; margin-top: 1px; letter-spacing: .3px; }
+  #start .bigbtn { animation: menuin .45s ease backwards; }
+  #start .bigbtn:nth-of-type(2) { animation-delay: .07s; }
+  #start .bigbtn:nth-of-type(3) { animation-delay: .14s; }
+  #start .bigbtn:nth-of-type(4) { animation-delay: .21s; }
+  #start .bigbtn:nth-of-type(5) { animation-delay: .28s; }
+  #start .bigbtn:nth-of-type(6) { animation-delay: .35s; }
+  #start .bigbtn:nth-of-type(7) { animation-delay: .42s; }
+  @keyframes menuin { from { opacity: 0; transform: translateY(14px); } }
+  #start #startbtn { animation: menuin .45s ease backwards .07s, ctapulse 2.4s ease-in-out 1.4s infinite; }
+  @keyframes ctapulse { 0%, 100% { box-shadow: 0 4px 0 #176b3e; }
+    50% { box-shadow: 0 4px 0 #176b3e, 0 0 24px rgba(55,201,122,.6); } }
+  #ticker { position: absolute; left: 0; right: 0; bottom: 0; overflow: hidden; padding: 8px 0 10px;
+    border-top: 1px solid #222b3b; background: rgba(10,14,20,.72); }
+  #tickertrack { display: inline-block; white-space: nowrap; color: #8fa2b8; font-size: 12px;
+    letter-spacing: 1.2px; animation: tickermove 75s linear infinite; will-change: transform; }
+  @keyframes tickermove { to { transform: translateX(-50%); } }
+
   /* ---------- HUD ---------- */
   #hud { display: flex; align-items: center; gap: 8px; padding: 10px 12px 6px; font-size: clamp(12px, 3.2vw, 15px); }
   #hud .spacer { flex: 1; }
@@ -666,22 +747,24 @@
 
   <!-- START SCREEN -->
   <div id="start" class="screen">
-    <h1>THE URINAL <span class="drop">TEST</span> 🚹</h1>
-    <div class="tagline">One sacred code. Infinite bathrooms. Do you have what it takes?</div>
+    <h1>THE URINAL <span class="drop">TEST</span> 🚹<span class="h1drip">💧</span></h1>
+    <div class="tagline">One sacred code. Infinite bathrooms. <b>Do you have what it takes?</b></div>
     <div id="cityline"></div>
     <div id="chalbanner" class="hiddenrow"></div>
-    <button class="bigbtn howto" id="howtobtn">📖 HOW TO PLAY — the sacred code</button>
-    <button class="bigbtn" id="startbtn">🏆 THE GAUNTLET — 10 rounds</button>
+    <div id="attract"></div>
+    <button class="bigbtn howto" id="howtobtn">📖 HOW TO PLAY<small>the sacred code · 30 seconds</small></button>
+    <button class="bigbtn" id="startbtn">🏆 THE GAUNTLET<small>10 rounds · the classic run</small></button>
     <button class="bigbtn daily" id="dailybtn">📅 DAILY CHALLENGE</button>
-    <button class="bigbtn alt" id="endlessbtn">♾️ ENDLESS RUSH</button>
-    <button class="bigbtn loc" id="locbtn">📍 PLAY YOUR HOME BALLPARK</button>
+    <button class="bigbtn alt" id="endlessbtn">♾️ ENDLESS RUSH<small>survive as long as you can · beat your best</small></button>
+    <button class="bigbtn loc" id="locbtn">📍 PLAY YOUR HOME BALLPARK<small>your park · your airport · your inside jokes</small></button>
     <button class="bigbtn beta3d" id="btn3d">🧪 3D MODE: OFF <span style="font-weight:normal">(beta — urinal rooms)</span></button>
-    <button class="bigbtn roadtrip hiddenrow" id="roadtripbtn">🗺️ ROAD TRIP — CHOOSE ANY CITY</button>
+    <button class="bigbtn roadtrip hiddenrow" id="roadtripbtn">🗺️ ROAD TRIP<small>choose any of the 30 ballpark cities</small></button>
     <div id="locline"></div>
     <div id="roadtripline"></div>
     <div id="towelline"></div>
     <div id="bestline"></div>
     <div class="subnote">📱 Best on a phone — wrong picks trigger haptic splash feedback.</div>
+    <div id="ticker"><div id="tickertrack"></div></div>
   </div>
 
   <!-- END SCREEN -->
@@ -827,10 +910,7 @@
         <div id="attnote"></div>
         <div id="drinkrow">
           <div class="attq" id="drinkq"></div>
-          <div class="attbtns">
-            <button class="col" id="dr-yes"></button>
-            <button class="walk" id="dr-no">🚱 Pass<br><small>stay light</small></button>
-          </div>
+          <div class="attbtns" id="drinkbtns"></div>
         </div>
         <button id="nextbtn">NEXT →</button>
       </div>
@@ -1273,7 +1353,7 @@ function buildRulesDeck() {
     { e: "🕶️", t: `THE <span class="hl">REC</span> GUY`, x: `Meta smart glasses means he's <b>streaming</b>. Extra distance. Always. Dividers don't help — his followers can still see you.`, art: artRec },
     { e: "⚠️", t: `<span class="hl">HAZARDS</span> ARE REAL`, x: `🛍️ Bagged = <b>broken</b>. 🚧 Tape = <b>an active crime scene</b>. 🧳 Luggage takes ankles. 💡 And nobody — <i>nobody</i> — prefers the flickering light.`, art: artHazards },
     { e: "🛁", t: `THE <span class="hl">SHAME TUB</span>`, x: `Some venues have a tub. People stand <b>all the way around it</b>. Eye contact across the water is the one unforgivable sin. (The hot dogs are for orientation. And safety.)`, art: artTub },
-    { e: "🍺", t: `DRINKS ARE A <span class="hl">CHOICE</span>`, x: `Wins earn a drink offer: <b>+10% score buzz each</b>… and one more thing in the tank. Every drink makes the clock meaner. Nobody pours it for you.`, art: null },
+    { e: "🍺", t: `DRINKS ARE A <span class="hl">CHOICE</span>`, x: `Wins earn a drink offer. <b>🍺 Beer +10% pts</b> but the clock runs 12% faster. <b>☕ Cold brew +6%</b>, barely touches the clock. <b>⚡ Espresso +18%</b> — and 25% faster. Every drink is +1 in the tank.`, art: null },
     { e: "🚨", t: `<span class="hl">DESPERATION</span>`, x: `At 🍺×3 you're desperate. The clock <b>flies</b>. Run out of time and you will <b>piss yourself</b> in front of everyone. Going relieves 2 drinks. Plan accordingly.`, art: null },
     { e: "🚻", t: `THE <span class="hl">STALL</span> GAMBLE`, x: `No decent spot? Knock on the stall — <b>3 waits per run</b>, each burns ~2.5 seconds, and sometimes… <i>"someone's IN here!"</i>`, art: null },
     { e: "🧖", t: `TIP THE <span class="hl">ATTENDANT</span>`, x: `Towel? Cologne? Gum? <b>$2 buys a towel blessing</b> that saves your pants from one splash. Walk past at your own risk. He's seen things.`, art: artAtt },
@@ -1422,7 +1502,7 @@ function endlessPlan(r) {
 /* ---------- game state ---------- */
 const G = {
   mode: "gauntlet",
-  round: 0, score: 0, streak: 0, lives: 3, drinks: 0, pissed: false,
+  round: 0, score: 0, streak: 0, lives: 3, drinks: 0, held: [], pissed: false,
   splashes: 0, perfects: 0, trail: [], seed: null, city: null, stalls: 3,
   cur: null, timer: null, timeLeft: 0, timerTotal: 10, introT: null, locked: false,
 };
@@ -1546,7 +1626,7 @@ function showRewardedAd(onReward) {
 
 /* ---------- respawn ---------- */
 function respawn() {
-  G.pissed = false; G.lives = 1; G.drinks = 0; G.locked = false;
+  G.pissed = false; G.lives = 1; G.drinks = 0; G.held = []; G.locked = false;
   $("end").classList.add("hidden");
   toast("🧻 Toweled off. One pair of pants. Make it count.");
   startRound();
@@ -1575,12 +1655,39 @@ function updateStartLines() {
   try {
     const daily = JSON.parse(localStorage.getItem("ut_daily_" + dailyKey()) || "null");
     $("dailybtn").innerHTML = daily
-      ? `📅 DAILY ✓ ${daily.score} pts — practice again`
-      : `📅 DAILY CHALLENGE — same bathrooms worldwide`;
+      ? `📅 DAILY ✓ ${daily.score} pts<small>practice again · one recorded try per day</small>`
+      : `📅 DAILY CHALLENGE<small>same bathrooms worldwide · today only</small>`;
     const best = Number(localStorage.getItem("ut_bestEndless") || 0);
     const bestScore = Number(localStorage.getItem("ut_bestEndlessScore") || 0);
     $("bestline").textContent = best ? `♾️ Endless best: round ${best} · ${bestScore} pts` : "";
   } catch (e) {}
+  buildAttract(); buildTicker();
+}
+
+/* Attract mode: a looping demo of the sacred code, right on the menu. */
+function buildAttract() {
+  if ($("attract").childElementCount) return;
+  const occ = { 0: "regular", 2: "glasses" };
+  let s = '<div class="at-row">';
+  for (let i = 0; i < 5; i++) {
+    s += `<div class="at-slot">${urinalSVG()}` +
+      (occ[i] ? `<div class="at-person">${personSVG(occ[i], "back")}</div>` : "") +
+      (i === 4 ? `<div class="at-ring"></div>` : "") + `</div>`;
+  }
+  $("attract").innerHTML = s + `</div><div class="at-walker">🚶</div><div class="at-q">?</div>`;
+}
+
+/* Bottom ticker: the sign library, scrolling like a stadium ribbon board. */
+function buildTicker() {
+  const pk = THEMES.stadium.parkRef;
+  const tt = $("tickertrack");
+  const key = pk ? pk.park : "";
+  if (tt.dataset.k === key && tt.textContent) return;
+  tt.dataset.k = key;
+  const pool = [...POSTERS_GENERIC.slice(0, 14), ...(pk ? cityJokes(pk).slice(0, 14) : GRAFFITI.slice(0, 8))];
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  const seg = pool.join("   ·   ") + "   ·   ";
+  tt.textContent = seg + seg;
 }
 
 /* ---------- round generation ---------- */
@@ -1942,7 +2049,7 @@ function spawnFly() {
     e.stopPropagation();
     if (dead) return;
     dead = true;
-    G.score += 5;
+    gainScore(5, "mid");
     f.classList.add("squish");
     buzz(25); tone(900, .07, "square", .06); tone(300, .12, "square", .05, .06);
     toast("🪰 SPLAT. +5. You're disgusting. Respect.");
@@ -2093,12 +2200,12 @@ function renderRound(round) {
 function updateHUD() {
   $("roundchip").textContent = G.mode === "endless" ? `Round ${G.round + 1} ♾️`
     : G.mode === "daily" ? `Daily ${G.round + 1}/10` : `Round ${G.round + 1}/10`;
-  $("scorechip").textContent = `${G.score} pts`;
+  if (!scoreAnimT) $("scorechip").textContent = `${G.score} pts`;
   $("lives").textContent = "👖".repeat(G.lives) + "💦".repeat(Math.max(0, 3 - G.lives));
   $("streakchip").textContent = `🔥 ${G.streak}`;
   $("streakchip").classList.toggle("hot", G.streak >= 3);
   const dc = $("drinkchip");
-  dc.textContent = desperate() ? `🍺 ${G.drinks} 🚨` : `🍺 ${G.drinks} · +${G.drinks * 10}%`;
+  dc.textContent = desperate() ? `${heldIcons()} 🚨` : `${heldIcons() || "🍺"} +${buzzPct()}%`;
   dc.classList.toggle("on", G.drinks > 0);
   dc.classList.toggle("danger", desperate());
   $("shieldchip").classList.toggle("on", !!G.shield);
@@ -2111,6 +2218,29 @@ function updateHUD() {
   const door = $("stalldoor");
   door.classList.toggle("avail", G.stalls > 0);
   door.classList.toggle("spent", G.stalls <= 0);
+}
+
+let scoreAnimT = null;
+/* Points must be FELT: chip pulses + counts up, and the number flies out of the room. */
+function gainScore(pts, kind) {
+  const from = G.score;
+  G.score = Math.max(0, G.score + pts);
+  const to = G.score;
+  const chip = $("scorechip");
+  chip.classList.remove("bump"); void chip.offsetWidth; chip.classList.add("bump");
+  if (scoreAnimT) cancelAnimationFrame(scoreAnimT);
+  const t0 = performance.now(), dur = 650;
+  const tick = now => {
+    const t = Math.min(1, (now - t0) / dur);
+    chip.textContent = `${Math.round(from + (to - from) * (1 - Math.pow(1 - t, 3)))} pts`;
+    if (t < 1) scoreAnimT = requestAnimationFrame(tick); else scoreAnimT = null;
+  };
+  scoreAnimT = requestAnimationFrame(tick);
+  const el = document.createElement("div");
+  el.className = "scorefly " + (kind || (pts < 0 ? "bad" : "ok"));
+  el.textContent = (pts < 0 ? "−" : "+") + Math.abs(pts);
+  $("scene").appendChild(el);
+  setTimeout(() => el.remove(), 1200);
 }
 
 function toast(msg) {
@@ -2311,14 +2441,14 @@ function attendantDone(note) {
   updateHUD();
 }
 function attTip() {
-  G.score = Math.max(0, G.score - 20);
+  gainScore(-20);
   G.shield = true;
   buzz(25); sfx.good();
   attendantDone(`🧖 "A gentleman." He drapes a towel over your shoulder. ` +
     `<b>Towel blessing active</b> — your next splash gets toweled off, pants intact.`);
 }
 function attCologne() {
-  G.score += 25;
+  gainScore(25, "mid");
   G.musk = true;
   buzz([20, 30, 20]); sfx.ok();
   attendantDone(`🧴 Two sprays. Direct hit. <b>+25 pts</b>, but the musk is <i>substantial</i> — ` +
@@ -2326,7 +2456,7 @@ function attCologne() {
 }
 function attWalk() {
   if (Math.random() < 0.5) {
-    G.score = Math.max(0, G.score - 15);
+    gainScore(-15);
     buzz([60, 40, 60]); sfx.splash();
     const fx = $("fx");
     for (let k = 0; k < 8; k++) {
@@ -2403,31 +2533,54 @@ function neighborDesc(r, i) {
 /* Going while desperate vents pressure; otherwise the day's intake stays with you. */
 function relieve() {
   if (desperate()) {
-    G.drinks = Math.max(0, G.drinks - 2);
+    G.held.splice(0, 2); // the two oldest drinks leave the system
+    G.drinks = G.held.length;
     setTimeout(() => announce("😮‍💨", "EMERGENCY RELIEF", `−2 drinks. Bladder at ${G.drinks}. You live to sip again.`, 1500, "good"), 800);
   }
 }
-function buzzMult() { return 1 + 0.1 * G.drinks; }
 
-/* The drink is YOUR call: buzz bonus vs. bladder. Consequences are all yours. */
+/* Three beverages, three deals — the math is printed on every button. */
+const DRINKS = {
+  beer:     { icon: "🍺", name: "BEER",      buzz: 0.10, clock: 0.12 },
+  coffee:   { icon: "☕", name: "COLD BREW", buzz: 0.06, clock: 0.03 },
+  espresso: { icon: "⚡", name: "ESPRESSO",  buzz: 0.18, clock: 0.25 },
+};
+function buzzPct() { return Math.round(G.held.reduce((s, k) => s + DRINKS[k].buzz, 0) * 100); }
+function clockPct() { return Math.min(50, Math.round(G.held.reduce((s, k) => s + DRINKS[k].clock, 0) * 100)); }
+function heldIcons() { return G.held.map(k => DRINKS[k].icon).join(""); }
+function buzzMult() { return 1 + buzzPct() / 100; }
+
+/* The drink is YOUR call: buzz bonus vs. bladder vs. clock. Consequences are all yours. */
 function showDrinkOffer() {
   const t = THEMES[G.cur.themeKey];
-  const n = t.drinks || 1;
-  const beer = !!t.drinks;
-  $("drinkq").innerHTML = beer
-    ? `🍺 ${t.drinkMsg || "The boys are ordering another round…"} Join in?`
-    : `☕ Victory cold brew from the lobby cart? It <i>will</i> go right through you.`;
-  $("dr-yes").innerHTML = `${beer ? "🍺" : "☕"} Drink${n > 1 ? ` ×${n}` : ""}<br><small>+${n * 10}% buzz · +${n} bladder</small>`;
-  $("dr-yes").dataset.n = n;
+  const key = G.cur.themeKey;
+  // venue decides the menu (deterministic, so daily/challenge stays fair)
+  const beerN = key === "coffee" ? 0 : (t.drinks || (key === "airport" ? 1 : 0));
+  const menu = beerN ? [["beer", beerN], ["espresso", 1]] : [["coffee", 1], ["espresso", 1]];
+  $("drinkq").innerHTML = beerN
+    ? `🍺 ${t.drinkMsg || "The boys are ordering another round…"} Or just a jolt?`
+    : key === "coffee" ? `☕ ${t.drinkMsg} Or a quick shot at the bar?`
+    : `☕ Victory beverage? The cart's right there. Every drink is +1 to the tank.`;
+  const bb = $("drinkbtns");
+  bb.innerHTML = menu.map(([k, n]) => {
+    const d = DRINKS[k];
+    return `<button class="dk dk-${k}" data-k="${k}" data-n="${n}">${d.icon} ${d.name}${n > 1 ? ` ×${n}` : ""}` +
+      `<small>+${Math.round(d.buzz * 100 * n)}% pts · clock −${Math.round(d.clock * 100 * n)}% · +${n} bladder</small></button>`;
+  }).join("") + `<button class="walk" id="dr-no">🚱 PASS<small>no buzz · no bladder</small></button>`;
+  bb.querySelectorAll(".dk").forEach(b => b.addEventListener("click", () => takeDrink(b.dataset.k, Number(b.dataset.n) || 1)));
+  $("dr-no").addEventListener("click", () => drinkNo());
   $("drinkrow").classList.add("show");
 }
-function drinkYes() {
-  const n = Number($("dr-yes").dataset.n) || 1;
-  G.drinks += n;
+function takeDrink(key, n) {
+  const d = DRINKS[key];
+  for (let i = 0; i < n; i++) G.held.push(key);
+  G.drinks = G.held.length;
   $("drinkrow").classList.remove("show");
   buzz([20, 30, 20]); sfx.ok();
-  if (desperate()) announce("🍺", `+${n} — YOU'RE AT ${G.drinks}`, "Buzz +" + G.drinks * 10 + "% score… and you are now DESPERATE. Clock will fly.", 2000, "warn");
-  else announce("🍺", `+${n} DRINK${n > 1 ? "S" : ""}`, `Buzz +${G.drinks * 10}% score · bladder at ${G.drinks}. Your choice, champ.`, 1500);
+  if (desperate()) announce(d.icon, `${d.name} — BLADDER AT ${G.drinks} 🚨`,
+    `Score +${buzzPct()}% · next clock −${clockPct()}%… and you're DESPERATE. Run out of time and it's over.`, 2100, "warn");
+  else announce(d.icon, `${d.name}${n > 1 ? ` ×${n}` : ""} DOWN`,
+    `Score bonus +${buzzPct()}% · next clock −${clockPct()}% · bladder ${G.drinks}/3`, 1700);
   updateHUD();
 }
 function drinkNo() {
@@ -2448,7 +2601,7 @@ function resolveChoice(i) {
       const drinksAtPick = G.drinks;
       G.streak++; G.trail.push("😬");
       const pts = Math.round(80 * buzzMult());
-      G.score += pts; G.perfects++;
+      gainScore(pts, "ok"); G.perfects++;
       relieve();
       buzz([30, 20, 30]); sfx.ok();
       verdict("GRITTED TEETH 😬", "ok");
@@ -2472,8 +2625,8 @@ function resolveChoice(i) {
     G.streak++; G.trail.push("🟩");
     const mult = 1 + Math.min(0.5, (G.streak - 1) * 0.1);
     const pts = Math.round((100 + speedBonus) * mult * buzzMult());
-    const buzzNote = G.drinks > 0 ? ` 🍺 +${G.drinks * 10}% buzz bonus!` : "";
-    G.score += pts; G.perfects++;
+    const buzzNote = G.held.length ? ` ${heldIcons()} +${buzzPct()}% buzz bonus!` : "";
+    gainScore(pts, "big"); G.perfects++;
     relieve();
     buzz(30); sfx.good();
     verdict("PERFECT!", "good");
@@ -2486,7 +2639,7 @@ function resolveChoice(i) {
   } else if (sc.eff > 1.0) {
     G.streak = 0; G.trail.push("🟨");
     const pts = Math.round(40 * buzzMult());
-    G.score += pts;
+    gainScore(pts, "mid");
     relieve();
     buzz([15, 30, 15]); sfx.ok();
     verdict("ACCEPTABLE", "ok");
@@ -2612,11 +2765,11 @@ function stallSuccess() {
   door.classList.add("spent");
   sfx.flush();
   buzz([30, 60, 30]);
-  G.drinks = 0; // a stall is a proper visit — full relief
+  G.drinks = 0; G.held = []; // a stall is a proper visit — full relief
   if (r.isWaitRound) {
     G.streak++; G.trail.push("🚻");
     const pts = Math.round(150 * buzzMult());
-    G.score += pts; G.perfects++;
+    gainScore(pts, "big"); G.perfects++;
     verdict("PRO MOVE 🚻", "good");
     showLesson("Grandmaster patience.",
       `Every open spot meant standing shoulder-to-shoulder${r.spots.some(s => s.persona === "glasses") ? " (one of them was <b>recording</b>)" : ""}. ` +
@@ -2624,7 +2777,7 @@ function stallSuccess() {
   } else {
     G.streak = 0; G.trail.push("🚻");
     const pts = 30;
-    G.score += pts;
+    gainScore(pts, "mid");
     verdict("STALL REFUGE 🚻", "ok");
     showLesson("It worked… but the board was solvable.",
       `The stall opened and nobody can take that from you. Still, the pros would take ${describeBest(r)} ` +
@@ -2669,9 +2822,10 @@ function startRound() {
   const sc = $("scene");
   sc.classList.remove("dollying"); void sc.offsetWidth; sc.classList.add("dollying");
   setTimeout(() => sc.classList.remove("dollying"), 1600);
-  let factor = Math.max(0.5, 1 - 0.12 * G.drinks); // every drink makes the clock meaner
+  let factor = Math.max(0.5, 1 - clockPct() / 100); // every drink makes the clock meaner
   let muskNote = "";
   if (G.musk) { factor *= 0.88; G.musk = false; muskNote = " · 🧴 cologne cloud: −12% time"; }
+  if (G.held.length) muskNote += ` · ${heldIcons()} clock −${clockPct()}%`;
   $("bladder").style.width = "100%";
   $("bladderwrap").classList.remove("low");
   // big round-intro card — THE readable moment, before any pressure starts
@@ -2890,7 +3044,7 @@ function resetGame(mode, seed) {
     : m === "daily" ? dateSeed()
     : (Math.floor(Math.random() * 2147483647));
   setSeed(s);
-  Object.assign(G, { mode: m, seed: s, round: 0, score: 0, streak: 0, lives: 3, drinks: 0, pissed: false,
+  Object.assign(G, { mode: m, seed: s, round: 0, score: 0, streak: 0, lives: 3, drinks: 0, held: [], pissed: false,
     shield: false, musk: false, stalls: 3, splashes: 0, perfects: 0, trail: [], locked: false });
   $("end").classList.add("hidden");
   $("start").classList.add("hidden");
@@ -3531,8 +3685,6 @@ $("menubtn").addEventListener("click", () => { $("end").classList.add("hidden");
 $("nextbtn").addEventListener("click", () => nextRound());
 $("waitbtn").addEventListener("click", () => onStall());
 $("stalldoor").addEventListener("click", () => onStall());
-$("dr-yes").addEventListener("click", () => drinkYes());
-$("dr-no").addEventListener("click", () => drinkNo());
 $("locbtn").addEventListener("click", () => localizeStadium());
 $("att-tip").addEventListener("click", () => attTip());
 $("att-col").addEventListener("click", () => attCologne());

@@ -23,12 +23,14 @@ and **Endless Rush** (procedurally generated rounds until the rush claims you).
 - **The Meta smart-glasses guy** (🔴 REC) needs extra distance — dividers don't
   help, you're on his livestream. **Travelers' rolling luggage** blocks spots
   in airports & stations (pick one and you trip).
-- **The drink economy is your choice**: after a winning pick, the round
-  offers you a drink ("the boys got a round going… +2 🍺?"). Accept for +10%
-  score buzz per drink held, or pass and stay light. Every drink speeds up
-  the round timer; at 🍺×3 you're **desperate** — run out of time and you
-  **piss yourself: instant game over** ("🌊 Puddle Maker"). Going while
-  desperate vents 2 drinks.
+- **The drink economy is your choice**: after a winning pick, the venue
+  offers a menu — and every button prints its exact math. **🍺 Beer** +10%
+  score buzz but the next clock runs 12% faster; **☕ cold brew** a modest
+  +6% that barely touches the clock; **⚡ espresso** +18% but the clock
+  flies 25% faster. Every drink is +1 in the tank; at ×3 you're
+  **desperate** — run out of time and you **piss yourself: instant game
+  over** ("🌊 Puddle Maker"). Going while desperate vents the 2 oldest
+  drinks. Dive bars pour doubles; the coffee shop doesn't stock beer.
 - **The stall gamble**: a stall door sits at the end of every row (plus a big
   button). You get **3 stall waits per run**; each burns ~2.5 seconds and
   ~40% of the time it's occupied ("…someone's IN here!"). On unwinnable
