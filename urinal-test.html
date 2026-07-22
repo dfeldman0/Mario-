@@ -301,6 +301,21 @@
   #stalldoor.knocking { animation: knock .5s ease-in-out 2; }
   @keyframes knock { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
 
+  /* ---------- ballpark photo interstitial ---------- */
+  #parkphoto { position: absolute; inset: 0; z-index: 34; display: none; overflow: hidden; border-radius: 14px; }
+  #parkphoto.show { display: block; }
+  .pp-img { position: absolute; inset: 0; background-size: cover; background-position: center;
+    animation: ppzoom 2.6s ease-out forwards; }
+  @keyframes ppzoom { from { transform: scale(1.1); } to { transform: scale(1); } }
+  .pp-shade { position: absolute; inset: 0;
+    background: linear-gradient(rgba(10,13,19,.15) 30%, rgba(10,13,19,.85)); }
+  .pp-text { position: absolute; left: 0; right: 0; bottom: 9%; text-align: center; animation: ppup .6s ease-out; }
+  @keyframes ppup { from { transform: translateY(18px); opacity: 0; } }
+  .pp-now { letter-spacing: 6px; font-size: clamp(11px, 3vw, 14px); color: #cfe8ff; }
+  .pp-name { font-weight: 900; font-size: clamp(24px, 7.5vw, 40px); letter-spacing: 1px;
+    text-shadow: 0 3px 10px rgba(0,0,0,.8); margin: 2px 0; }
+  .pp-sub { color: #ffd76a; font-size: clamp(12px, 3.4vw, 15px); font-weight: bold; }
+
   /* ---------- center-stage announcements ---------- */
   #announce { position: absolute; left: 50%; top: 38%; transform: translate(-50%,-50%) scale(.7);
     opacity: 0; z-index: 35; pointer-events: none; text-align: center;
@@ -520,6 +535,11 @@
         <div class="panel"></div>
         <div class="panel2"></div>
         <div class="knob"></div>
+      </div>
+      <div id="parkphoto">
+        <div class="pp-img"></div>
+        <div class="pp-shade"></div>
+        <div class="pp-text"><div class="pp-now">NOW ENTERING</div><div class="pp-name"></div><div class="pp-sub">⚾ find the head, hero</div></div>
       </div>
       <div id="announce"><div class="aicon"></div><div class="atitle"></div><div class="asub"></div></div>
       <div id="verdict"></div>
@@ -919,8 +939,14 @@ function haversineKm(a, b, c, d) {
   const h = Math.sin(dLat / 2) ** 2 + Math.cos(toR(a)) * Math.cos(toR(c)) * Math.sin(dLon / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(h));
 }
+function parkSlug(name) { return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+function parkPhotoURL(p) { return `parks/${parkSlug(p.park)}.jpg`; }
+
 function applyPark(p, km) {
   const s = THEMES.stadium;
+  // warm the photo cache so the interstitial never pops in late
+  const pre = new Image();
+  pre.src = parkPhotoURL(p);
   s.name = `${p.park} — 7th-Inning Rush`;
   s.icon = "⚾";
   s.wall = p.wallc ? p.wallc[0] : mixWhite(p.c, 0.72);
@@ -1471,6 +1497,7 @@ function runTimer() {
 function stopTimer() {
   if (G.timer) { clearInterval(G.timer); G.timer = null; }
   if (G.introT) { clearTimeout(G.introT); G.introT = null; }
+  $("parkphoto").classList.remove("show"); // never strand the interstitial over a live board
 }
 
 /* ---------- FX ---------- */
@@ -1885,14 +1912,31 @@ function startRound() {
   if (G.cur.flickerAt >= 0) hazards.push("💡 flickering light");
   const hazardNote = hazards.length ? ` · ${hazards.join(" · ")}` : "";
   const roundLabel = G.mode === "endless" ? `ROUND ${G.round + 1}` : `ROUND ${G.round + 1} / 10`;
-  announce(G.cur.theme.icon, G.cur.theme.name, `${roundLabel} — ${layoutNote}${hazardNote}${muskNote}`, hazards.length ? 1650 : 1300);
   const secs = G.cur.time * factor;
   G.timeLeft = secs; G.timerTotal = secs; // clicking during the intro still earns full speed bonus
-  G.introT = setTimeout(() => {
-    G.introT = null;
-    startTimer(secs);
-    if (desperate()) announce("🚨", "YOU'RE DESPERATE", `${G.drinks} drinks deep — clock is flying. Run out of time and it's over. GO.`, 1900, "warn");
-  }, 1250);
+  const proceed = () => {
+    announce(G.cur.theme.icon, G.cur.theme.name, `${roundLabel} — ${layoutNote}${hazardNote}${muskNote}`, hazards.length ? 1650 : 1300);
+    G.introT = setTimeout(() => {
+      G.introT = null;
+      startTimer(secs);
+      if (desperate()) announce("🚨", "YOU'RE DESPERATE", `${G.drinks} drinks deep — clock is flying. Run out of time and it's over. GO.`, 1900, "warn");
+    }, 1250);
+  };
+  // ballpark rounds with a home park set get the full photo interstitial first
+  const p = G.cur.themeKey === "stadium" ? THEMES.stadium.parkRef : null;
+  if (p) {
+    if (announceT) clearTimeout(announceT);
+    $("announce").classList.remove("show"); // the photo IS the announcement
+    const pp = $("parkphoto");
+    pp.querySelector(".pp-img").style.backgroundImage = `url('${parkPhotoURL(p)}')`;
+    pp.querySelector(".pp-name").textContent = p.park.toUpperCase();
+    pp.querySelector(".pp-sub").textContent = `⚾ ${p.flavor} — find the head, hero`;
+    pp.classList.remove("show"); void pp.offsetWidth; pp.classList.add("show");
+    sfx.flush();
+    G.introT = setTimeout(() => { pp.classList.remove("show"); proceed(); }, 2300);
+  } else {
+    proceed();
+  }
 }
 
 function nextRound() {

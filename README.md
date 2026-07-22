@@ -44,6 +44,11 @@ and **Endless Rush** (procedurally generated rounds until the rush claims you).
   a big marquee sign ("WRIGLEY FIELD — HOME OF THE CUBS"), team-colored
   bunting, and signature set dressing: Wrigley's ivy wall, Fenway's Green
   Monster + scoreboard, Yankee Stadium's frieze.
+- **🏟️ Photo interstitials**: ballpark rounds open with a full-screen iconic
+  photo of *your* park ("NOW ENTERING WRIGLEY FIELD… find the head, hero")
+  with a slow cinematic zoom before the restroom appears. All 30 parks ship
+  in `parks/` (sources & licenses in `parks/CREDITS.md`) — drop in your own
+  JPG named `<park-name-slug>.jpg` to replace any of them.
 - **Orientation is obvious**: guys facing you at the shame tub hold a
   ballpark frank at waist level with both hands. That's what the hands are
   doing. It's a hot dog. Rated E for Everyone.
