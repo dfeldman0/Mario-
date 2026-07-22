@@ -10,6 +10,7 @@
     --wall2: #9fc3c8;
     --floor1: #9aa0aa;
     --floor2: #767c88;
+    --stall-lane: calc(clamp(46px, 13vw, 66px) + 14px); /* reserved so the door never covers a urinal */
   }
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
@@ -155,12 +156,12 @@
     background-size: 30px 100%; }
 
   #row { position: absolute; left: 0; right: 0; bottom: 8%; top: 18%; display: flex;
-    align-items: flex-end; justify-content: center; padding: 0 8px; z-index: 4; }
+    align-items: flex-end; justify-content: center; padding: 0 var(--stall-lane) 0 8px; z-index: 4; }
 
   .slot { position: relative; flex: 1 1 0; max-width: 110px; height: 100%; cursor: pointer;
     animation: slotin .35s backwards; }
   @keyframes slotin { from { opacity: 0; transform: translateY(14px); } }
-  .slot .fixture { position: absolute; left: 50%; transform: translateX(-50%); bottom: 26%; width: 82%; max-width: 74px;
+  .slot .fixture { position: absolute; left: 50%; transform: translateX(-50%); bottom: 26%; width: 88%; max-width: 80px;
     filter: drop-shadow(0 5px 5px rgba(0,0,0,.28)); }
   .slot .person { position: absolute; left: 50%; transform: translateX(-50%); bottom: 5%; width: 96%; max-width: 96px; pointer-events: none; z-index: 5; }
   .person svg { transform-origin: 50% 92%; animation: sway 3.2s ease-in-out infinite alternate; }
@@ -183,16 +184,21 @@
   .slot .tape2 { bottom: 32%; transform: rotate(1.5deg); }
   .slot .cone { position: absolute; left: 50%; transform: translateX(-50%); bottom: 5%; width: 48%; max-width: 46px;
     z-index: 6; pointer-events: none; }
-  .slot .flick { position: absolute; left: 2%; right: 2%; top: 32%; bottom: 18%; border-radius: 14px;
-    background: radial-gradient(ellipse at 50% 40%, rgba(5,8,18,.5), rgba(5,8,18,.25) 70%, transparent);
-    pointer-events: none; z-index: 4; animation: flickA 1.1s steps(3, end) infinite; }
-  @keyframes flickA { 0%,100% { opacity: .55; } 40% { opacity: .05; } 55% { opacity: .7; } 70% { opacity: .15; } }
+  .slot .flick { position: absolute; left: 8%; right: 8%; top: 56%; bottom: 24%; border-radius: 10px;
+    background: linear-gradient(rgba(8,10,20,.5), rgba(8,10,20,.18));
+    pointer-events: none; z-index: 4; animation: flickA .9s steps(2, end) infinite; }
+  .slot .flick::before { content: "💡"; position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+    font-size: 15px; filter: drop-shadow(0 0 7px #ffd76a); animation: flickA .9s steps(2, end) infinite reverse; }
+  @keyframes flickA { 0%,100% { opacity: .75; } 40% { opacity: .1; } 55% { opacity: .85; } 70% { opacity: .2; } }
   .slot.chosen-good .fixture { filter: drop-shadow(0 0 12px rgba(47,180,107,1)); }
   .slot.chosen-bad .fixture  { filter: drop-shadow(0 0 12px rgba(230,72,61,1)); }
   .slot.best-mark::before { content: "✔ best"; position: absolute; top: 2%; left: 50%; transform: translateX(-50%);
     color: #6fe3a1; font-size: 11px; font-weight: bold; text-shadow: 0 1px 2px #000; z-index: 8; }
-  #scene.tub .slot.chosen-good, #scene.trough .slot.chosen-good { outline: 3px solid rgba(47,180,107,.85); outline-offset: -3px; border-radius: 12px; }
-  #scene.tub .slot.chosen-bad, #scene.trough .slot.chosen-bad { outline: 3px solid rgba(230,72,61,.85); outline-offset: -3px; border-radius: 12px; }
+  /* chosen-spot feedback on trough/tub: recolor the position ring (no giant slot outline) */
+  .slot.free.chosen-good::after { border: 3.5px solid #2fb46b !important; background: rgba(47,180,107,.3) !important;
+    box-shadow: 0 0 14px rgba(47,180,107,.95) !important; animation: none !important; opacity: 1 !important; }
+  .slot.free.chosen-bad::after { border: 3.5px solid #e6483d !important; background: rgba(230,72,61,.3) !important;
+    box-shadow: 0 0 14px rgba(230,72,61,.95) !important; animation: none !important; opacity: 1 !important; }
 
   .divider { flex: 0 0 8px; height: 38%; align-self: flex-end; margin-bottom: 21%; position: relative;
     background: linear-gradient(90deg, #dee3ea, #aab1bb 55%, #868d98); border-radius: 5px 5px 0 0;
@@ -201,13 +207,13 @@
     background: linear-gradient(#9aa2ad, #6c737e); border-radius: 2px 0 0 2px; }
 
   /* ---------- wall-mounted trough ---------- */
-  #trough { position: absolute; left: 3%; right: 3%; top: 0; bottom: 0; display: none; z-index: 2; pointer-events: none; }
+  #trough { position: absolute; left: 3%; right: var(--stall-lane); top: 0; bottom: 0; display: none; z-index: 2; pointer-events: none; }
   #scene.trough #trough { display: block; }
   #scene.trough .fixture { display: none; }
-  #scene.trough .slot.free:not(.blocked)::after { bottom: 40%; width: 26px; height: 12px; z-index: 6;
-    background: transparent; border: 3px solid rgba(240,250,255,.75); box-shadow: 0 0 8px rgba(160,220,255,.8); }
+  #scene.trough .slot.free:not(.blocked)::after { bottom: 40%; width: 30px; height: 14px; z-index: 6;
+    background: rgba(87,184,255,.2); border: 3.5px solid #57b8ff; box-shadow: 0 0 12px rgba(87,184,255,.95); }
   #scene.trough .person { bottom: 27%; }
-  #troughfront { position: absolute; left: 3%; right: 3%; top: 0; bottom: 0; display: none; z-index: 5; pointer-events: none; }
+  #troughfront { position: absolute; left: 3%; right: var(--stall-lane); top: 0; bottom: 0; display: none; z-index: 5; pointer-events: none; }
   #scene.trough #troughfront { display: block; }
   .t-back { position: absolute; left: 0; right: 0; bottom: 30%; height: 15%;
     background:
@@ -264,13 +270,13 @@
   #scene.tub #row { top: 52%; bottom: 2%; }
   #scene.tub #row .person { max-width: 112px; width: 104%; bottom: 2%; }
   #rowfar { position: absolute; left: 5%; right: 5%; top: 17%; height: 29%; display: none;
-    align-items: flex-end; justify-content: center; padding: 0 8px; z-index: 2; }
+    align-items: flex-end; justify-content: center; padding: 0 var(--stall-lane) 0 8px; z-index: 2; }
   #scene.tub #rowfar { display: flex; }
   #rowfar .slot { max-width: 88px; }
   #rowfar .person { max-width: 68px; bottom: 0; }
   #rowfar .slot.free:not(.blocked)::after { bottom: -6%; }
-  #scene.tub .slot.free:not(.blocked)::after { width: 28px; border: 3px solid rgba(240,250,255,.7);
-    background: transparent; box-shadow: 0 0 8px rgba(160,220,255,.7); height: 11px; }
+  #scene.tub .slot.free:not(.blocked)::after { width: 30px; border: 3.5px solid #57b8ff;
+    background: rgba(87,184,255,.2); box-shadow: 0 0 12px rgba(87,184,255,.95); height: 13px; }
   #scene.tub #row .slot.free:not(.blocked)::after { bottom: 6%; }
 
   /* ---------- the stall gamble ---------- */
@@ -407,7 +413,7 @@
       <stop offset=".8" stop-color="#d4dce3"/><stop offset="1" stop-color="#b9c4cd"/>
     </linearGradient>
     <linearGradient id="bowlG" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#c7d1d9"/><stop offset=".6" stop-color="#dde4ea"/><stop offset="1" stop-color="#b5c0c9"/>
+      <stop offset="0" stop-color="#adbac4"/><stop offset=".6" stop-color="#ccd6dd"/><stop offset="1" stop-color="#96a4af"/>
     </linearGradient>
     <linearGradient id="steelG" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#f8fafc"/><stop offset=".4" stop-color="#c7d0d8"/>
@@ -774,7 +780,7 @@ function urinalSVG() {
     <rect x="22" y="13" width="9" height="4" rx="2" fill="url(#steelG)"/>
     <rect x="37" y="20" width="6" height="8" fill="url(#steelG)"/>
     <path d="M14 28 h52 a5 5 0 0 1 5 5 v40 a31 31 0 0 1 -31 31 a31 31 0 0 1 -31 -31 v-40 a5 5 0 0 1 5 -5 z"
-      fill="url(#porcG)" stroke="#a7b2bc" stroke-width="2"/>
+      fill="url(#porcG)" stroke="#75838f" stroke-width="2.6"/>
     <path d="M60 30 a4 4 0 0 1 8 2 v40 a29 29 0 0 1 -14 25 a31 31 0 0 0 6 -25 z" fill="rgba(0,0,0,.08)"/>
     <path d="M22 36 h36 a4 4 0 0 1 4 4 v31 a22 22 0 0 1 -22 22 a22 22 0 0 1 -22 -22 v-31 a4 4 0 0 1 4 -4 z"
       fill="url(#bowlG)"/>
@@ -940,13 +946,20 @@ function haversineKm(a, b, c, d) {
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 function parkSlug(name) { return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
-function parkPhotoURL(p) { return `parks/${parkSlug(p.park)}.jpg`; }
+/* PARK_VARIANTS is generated from the files shipped in parks/ — see tools in repo history */
+const PARK_VARIANTS = {"american-family-field":4,"angel-stadium":4,"busch-stadium":3,"camden-yards":4,"chase-field":3,"citi-field":3,"citizens-bank-park":3,"comerica-park":3,"coors-field":3,"daikin-park":4,"dodger-stadium":3,"fenway-park":4,"globe-life-field":3,"great-american-ball-park":4,"kauffman-stadium":3,"loandepot-park":2,"nationals-park":3,"oracle-park":4,"petco-park":4,"pnc-park":3,"progressive-field":4,"rate-field":4,"rogers-centre":4,"sutter-health-park":4,"t-mobile-park":3,"target-field":4,"tropicana-field":4,"truist-park":4,"wrigley-field":4,"yankee-stadium":4};
+function parkPhotoURL(p) {
+  const s = parkSlug(p.park);
+  const n = PARK_VARIANTS[s] || 1;
+  const v = 1 + Math.floor(Math.random() * n); // variety per visit; cosmetic RNG on purpose
+  return `parks/${s}-${v}.jpg`;
+}
 
 function applyPark(p, km) {
   const s = THEMES.stadium;
   // warm the photo cache so the interstitial never pops in late
-  const pre = new Image();
-  pre.src = parkPhotoURL(p);
+  const slug0 = parkSlug(p.park);
+  for (let v = 1; v <= (PARK_VARIANTS[slug0] || 1); v++) { const pre = new Image(); pre.src = `parks/${slug0}-${v}.jpg`; }
   s.name = `${p.park} — 7th-Inning Rush`;
   s.icon = "⚾";
   s.wall = p.wallc ? p.wallc[0] : mixWhite(p.c, 0.72);
