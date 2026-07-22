@@ -2859,6 +2859,7 @@ function tex(drawFn, w, h) {
   const c = document.createElement("canvas"); c.width = w || 256; c.height = h || 256;
   drawFn(c.getContext("2d"), c.width, c.height);
   const t = new THREE.CanvasTexture(c);
+  if (T3.renderer) t.anisotropy = T3.renderer.capabilities.getMaxAnisotropy();
   return t;
 }
 const parkTexCache = {};
@@ -2886,12 +2887,12 @@ function boardMesh(title, rows, w, h) {
   const t = tex((x, cw, ch) => {
     x.fillStyle = "#0d1b12"; x.fillRect(0, 0, cw, ch);
     x.strokeStyle = "#c8d0d7"; x.lineWidth = 10; x.strokeRect(5, 5, cw - 10, ch - 10);
-    x.fillStyle = "#ffd76a"; x.font = "bold 44px Trebuchet MS"; x.textAlign = "left";
-    x.fillText(title, 36, 70);
+    x.fillStyle = "#ffd76a"; x.font = "bold 54px Trebuchet MS"; x.textAlign = "left";
+    x.fillText(title, 36, 74);
     x.strokeStyle = "rgba(255,255,255,.25)"; x.lineWidth = 3;
     x.beginPath(); x.moveTo(30, 92); x.lineTo(cw - 30, 92); x.stroke();
-    x.font = "bold 36px Courier New";
-    rows.forEach((r2, i) => { x.fillStyle = r2.bad ? "#ff9a90" : "#8fe3a8"; x.fillText(r2.t, 36, 150 + i * 52); });
+    x.font = "bold 46px Courier New";
+    rows.forEach((r2, i) => { x.fillStyle = r2.bad ? "#ff9a90" : "#8fe3a8"; x.fillText(r2.t, 36, 158 + i * 62); });
   }, 1024, 512);
   return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t }));
 }
@@ -2975,6 +2976,10 @@ function build3D(round) {
   const n = round.n, S = 0.85;
   const X = i => (i - (n - 1) / 2) * S;
   const roomW = n * S + 4;
+  const halfW0 = (n - 1) / 2 * S + 0.8;
+  const hHalf0 = Math.atan(Math.tan(58 * Math.PI / 360) * (T3.cam.aspect || 0.5));
+  const camDist = Math.max(4.2, halfW0 / Math.tan(hHalf0) + 0.7);
+  const sgn = Math.min(2.3, Math.max(1, camDist / 6.2)); // signage scale: constant apparent size
   const wallC = new THREE.Color(round.theme.wall);
   const floor1 = new THREE.Color(round.theme.floor1);
   // room shell — 4K treatment: hi-res tiled walls, glossy floor, baseboard, depth fog
@@ -3042,14 +3047,17 @@ function build3D(round) {
     const txt = pick(posterPool);
     const pt = tex((x, w, h) => {
       x.fillStyle = "#f7f4e8"; x.fillRect(0, 0, w, h);
-      x.fillStyle = "#3a3428"; x.font = "bold 52px Trebuchet MS"; x.textAlign = "center";
+      x.fillStyle = "#3a3428"; x.font = "bold 64px Trebuchet MS"; x.textAlign = "center";
       const words = txt.split(" "); let line = "", lines = [];
-      for (const wd of words) { if ((line + wd).length > 14) { lines.push(line); line = wd + " "; } else line += wd + " "; }
+      for (const wd of words) { if ((line + wd).length > 12) { lines.push(line); line = wd + " "; } else line += wd + " "; }
       lines.push(line);
-      lines.forEach((l, i) => x.fillText(l.trim(), w / 2, h / 2 - (lines.length - 1) * 32 + i * 64));
+      lines.forEach((l, i) => x.fillText(l.trim(), w / 2, h / 2 - (lines.length - 1) * 36 + i * 72 + 10));
     }, 512, 320);
-    const poster = new THREE.Mesh(new THREE.PlaneGeometry(0.85, 0.55), new THREE.MeshLambertMaterial({ map: pt }));
-    poster.position.set((k % 2 === 0 ? -1 : 1) * rnd(roomW / 6, roomW / 2.4), rnd(1.85, 2.5), 0.02);
+    const poster = new THREE.Mesh(new THREE.PlaneGeometry(1.15 * sgn, 0.72 * sgn), new THREE.MeshLambertMaterial({ map: pt }));
+    let ppx = (k % 2 === 0 ? -1 : 1) * rnd(roomW / 6, roomW / 2.6);
+    const ppMax = Math.max(1, halfW0 - 0.68 * sgn);
+    ppx = Math.max(-ppMax, Math.min(ppMax, ppx));
+    poster.position.set(ppx, rnd(1.95, 2.45), 0.02);
     poster.rotation.z = rnd(-0.05, 0.05);
     T3.group.add(poster);
   }
@@ -3157,12 +3165,12 @@ function build3D(round) {
       x.fillRect(8, 8, w - 16, h - 16);
       x.strokeStyle = "#fff"; x.lineWidth = 10; x.strokeRect(16, 16, w - 32, h - 32);
       x.fillStyle = "#fff"; x.textAlign = "center";
-      x.font = "bold 64px Trebuchet MS"; x.fillText(pk3.park.toUpperCase(), w / 2, 84);
-      x.font = "bold 30px Trebuchet MS"; x.fillStyle = "rgba(255,255,255,.85)";
-      x.fillText("HOME OF THE " + pk3.team.toUpperCase(), w / 2, 134);
+      x.font = "bold 78px Trebuchet MS"; x.fillText(pk3.park.toUpperCase(), w / 2, 88);
+      x.font = "bold 38px Trebuchet MS"; x.fillStyle = "rgba(255,255,255,.9)";
+      x.fillText("HOME OF THE " + pk3.team.toUpperCase(), w / 2, 140);
     }, 1024, 168);
-    const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 0.38), new THREE.MeshBasicMaterial({ map: signT, transparent: true }));
-    sign.position.set(0, 2.86, 0.05); sign.rotation.z = -0.012;
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(Math.min(roomW - 1.2, 2.6 * sgn), Math.min(roomW - 1.2, 2.6 * sgn) * 0.165, 1), new THREE.MeshBasicMaterial({ map: signT, transparent: true }));
+    sign.position.set(0, Math.min(2.86, 3.0 - sign.geometry.parameters.height / 2), 0.05); sign.rotation.z = -0.012;
     T3.group.add(sign);
     if (pk3.sig === "ivy") {
       const ivyT = tex((x, w, h) => {
@@ -3180,12 +3188,14 @@ function build3D(round) {
       T3.group.add(sb);
     }
   } else if (pk3 && round.themeKey === "airport") {
-    const b = boardMesh("\u2708 " + pk3.ap.toUpperCase(), [{ t: "B12  BOARDING" }, { t: "C07  DELAYED", bad: true }, { t: "A03  FINAL CALL" }], 3.1, 1.45);
-    b.position.set(0, 2.25, 0.02);
+    const bw = Math.min(roomW - 1.6, 3.4 * Math.min(sgn, 1.5)), bh = bw * 0.47;
+    const b = boardMesh("\u2708 " + pk3.ap.toUpperCase(), [{ t: "B12  BOARDING" }, { t: "C07  DELAYED", bad: true }, { t: "A03  FINAL CALL" }], bw, bh);
+    b.position.set(0, Math.min(2.3, 2.98 - bh / 2), 0.02);
     T3.group.add(b);
   } else if (pk3 && round.themeKey === "station") {
-    const b = boardMesh("\ud83d\ude86 " + pk3.st.toUpperCase(), [{ t: "5:15  ON TIME" }, { t: "5:45  DELAYED", bad: true }, { t: "6:10  CANCELED", bad: true }], 3.1, 1.45);
-    b.position.set(0, 2.25, 0.02);
+    const bw = Math.min(roomW - 1.6, 3.4 * Math.min(sgn, 1.5)), bh = bw * 0.47;
+    const b = boardMesh("\ud83d\ude86 " + pk3.st.toUpperCase(), [{ t: "5:15  ON TIME" }, { t: "5:45  DELAYED", bad: true }, { t: "6:10  CANCELED", bad: true }], bw, bh);
+    b.position.set(0, Math.min(2.3, 2.98 - bh / 2), 0.02);
     T3.group.add(b);
   }
   if (pk3 && round.themeKey !== "stadium") {
@@ -3196,8 +3206,8 @@ function build3D(round) {
       x.fillStyle = "#fff"; x.font = "bold 52px Trebuchet MS"; x.textAlign = "left";
       x.fillText(pk3.team.toUpperCase(), 44, h / 2 + 18);
     }, 512, 200);
-    const pen = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 0.44), new THREE.MeshBasicMaterial({ map: penT, transparent: true }));
-    pen.position.set(-roomW / 2 + 1.2 + Math.random() * 0.8, 2.45, 0.03); pen.rotation.z = rnd(-0.06, 0.03);
+    const pen = new THREE.Mesh(new THREE.PlaneGeometry(1.15 * sgn, 0.44 * sgn), new THREE.MeshBasicMaterial({ map: penT, transparent: true }));
+    pen.position.set(-Math.max(1, halfW0 - 0.75 * sgn), 2.5, 0.03); pen.rotation.z = rnd(-0.06, 0.03);
     T3.group.add(pen);
   }
   // sinks + mirror at the end of the row
@@ -3235,11 +3245,11 @@ function build3D(round) {
   if (Math.random() < 0.5) {
     const gt = tex((x, w, h) => {
       x.clearRect(0, 0, w, h);
-      x.fillStyle = pick(["rgba(122,47,47,.7)", "rgba(47,74,122,.7)", "rgba(63,107,58,.7)"]);
-      x.font = "italic bold 40px Comic Sans MS, cursive"; x.textAlign = "center";
+      x.fillStyle = pick(["rgba(102,32,32,.95)", "rgba(32,58,108,.95)", "rgba(45,92,40,.95)"]);
+      x.font = "italic bold 52px Comic Sans MS, cursive"; x.textAlign = "center";
       x.fillText(pick([...GRAFFITI, ...cityJokes(THEMES.stadium.parkRef).map(j => j.toLowerCase())]).slice(0, 30), w / 2, h / 2 + 14);
     }, 1024, 128);
-    const graf = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.2), new THREE.MeshBasicMaterial({ map: gt, transparent: true }));
+    const graf = new THREE.Mesh(new THREE.PlaneGeometry(1.7 * sgn, 0.21 * sgn), new THREE.MeshBasicMaterial({ map: gt, transparent: true }));
     graf.position.set(rnd(-roomW / 4, roomW / 4), rnd(0.36, 0.5), 0.025);
     graf.rotation.z = rnd(-0.08, 0.08);
     T3.group.add(graf);
@@ -3265,9 +3275,7 @@ function build3D(round) {
   // camera: STRAIGHT-ON — the whole row visible instantly, zero navigation.
   // Distance auto-fits the row width to the viewport, walk-in dollies straight through the door.
   T3.cam.fov = 58; T3.cam.updateProjectionMatrix();
-  const halfW = (n - 1) / 2 * S + 0.8;
-  const hHalf = Math.atan(Math.tan(T3.cam.fov * Math.PI / 360) * T3.cam.aspect);
-  const dist = Math.max(4.2, halfW / Math.tan(hHalf) + 0.7);
+  const dist = camDist;
   T3.camFrom = new THREE.Vector3(0, 1.82, dist + 2.4);
   T3.camTo = new THREE.Vector3(0, 1.5, dist);
   T3.look = new THREE.Vector3(0, 1.08, 0.2);
