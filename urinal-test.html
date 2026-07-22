@@ -1653,6 +1653,41 @@ function analyze(round) {
 /* ---------- rendering ---------- */
 function slotEl(i) { return $("scene").querySelector(`.slot[data-i="${i}"]`); }
 
+/* ---------- deep city lore: posters only the locals fully get ---------- */
+const CITY_JOKES = {
+  "Angel Stadium": ["TRAFFIC ON THE 5: YES", "DISNEY ADULTS WASH TWICE", "OC PARKING VALIDATED: NEVER", "TROUT WAS HERE"],
+  "Daikin Park": ["NO BANGING ON THE TRASH CANS", "HUMIDITY: 100%. AGAIN.", "WHATABURGER AFTER? OBVIOUSLY", "I-45 CLOSED THIS WEEKEND (ALWAYS)"],
+  "Sutter Health Park": ["TEMPORARY HOME, PERMANENT LINES", "FARM-TO-FORK, FORK-TO-HERE", "IT'S A DRY HEAT (IT'S NOT OK)", "STILL BETTER THAN THE COLISEUM PLUMBING"],
+  "Tropicana Field": ["RING THE BELL IF DRY", "CATWALK RULES APPLY", "GATOR IN LOT C AGAIN", "HURRICANE SEASON: HOLD EVERYTHING"],
+  "Yankee Stadium": ["THE 4 TRAIN LEAVES WITHOUT YOU", "BLEACHER CREATURES WASH UP TOO", "$19 BEER, PRICELESS RELIEF", "JUDGE'S CHAMBERS → THAT WAY"],
+  "Progressive Field": ["THE LAND FORGIVES. THE LINE DOESN'T.", "BROWNS FANS: HUGS AVAILABLE", "FLATS BATHROOM RULES APPLY", "ROCK HALL SNUBBED US TOO"],
+  "Comerica Park": ["CONEY: ONE UP, ONE DOWN", "313 REPRESENT", "FORD VS CHEVY: NOT IN HERE", "WE STILL BELIEVE (RESPECTFULLY)"],
+  "Kauffman Stadium": ["BURNT ENDS CATCH UP FAST", "THE FOUNTAINS ARE NOT URINALS", "MAHOMES MENTION QUOTA: MET", "BOULEVARD BEFORE, REGRET AFTER"],
+  "Target Field": ["YOU BETCHA WE'RE OUT OF SOAP", "DULUTH IS NOT A SUBURB", "THE SKYWAY CLOSES AT 7", "-20° IS JACKET WEATHER"],
+  "Rate Field": ["SOUTH SIDE, BEST SIDE", "DA POPE IS A SOX FAN", "GIARDINIERA ON EVERYTHING", "35TH & SHIELDS FOREVER", "CUBS FANS: VISITORS' LINE →"],
+  "Wrigley Field": ["THE TROUGHS RAISED LEGENDS", "IVY DON'T LIE", "CLARK & ADDISON: JUST WALK", "MALÖRT AFTER? BRAVE.", "GO CUBS GO PLAYS EITHER WAY"],
+  "Great American Ball Park": ["SKYLINE: 4-WAY, HOLD THE REGRET", "FLYING PIGS LAND HERE", "GOETTA IN THE MORNING", "WHO DEY IN HERE TOO"],
+  "American Family Field": ["BRAT BEFORE BEER, YOU'RE IN THE CLEAR", "SPOTTED COW SMUGGLERS WELCOME", "THE RACING SAUSAGES CHANGED HERE", "KWIK TRIP GLAZERS → LOBBY"],
+  "PNC Park": ["YINZ WASH UP", "PUT FRIES ON IT", "THE INCLINE'S FASTER THAN THIS LINE", "STILLERS TALK PERMITTED YEAR-ROUND"],
+  "Busch Stadium": ["WHERE'D YOU GO TO HIGH SCHOOL?", "PROVEL IS CHEESE. FIGHT US.", "GOOEY BUTTER CAKE HITS DIFFERENT", "NO BATHROOM ATOP THE ARCH. PLAN AHEAD."],
+  "Coors Field": ["ALTITUDE HITS AT BEER TWO", "GREEN CHILE ON EVERYTHING", "TRAILHEAD ETIQUETTE APPLIES", "CASA BONITA DIVERS WASH UP TOO"],
+  "Dodger Stadium": ["ARRIVE 3RD, LEAVE 7TH", "DODGER DOG FIRST, QUESTIONS LATER", "THE 110 IS A LIFESTYLE", "IN VIN WE TRUST"],
+  "Petco Park": ["JUNE GLOOM CAN'T DAMPEN THIS", "CALI BURRITO: FRIES INSIDE", "SLOW DOWN. IT'S SAN DIEGO.", "THE GASLAMP LINE WAS WORSE"],
+  "Oracle Park": ["KARL THE FOG ROLLED IN HERE", "DON'T CALL IT FRISCO", "GARLIC FRIES: WORTH IT. MOSTLY.", "NO STANDUPS IN HERE, TECH BROS"],
+  "Chase Field": ["110° BUT IT'S A DRY HEAT", "THE POOL IS NOT A TROUGH", "SAGUAROS WAIT 75 YEARS FOR AN ARM. WAIT YOUR TURN.", "SNOWBIRDS: WELCOME BACK"],
+  "T-Mobile Park": ["NO UMBRELLA. WE KNOW.", "THE FISH GUYS THROW. YOU DODGE.", "SODO MOJO", "COFFEE IN, COFFEE OUT"],
+  "Globe Life Field": ["EVERYTHING'S BIGGER. THE LINE TOO.", "BRISKET WAITS FOR NO MAN", "DR PEPPER IS A FOOD GROUP", "YEEHAW RESPONSIBLY"],
+  "Fenway Park": ["WICKED LONG LINE, KID", "THE PIKE'S BACKED UP TOO", "DUNKS RUNS RIGHT THROUGH YOU", "YANKEES FANS: PORTA-POTTY OUTSIDE", "PAHK THE CAH FIRST"],
+  "Camden Yards": ["OLD BAY ON EVERYTHING. EVERYTHING.", "NATTY BOH EYES ARE WATCHING", "HON, WASH YOUR HANDS", "PURPLE FRIDAYS HONORED HERE"],
+  "Rogers Centre": ["SORRY, EH (FOR THE WAIT)", "THE 6IX FLUSHES CLEAN", "TIM'S DOUBLE-DOUBLE GOES RIGHT THROUGH", "DRAKE SAT HERE (COURTSIDE)"],
+  "Truist Park": ["THE CONNECTOR IS STILL JAMMED", "WAFFLE HOUSE AFTER: SCATTERED, SMOTHERED", "ITP / OTP TRUCE ZONE", "CHOP RESPONSIBLY"],
+  "loanDepot park": ["CAFECITO AT 3:05", "ABUELA SAYS WASH TWICE", "305 TILL I DIE", "PITBULL PLAYED THIS BATHROOM (UNVERIFIED)"],
+  "Citi Field": ["THE 7 TRAIN JUDGES NO ONE", "BACON EGG & CHEESE REPERCUSSIONS", "GRIMACE BLESSED THIS ROOM", "LGM: LET'S GO (FIRST)"],
+  "Citizens Bank Park": ["JAWN CLEAN, HANDS CLEANER", "WATER ICE FIXES EVERYTHING", "GRITTY WATCHES. ALWAYS.", "WIT OR WITOUT, WASH UP", "BOO RESPONSIBLY"],
+  "Nationals Park": ["FILIBUSTER-FREE ZONE", "METRO'S SINGLE-TRACKING AGAIN", "HALF-SMOKE > HOT DOG", "RACING PRESIDENTS PIT STOP"],
+};
+function cityJokes(pk) { return (pk && CITY_JOKES[pk.park]) || []; }
+
 /* ---------- procedural set dressing ---------- */
 const POSTERS_GENERIC = ["EMPLOYEES MUST WASH HANDS", "OUT OF SOAP — BE BRAVE", "AIM. THANK YOU. — MGMT",
   "NOW HIRING: ATTENDANT", "FREE WIFI: 'guest123'", "NO PHONE CALLS. WE CAN ALL HEAR YOU.",
@@ -1726,7 +1761,7 @@ function dressScene(round) {
   const venueEmoji = (round.theme.backdrop || "").split(/\s+/).filter(Boolean).concat(season.frames);
   const cityEmoji = pk ? pk.land.split(" ") : [];
   const posterPool = [...POSTERS_GENERIC, ...(POSTERS_VENUE[round.themeKey] || []), ...season.posters, ...season.posters];
-  const cityPosters = pk ? [`${pk.chant}!`, `${pk.team.toUpperCase()} GAME TONIGHT`, `${pk.city} 💙 YOU`] : [];
+  const cityPosters = pk ? [`${pk.chant}!`, `${pk.team.toUpperCase()} GAME TONIGHT`, ...cityJokes(pk), ...cityJokes(pk)] : [];
   const n = rand(3, Math.min(5, anchors.length));
   let html = "";
   for (let i = 0; i < n; i++) {
@@ -1741,7 +1776,7 @@ function dressScene(round) {
     } else if (roll < 0.88) {
       html += `<div class="poster" style="left:${x}%;top:${y}%;transform:rotate(${rot}deg)">${pick(posterPool)}</div>`;
     } else {
-      html += `<div class="graffiti" style="left:${x}%;top:${y + 4}%;transform:rotate(${rnd(-9, 9).toFixed(1)}deg);color:${pick(["#7a2f2f", "#2f4a7a", "#3f6b3a"])}">${pick(GRAFFITI)}</div>`;
+      html += `<div class="graffiti" style="left:${x}%;top:${y + 4}%;transform:rotate(${rnd(-9, 9).toFixed(1)}deg);color:${pick(["#7a2f2f", "#2f4a7a", "#3f6b3a"])}">${pick([...GRAFFITI, ...cityJokes(pk).map(j => j.toLowerCase())])}</div>`;
     }
   }
   // hometown pride: pennant or framed jersey, random side (non-stadium rounds)
@@ -2710,7 +2745,7 @@ function t3Init() {
   if (T3.ready) return;
   const cv = $("three3d");
   T3.renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
-  T3.renderer.setPixelRatio(Math.min(2.75, window.devicePixelRatio || 1));
+  T3.renderer.setPixelRatio(Math.min(3, window.devicePixelRatio || 1));
   T3.renderer.outputColorSpace = THREE.SRGBColorSpace;
   T3.renderer.toneMapping = THREE.ACESFilmicToneMapping;
   T3.renderer.shadowMap.enabled = true;
@@ -2723,7 +2758,7 @@ function t3Init() {
   T3.dir = new THREE.DirectionalLight(0xffffff, 0.9);
   T3.dir.position.set(2, 5, 6);
   T3.dir.castShadow = true;
-  T3.dir.shadow.mapSize.set(1024, 1024);
+  T3.dir.shadow.mapSize.set(2048, 2048);
   T3.dir.shadow.bias = -0.002;
   T3.p1 = new THREE.PointLight(0xfff6dd, 14, 18);
   T3.p2 = new THREE.PointLight(0xfff6dd, 14, 18);
@@ -2751,12 +2786,51 @@ function smat(c, rough, metal, opts) {
   return new THREE.MeshStandardMaterial(Object.assign(
     { color: c, roughness: rough == null ? 0.5 : rough, metalness: metal || 0, envMapIntensity: 0.9 }, opts || {}));
 }
+function pmat(c, rough, clearcoat, opts) {
+  return new THREE.MeshPhysicalMaterial(Object.assign(
+    { color: c, roughness: rough == null ? 0.3 : rough, metalness: 0,
+      clearcoat: clearcoat == null ? 0.8 : clearcoat, clearcoatRoughness: 0.15, envMapIntensity: 1 }, opts || {}));
+}
 function shadowify(obj) { obj.traverse(o => { if (o.isMesh) { o.castShadow = true; } }); return obj; }
 function tex(drawFn, w, h) {
   const c = document.createElement("canvas"); c.width = w || 256; c.height = h || 256;
   drawFn(c.getContext("2d"), c.width, c.height);
   const t = new THREE.CanvasTexture(c);
   return t;
+}
+const parkTexCache = {};
+function parkTex(url) {
+  if (!parkTexCache[url]) {
+    const l = new THREE.TextureLoader();
+    l.setCrossOrigin(undefined); // same-origin deploys and file:// testing both work
+    const t = l.load(url);
+    t.colorSpace = THREE.SRGBColorSpace;
+    parkTexCache[url] = t;
+  }
+  return parkTexCache[url];
+}
+function glowSprite(colorCss, scale) {
+  const t = tex((x, w, h) => {
+    const g = x.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
+    g.addColorStop(0, colorCss); g.addColorStop(1, "rgba(255,255,255,0)");
+    x.fillStyle = g; x.fillRect(0, 0, w, h);
+  }, 128, 128);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
+  s.scale.set(scale, scale * 0.55, 1);
+  return s;
+}
+function boardMesh(title, rows, w, h) {
+  const t = tex((x, cw, ch) => {
+    x.fillStyle = "#0d1b12"; x.fillRect(0, 0, cw, ch);
+    x.strokeStyle = "#c8d0d7"; x.lineWidth = 10; x.strokeRect(5, 5, cw - 10, ch - 10);
+    x.fillStyle = "#ffd76a"; x.font = "bold 44px Trebuchet MS"; x.textAlign = "left";
+    x.fillText(title, 36, 70);
+    x.strokeStyle = "rgba(255,255,255,.25)"; x.lineWidth = 3;
+    x.beginPath(); x.moveTo(30, 92); x.lineTo(cw - 30, 92); x.stroke();
+    x.font = "bold 36px Courier New";
+    rows.forEach((r2, i) => { x.fillStyle = r2.bad ? "#ff9a90" : "#8fe3a8"; x.fillText(r2.t, 36, 150 + i * 52); });
+  }, 1024, 512);
+  return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t }));
 }
 function t3Person(persona, shirtHex) {
   const g = new THREE.Group();
@@ -2801,7 +2875,7 @@ function t3Person(persona, shirtHex) {
 }
 function t3Urinal() {
   const g = new THREE.Group();
-  const porcelain = smat(0xf4f7f9, 0.12, 0, { side: THREE.DoubleSide });
+  const porcelain = pmat(0xf4f7f9, 0.14, 1, { side: THREE.DoubleSide });
   const chrome = smat(0xdde4ea, 0.15, 1);
   // smooth lathe-turned porcelain bowl, half-revolution facing the room
   const pts = [];
@@ -2871,7 +2945,7 @@ function build3D(round) {
   }, 1024, 1024);
   floorT.wrapS = floorT.wrapT = THREE.RepeatWrapping; floorT.repeat.set(roomW / 1.6, 6);
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(roomW, 12),
-    new THREE.MeshStandardMaterial({ map: floorT, roughness: 0.28, metalness: 0, envMapIntensity: 0.7 }));
+    new THREE.MeshPhysicalMaterial({ map: floorT, roughness: 0.34, metalness: 0, clearcoat: 0.55, clearcoatRoughness: 0.25, envMapIntensity: 0.85 }));
   floor.rotation.x = -Math.PI / 2; floor.position.set(0, 0, 5);
   floor.receiveShadow = true;
   const base = new THREE.Mesh(new THREE.BoxGeometry(roomW, 0.14, 0.05), smat(0x3d434c, 0.6));
@@ -2893,11 +2967,15 @@ function build3D(round) {
   for (const lx of [-roomW / 4, roomW / 4]) {
     const lamp = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.06, 0.3), new THREE.MeshBasicMaterial({ color: 0xf4f9ff }));
     lamp.position.set(lx, 2.98, 1.2);
-    T3.group.add(lamp);
+    const glow = glowSprite("rgba(255,246,214,.85)", 1.7);
+    glow.position.set(lx, 2.88, 1.28);
+    T3.group.add(lamp, glow);
   }
-  // wall posters (canvas-text, from the same pools)
-  const posterPool = [...POSTERS_GENERIC, ...(POSTERS_VENUE[round.themeKey] || [])];
-  for (let k = 0; k < 2; k++) {
+  // wall posters (canvas-text, from the same pools) — skipped when a stadium window takes the wall
+  const pkJ = THEMES.stadium.parkRef;
+  const posterPool = [...POSTERS_GENERIC, ...(POSTERS_VENUE[round.themeKey] || []), ...cityJokes(pkJ), ...cityJokes(pkJ)];
+  const stadiumWindow = pkJ && round.themeKey === "stadium";
+  for (let k = 0; k < (stadiumWindow ? 0 : (pkJ ? 3 : 2)); k++) {
     const txt = pick(posterPool);
     const pt = tex((x, w, h) => {
       x.fillStyle = "#f7f4e8"; x.fillRect(0, 0, w, h);
@@ -2908,7 +2986,7 @@ function build3D(round) {
       lines.forEach((l, i) => x.fillText(l.trim(), w / 2, h / 2 - (lines.length - 1) * 32 + i * 64));
     }, 512, 320);
     const poster = new THREE.Mesh(new THREE.PlaneGeometry(0.85, 0.55), new THREE.MeshLambertMaterial({ map: pt }));
-    poster.position.set((k === 0 ? -1 : 1) * rnd(roomW / 5, roomW / 3), rnd(1.9, 2.3), 0.02);
+    poster.position.set((k % 2 === 0 ? -1 : 1) * rnd(roomW / 6, roomW / 2.4), rnd(1.85, 2.5), 0.02);
     poster.rotation.z = rnd(-0.05, 0.05);
     T3.group.add(poster);
   }
@@ -2985,6 +3063,124 @@ function build3D(round) {
   T3.group.add(doorG);
   T3.door = doorG;
   T3.hits.push(doorG);
+  // ---------- city & venue dressing, in real 3D ----------
+  const pk3 = THEMES.stadium.parkRef;
+  if (pk3 && round.themeKey === "stadium") {
+    // a window strip with the REAL ballpark view — you're at the game
+    const winW = Math.min(roomW - 1.6, 7.5), winH = 1.05, winY = 2.28;
+    const tint = { morning: 0xfff0da, day: 0xffffff, evening: 0xffcfa8, night: 0x8593c4 }[round.tod || "day"] || 0xffffff;
+    const win = new THREE.Mesh(new THREE.PlaneGeometry(winW, winH), new THREE.MeshBasicMaterial({ map: parkTex(parkPhotoURL(pk3)), color: tint }));
+    win.position.set(0, winY, 0.015);
+    const wframe = new THREE.Mesh(new THREE.BoxGeometry(winW + 0.16, winH + 0.18, 0.05), smat(0x2e3540, 0.4, 0.6));
+    wframe.position.set(0, winY, -0.012);
+    T3.group.add(wframe, win);
+    for (let m = 1; m < 4; m++) {
+      const bar = new THREE.Mesh(new THREE.BoxGeometry(0.035, winH, 0.03), smat(0x2e3540, 0.4, 0.6));
+      bar.position.set(-winW / 2 + m * winW / 4, winY, 0.03);
+      T3.group.add(bar);
+    }
+    // team bunting under the window
+    const c1 = "#" + new THREE.Color(pk3.c).getHexString();
+    const buntT = tex((x, w, h) => {
+      for (let i = 0; i < 14; i++) { x.fillStyle = i % 2 ? "#f5f7f9" : c1;
+        x.beginPath(); x.moveTo(i * w / 12, 0); x.lineTo(i * w / 12 + w / 24, h); x.lineTo(i * w / 12 + w / 12, 0); x.fill(); }
+    }, 1024, 128);
+    const bunt = new THREE.Mesh(new THREE.PlaneGeometry(winW + 0.2, 0.2), new THREE.MeshBasicMaterial({ map: buntT, transparent: true }));
+    bunt.position.set(0, winY - winH / 2 - 0.2, 0.03);
+    T3.group.add(bunt);
+    // marquee plate on the window
+    const signT = tex((x, w, h) => {
+      x.fillStyle = "#" + new THREE.Color(pk3.signc || pk3.c).getHexString();
+      x.fillRect(8, 8, w - 16, h - 16);
+      x.strokeStyle = "#fff"; x.lineWidth = 10; x.strokeRect(16, 16, w - 32, h - 32);
+      x.fillStyle = "#fff"; x.textAlign = "center";
+      x.font = "bold 64px Trebuchet MS"; x.fillText(pk3.park.toUpperCase(), w / 2, 84);
+      x.font = "bold 30px Trebuchet MS"; x.fillStyle = "rgba(255,255,255,.85)";
+      x.fillText("HOME OF THE " + pk3.team.toUpperCase(), w / 2, 134);
+    }, 1024, 168);
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 0.38), new THREE.MeshBasicMaterial({ map: signT, transparent: true }));
+    sign.position.set(0, 2.86, 0.05); sign.rotation.z = -0.012;
+    T3.group.add(sign);
+    if (pk3.sig === "ivy") {
+      const ivyT = tex((x, w, h) => {
+        x.fillStyle = "#2a5433"; x.fillRect(0, 0, w, h);
+        for (let i = 0; i < 900; i++) { x.fillStyle = `rgba(${40 + Math.random() * 40 | 0},${90 + Math.random() * 60 | 0},${45 + Math.random() * 40 | 0},.9)`;
+          x.beginPath(); x.arc(Math.random() * w, Math.random() * h, 4 + Math.random() * 9, 0, 7); x.fill(); }
+      }, 1024, 256);
+      const ivy = new THREE.Mesh(new THREE.PlaneGeometry(roomW, 0.42), new THREE.MeshStandardMaterial({ map: ivyT, roughness: 0.95 }));
+      ivy.position.set(0, 1.62, 0.018);
+      T3.group.add(ivy);
+    }
+    if (pk3.sig === "monster") {
+      const sb = boardMesh("BOS 3    OPP 2", [{ t: "H 7    E 0    \u25aa \u25aa \u25aa" }], 2.3, 0.5);
+      sb.position.set(0, 1.62, 0.02);
+      T3.group.add(sb);
+    }
+  } else if (pk3 && round.themeKey === "airport") {
+    const b = boardMesh("\u2708 " + pk3.ap.toUpperCase(), [{ t: "B12  BOARDING" }, { t: "C07  DELAYED", bad: true }, { t: "A03  FINAL CALL" }], 3.1, 1.45);
+    b.position.set(0, 2.25, 0.02);
+    T3.group.add(b);
+  } else if (pk3 && round.themeKey === "station") {
+    const b = boardMesh("\ud83d\ude86 " + pk3.st.toUpperCase(), [{ t: "5:15  ON TIME" }, { t: "5:45  DELAYED", bad: true }, { t: "6:10  CANCELED", bad: true }], 3.1, 1.45);
+    b.position.set(0, 2.25, 0.02);
+    T3.group.add(b);
+  }
+  if (pk3 && round.themeKey !== "stadium") {
+    const pc = "#" + new THREE.Color(pk3.c).getHexString();
+    const penT = tex((x, w, h) => {
+      x.fillStyle = pc; x.beginPath(); x.moveTo(10, 10); x.lineTo(w - 10, h / 2); x.lineTo(10, h - 10); x.fill();
+      x.strokeStyle = "#fff"; x.lineWidth = 8; x.stroke();
+      x.fillStyle = "#fff"; x.font = "bold 52px Trebuchet MS"; x.textAlign = "left";
+      x.fillText(pk3.team.toUpperCase(), 44, h / 2 + 18);
+    }, 512, 200);
+    const pen = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 0.44), new THREE.MeshBasicMaterial({ map: penT, transparent: true }));
+    pen.position.set(-roomW / 2 + 1.2 + Math.random() * 0.8, 2.45, 0.03); pen.rotation.z = rnd(-0.06, 0.03);
+    T3.group.add(pen);
+  }
+  // sinks + mirror at the end of the row
+  const sinkX = X(n - 1) + 1.5;
+  if (sinkX < roomW / 2 - 0.6) {
+    const mirror = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 0.9), new THREE.MeshStandardMaterial({ color: 0xbfd2de, roughness: 0.05, metalness: 1, envMapIntensity: 1.6 }));
+    mirror.position.set(sinkX, 1.75, 0.02);
+    const mframe = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.0, 0.04), smat(0x3a4149, 0.5, 0.4));
+    mframe.position.set(sinkX, 1.75, 0.0);
+    const counter = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.08, 0.55), pmat(0x6b7480, 0.25, 0.7));
+    counter.position.set(sinkX, 0.92, 0.3); counter.castShadow = true;
+    const basin = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.12, 0.12, 22), pmat(0xf4f7f9, 0.15, 1));
+    basin.position.set(sinkX, 1.0, 0.32); basin.castShadow = true;
+    const tap = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.18, 10), smat(0xdde4ea, 0.15, 1));
+    tap.position.set(sinkX, 1.12, 0.16); tap.rotation.x = 0.5; tap.castShadow = true;
+    T3.group.add(mframe, mirror, counter, basin, tap);
+  }
+  // ambient props: wet-floor A-frame, mop bucket, graffiti decal
+  if (Math.random() < 0.6) {
+    const wet = new THREE.Group();
+    const s1 = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.55, 0.02), smat(0xf5c518, 0.6));
+    s1.rotation.x = -0.28; s1.position.y = 0.27;
+    const s2 = s1.clone(); s2.rotation.x = 0.28; s2.position.z = -0.14;
+    wet.add(s1, s2);
+    wet.position.set(rnd(-roomW / 3, roomW / 3), 0, rnd(2.2, 3.6));
+    wet.rotation.y = rnd(-0.7, 0.7);
+    T3.group.add(shadowify(wet));
+  }
+  if (Math.random() < 0.4) {
+    const bucket = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.13, 0.3, 18), pmat(0xc9b458, 0.4, 0.5));
+    bucket.position.set(pick([-1, 1]) * (roomW / 2 - 0.8), 0.15, rnd(1.6, 3));
+    bucket.castShadow = true;
+    T3.group.add(bucket);
+  }
+  if (Math.random() < 0.5) {
+    const gt = tex((x, w, h) => {
+      x.clearRect(0, 0, w, h);
+      x.fillStyle = pick(["rgba(122,47,47,.7)", "rgba(47,74,122,.7)", "rgba(63,107,58,.7)"]);
+      x.font = "italic bold 40px Comic Sans MS, cursive"; x.textAlign = "center";
+      x.fillText(pick([...GRAFFITI, ...cityJokes(THEMES.stadium.parkRef).map(j => j.toLowerCase())]).slice(0, 30), w / 2, h / 2 + 14);
+    }, 1024, 128);
+    const graf = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.2), new THREE.MeshBasicMaterial({ map: gt, transparent: true }));
+    graf.position.set(rnd(-roomW / 4, roomW / 4), rnd(0.36, 0.5), 0.025);
+    graf.rotation.z = rnd(-0.08, 0.08);
+    T3.group.add(graf);
+  }
   // time-of-day light grade
   const tod = round.tod || "day";
   const grades = {
