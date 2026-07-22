@@ -55,7 +55,11 @@ and **Endless Rush** (procedurally generated rounds until the rush claims you).
 - **🗺️ Road Trip**: score 650+ in any mode to permanently unlock the park
   picker — play *any* of the 30 ballparks, with its photos, team colors,
   airport, station and city banner. Your home turf is earned; the league is
-  a reward.
+  a reward. Mid-run, road trips happen at **travel moments**: a
+  boarding-pass **layover card** appears between rounds — the 7th-inning
+  stretch in the Gauntlet, every 5th round in Endless (never in the Daily) —
+  with the clock stopped. Change cities or stay; score and streak carry
+  either way.
 - **Orientation is obvious**: guys facing you at the shame tub hold a
   ballpark frank at waist level with both hands. That's what the hands are
   doing. It's a hot dog. Rated E for Everyone.

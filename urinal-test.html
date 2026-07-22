@@ -623,8 +623,23 @@
   .ef-a1 { font-size: clamp(26px, 8.4vw, 40px); font-weight: 900; color: #fff; text-shadow: 3px 4px 0 rgba(0,0,0,.35); }
   .ef-a2 { font-size: clamp(20px, 6.4vw, 30px); font-weight: 900; color: #ffe9a0; margin-top: 10px; text-shadow: 2px 3px 0 rgba(0,0,0,.3); transform: rotate(-1.4deg); }
   .ef-a3 { font-size: clamp(16px, 5vw, 24px); font-weight: 900; color: #c9f0ff; margin-top: 10px; text-shadow: 2px 3px 0 rgba(0,0,0,.3); transform: rotate(1deg); }
-  #lessontrip { position: absolute; top: -15px; right: 14px; font-family: inherit; font-size: 12px; font-weight: bold;
-    color: #e8b3a3; background: #3a2822; border: 1px solid #7a4f40; border-radius: 10px; padding: 4px 11px; cursor: pointer; z-index: 3; }
+  /* ---------- layover: the travel window between rounds ---------- */
+  #layover { position: fixed; inset: 0; background: rgba(5,8,12,.94); z-index: 110;
+    display: flex; align-items: center; justify-content: center; padding: 18px; }
+  #layover.show { display: flex !important; }
+  .lay-card { background: linear-gradient(#202a3e, #1a2130); border: 2px solid #3a4a63; border-radius: 16px;
+    padding: 16px; width: 100%; max-width: 420px; position: relative; overflow: hidden;
+    animation: layin .35s ease; }
+  @keyframes layin { from { opacity: 0; transform: translateY(18px) scale(.97); } }
+  .lay-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .lay-title { font-size: clamp(19px, 5.4vw, 25px); font-weight: 900; letter-spacing: 1px; color: #ffd76a; }
+  .lay-gate { font-family: 'Courier New', monospace; font-weight: bold; font-size: 13px; color: #8fa2b8;
+    border: 1px solid #3a4a63; border-radius: 7px; padding: 3px 8px; white-space: nowrap; }
+  .lay-sub { color: #b9c6d4; font-size: clamp(13px, 3.6vw, 15px); line-height: 1.5; margin-top: 8px; }
+  .lay-sub b { color: #eef2f6; }
+  .lay-tear { border-top: 2px dashed #3a4a63; margin: 13px -16px; }
+  .lay-code { height: 24px; margin-top: 12px; border-radius: 3px; opacity: .22;
+    background: repeating-linear-gradient(90deg, #cfd8e4 0 2px, transparent 2px 5px, #cfd8e4 5px 6px, transparent 6px 11px, #cfd8e4 11px 14px, transparent 14px 17px); }
   /* the doors swing open */
   #doorwipe { position: absolute; inset: 0; z-index: 37; display: none; pointer-events: none; overflow: hidden; border-radius: 14px; }
   #doorwipe.show { display: block; }
@@ -811,6 +826,18 @@
     </div>
   </div>
 
+  <!-- layover: boarding-pass travel window between rounds -->
+  <div id="layover" class="hiddenrow">
+    <div class="lay-card">
+      <div class="lay-top"><span class="lay-title" id="laytitle">✈️ LAYOVER</span><span class="lay-gate" id="laygate"></span></div>
+      <div class="lay-sub" id="laysub"></div>
+      <div class="lay-tear"></div>
+      <button class="bigbtn roadtrip" id="laygo" style="min-width:0;width:100%">🛫 CHANGE CITY<small>any of 30 ballparks · photos &amp; jokes included</small></button>
+      <button class="bigbtn alt" id="laystay" style="min-width:0;width:100%;margin-top:9px">🚹 STAY IN <span id="laycity">TOWN</span><small>keep the run rolling right here</small></button>
+      <div class="lay-code"></div>
+    </div>
+  </div>
+
   <!-- rewarded ad placeholder (wire Google AdMob / Ad Manager here) -->
   <div id="admodal" class="hiddenrow">
     <div class="adbox">
@@ -896,7 +923,6 @@
       <div id="announce"><div class="aicon"></div><div class="atitle"></div><div class="asub"></div></div>
       <div id="verdict"></div>
       <div id="lesson">
-        <button id="lessontrip" class="hiddenrow">🗺️ change city</button>
         <div class="ltitle"><span class="lpts" id="lpts"></span><span id="ltitle"></span></div>
         <div id="ltext"></div>
         <div id="attrow">
@@ -1423,8 +1449,8 @@ function openParkPicker(ctx) {
         // wheels up: straight into the next run, no menu detour
         resetGame(G.mode);
         setTimeout(() => announce("🛫", "ROAD TRIP", `Next stop: ${p.park}. Hold it on the flight.`, 1600, "good"), 300);
-      } else if (pickerCtx === "mid") {
-        announce("🗺️", "NEXT STOP: " + p.city, `${p.park} takes over from the next round. No restart needed.`, 1800, "good");
+      } else if (pickerCtx === "layover") {
+        resumeFromLayover(); // wheels down — the next round's entrance IS the arrival
       } else {
         toast(`🗺️ Road trip: ${p.park}. Safe travels.`);
       }
@@ -2419,7 +2445,6 @@ function showLesson(title, text, pts) {
   $("lpts").textContent = pts > 0 ? `+${pts}` : (pts < 0 ? `${pts}` : "");
   $("lesson").classList.add("show");
   $("scene").classList.add("scoring"); // soften the room — we're reviewing now
-  $("lessontrip").classList.toggle("hiddenrow", !roadtripUnlocked());
   const r = G.cur;
   if (!r.isWaitRound) {
     r.bestSpots.forEach(i => { const el = slotEl(i); if (el) el.classList.add("best-mark"); });
@@ -2960,6 +2985,37 @@ function nextRound() {
   if (G.lives <= 0) { endGame(false); return; }
   G.round++;
   if (G.mode !== "endless" && G.round >= ROUND_PLAN.length) { endGame(true); return; }
+  if (layoverDue()) { showLayover(); return; }
+  startRound();
+}
+
+/* Road trips happen at travel moments, not scoring moments: the 7th-inning
+   stretch in the Gauntlet, every 5th round in Endless. Never in the Daily —
+   same bathrooms worldwide. */
+function layoverDue() {
+  if (G.mode === "daily") return false;
+  if (G.score >= ROADTRIP_SCORE) unlockRoadtrip(); // earn it mid-run, use it mid-run
+  if (!roadtripUnlocked()) return false;
+  return G.mode === "endless" ? (G.round > 0 && G.round % 5 === 0) : G.round === 7;
+}
+function showLayover() {
+  const pk = THEMES.stadium.parkRef;
+  const stretch = G.mode !== "endless";
+  $("laytitle").textContent = stretch ? "⚾ 7TH-INNING STRETCH" : "✈️ LAYOVER";
+  $("laygate").textContent = stretch ? `SCORE ${G.score}` :
+    `GATE ${String.fromCharCode(65 + Math.floor(Math.random() * 4))}${Math.floor(Math.random() * 22) + 1} · SCORE ${G.score}`;
+  $("laysub").innerHTML = (stretch
+    ? `Stand up, stretch the hamstrings — you've earned a travel window. `
+    : `Between flushes there's a gap in the schedule. `) +
+    (pk ? `Keep working ${pk.city}'s porcelain, or take the run on the road — <b>new photos, colors, airport and inside jokes</b>, same score, same streak.`
+        : `Take the run on the road — <b>any ballpark city's photos, colors and inside jokes</b>, same score, same streak.`) +
+    ` The clock isn't running.`;
+  $("laycity").textContent = pk ? pk.city.toUpperCase() : "TOWN";
+  const l = $("layover"); l.classList.remove("hiddenrow"); l.classList.add("show");
+  sfx.ok();
+}
+function resumeFromLayover() {
+  const l = $("layover"); l.classList.remove("show"); l.classList.add("hiddenrow");
   startRound();
 }
 
@@ -3694,8 +3750,12 @@ $("certbtn").addEventListener("click", () => shareCertificate());
 $("chalbtn").addEventListener("click", () => shareChallenge());
 $("roadtripbtn").addEventListener("click", () => openParkPicker("start"));
 $("endroadtripbtn").addEventListener("click", () => openParkPicker("end"));
-$("pickclose").addEventListener("click", () => closeParkPicker());
-$("lessontrip").addEventListener("click", () => openParkPicker("mid"));
+$("pickclose").addEventListener("click", () => { closeParkPicker(); if (pickerCtx === "layover") resumeFromLayover(); });
+$("laystay").addEventListener("click", () => resumeFromLayover());
+$("laygo").addEventListener("click", () => {
+  $("layover").classList.remove("show"); $("layover").classList.add("hiddenrow");
+  openParkPicker("layover");
+});
 </script>
 </body>
 </html>
