@@ -1737,43 +1737,79 @@ function slotEl(i) { return $("scene").querySelector(`.slot[data-i="${i}"]`); }
 
 /* ---------- deep city lore: posters only the locals fully get ---------- */
 const CITY_JOKES = {
-  "Angel Stadium": ["TRAFFIC ON THE 5: YES", "DISNEY ADULTS WASH TWICE", "OC PARKING VALIDATED: NEVER", "TROUT WAS HERE"],
-  "Daikin Park": ["NO BANGING ON THE TRASH CANS", "HUMIDITY: 100%. AGAIN.", "WHATABURGER AFTER? OBVIOUSLY", "I-45 CLOSED THIS WEEKEND (ALWAYS)"],
-  "Sutter Health Park": ["TEMPORARY HOME, PERMANENT LINES", "FARM-TO-FORK, FORK-TO-HERE", "IT'S A DRY HEAT (IT'S NOT OK)", "STILL BETTER THAN THE COLISEUM PLUMBING"],
-  "Tropicana Field": ["RING THE BELL IF DRY", "CATWALK RULES APPLY", "GATOR IN LOT C AGAIN", "HURRICANE SEASON: HOLD EVERYTHING"],
-  "Yankee Stadium": ["THE 4 TRAIN LEAVES WITHOUT YOU", "BLEACHER CREATURES WASH UP TOO", "$19 BEER, PRICELESS RELIEF", "JUDGE'S CHAMBERS → THAT WAY"],
-  "Progressive Field": ["THE LAND FORGIVES. THE LINE DOESN'T.", "BROWNS FANS: HUGS AVAILABLE", "FLATS BATHROOM RULES APPLY", "ROCK HALL SNUBBED US TOO"],
-  "Comerica Park": ["CONEY: ONE UP, ONE DOWN", "313 REPRESENT", "FORD VS CHEVY: NOT IN HERE", "WE STILL BELIEVE (RESPECTFULLY)"],
-  "Kauffman Stadium": ["BURNT ENDS CATCH UP FAST", "THE FOUNTAINS ARE NOT URINALS", "MAHOMES MENTION QUOTA: MET", "BOULEVARD BEFORE, REGRET AFTER"],
-  "Target Field": ["YOU BETCHA WE'RE OUT OF SOAP", "DULUTH IS NOT A SUBURB", "THE SKYWAY CLOSES AT 7", "-20° IS JACKET WEATHER"],
-  "Rate Field": ["SOUTH SIDE, BEST SIDE", "DA POPE IS A SOX FAN", "GIARDINIERA ON EVERYTHING", "35TH & SHIELDS FOREVER", "CUBS FANS: VISITORS' LINE →"],
-  "Wrigley Field": ["THE TROUGHS RAISED LEGENDS", "IVY DON'T LIE", "CLARK & ADDISON: JUST WALK", "MALÖRT AFTER? BRAVE.", "GO CUBS GO PLAYS EITHER WAY"],
-  "Great American Ball Park": ["SKYLINE: 4-WAY, HOLD THE REGRET", "FLYING PIGS LAND HERE", "GOETTA IN THE MORNING", "WHO DEY IN HERE TOO"],
-  "American Family Field": ["BRAT BEFORE BEER, YOU'RE IN THE CLEAR", "SPOTTED COW SMUGGLERS WELCOME", "THE RACING SAUSAGES CHANGED HERE", "KWIK TRIP GLAZERS → LOBBY"],
-  "PNC Park": ["YINZ WASH UP", "PUT FRIES ON IT", "THE INCLINE'S FASTER THAN THIS LINE", "STILLERS TALK PERMITTED YEAR-ROUND"],
-  "Busch Stadium": ["WHERE'D YOU GO TO HIGH SCHOOL?", "PROVEL IS CHEESE. FIGHT US.", "GOOEY BUTTER CAKE HITS DIFFERENT", "NO BATHROOM ATOP THE ARCH. PLAN AHEAD."],
-  "Coors Field": ["ALTITUDE HITS AT BEER TWO", "GREEN CHILE ON EVERYTHING", "TRAILHEAD ETIQUETTE APPLIES", "CASA BONITA DIVERS WASH UP TOO"],
-  "Dodger Stadium": ["ARRIVE 3RD, LEAVE 7TH", "DODGER DOG FIRST, QUESTIONS LATER", "THE 110 IS A LIFESTYLE", "IN VIN WE TRUST"],
-  "Petco Park": ["JUNE GLOOM CAN'T DAMPEN THIS", "CALI BURRITO: FRIES INSIDE", "SLOW DOWN. IT'S SAN DIEGO.", "THE GASLAMP LINE WAS WORSE"],
-  "Oracle Park": ["KARL THE FOG ROLLED IN HERE", "DON'T CALL IT FRISCO", "GARLIC FRIES: WORTH IT. MOSTLY.", "NO STANDUPS IN HERE, TECH BROS"],
-  "Chase Field": ["110° BUT IT'S A DRY HEAT", "THE POOL IS NOT A TROUGH", "SAGUAROS WAIT 75 YEARS FOR AN ARM. WAIT YOUR TURN.", "SNOWBIRDS: WELCOME BACK"],
-  "T-Mobile Park": ["NO UMBRELLA. WE KNOW.", "THE FISH GUYS THROW. YOU DODGE.", "SODO MOJO", "COFFEE IN, COFFEE OUT"],
-  "Globe Life Field": ["EVERYTHING'S BIGGER. THE LINE TOO.", "BRISKET WAITS FOR NO MAN", "DR PEPPER IS A FOOD GROUP", "YEEHAW RESPONSIBLY"],
-  "Fenway Park": ["WICKED LONG LINE, KID", "THE PIKE'S BACKED UP TOO", "DUNKS RUNS RIGHT THROUGH YOU", "YANKEES FANS: PORTA-POTTY OUTSIDE", "PAHK THE CAH FIRST"],
-  "Camden Yards": ["OLD BAY ON EVERYTHING. EVERYTHING.", "NATTY BOH EYES ARE WATCHING", "HON, WASH YOUR HANDS", "PURPLE FRIDAYS HONORED HERE"],
-  "Rogers Centre": ["SORRY, EH (FOR THE WAIT)", "THE 6IX FLUSHES CLEAN", "TIM'S DOUBLE-DOUBLE GOES RIGHT THROUGH", "DRAKE SAT HERE (COURTSIDE)"],
-  "Truist Park": ["THE CONNECTOR IS STILL JAMMED", "WAFFLE HOUSE AFTER: SCATTERED, SMOTHERED", "ITP / OTP TRUCE ZONE", "CHOP RESPONSIBLY"],
-  "loanDepot park": ["CAFECITO AT 3:05", "ABUELA SAYS WASH TWICE", "305 TILL I DIE", "PITBULL PLAYED THIS BATHROOM (UNVERIFIED)"],
-  "Citi Field": ["THE 7 TRAIN JUDGES NO ONE", "BACON EGG & CHEESE REPERCUSSIONS", "GRIMACE BLESSED THIS ROOM", "LGM: LET'S GO (FIRST)"],
-  "Citizens Bank Park": ["JAWN CLEAN, HANDS CLEANER", "WATER ICE FIXES EVERYTHING", "GRITTY WATCHES. ALWAYS.", "WIT OR WITOUT, WASH UP", "BOO RESPONSIBLY"],
-  "Nationals Park": ["FILIBUSTER-FREE ZONE", "METRO'S SINGLE-TRACKING AGAIN", "HALF-SMOKE > HOT DOG", "RACING PRESIDENTS PIT STOP"],
+  "Angel Stadium": ["TRAFFIC ON THE 5: YES", "DISNEY ADULTS WASH TWICE", "OC PARKING VALIDATED: NEVER", "TROUT WAS HERE", "MICKEY ISN'T WATCHING. WASH ANYWAY.", "RALLY MONKEY APPROVED", "THE 57: STILL A PARKING LOT", "IN-N-OUT AFTER. ANIMAL STYLE.", "SURF'S FLAT, LINES AREN'T", "WE'RE FINE ABOUT OHTANI. WE'RE FINE."],
+  "Daikin Park": ["NO BANGING ON THE TRASH CANS", "HUMIDITY: 100%. AGAIN.", "WHATABURGER AFTER? OBVIOUSLY", "I-45 CLOSED THIS WEEKEND (ALWAYS)", "ALTUVE-SIZED URINAL ON THE END", "NASA CHECKED: IT'S CLEAN", "BUC-EE'S SET THE BAR. SORRY.", "KOLACHES IN THE MORNING", "THE LOOP IS A LIE", "H-TOWN HOLD 'EM"],
+  "Sutter Health Park": ["TEMPORARY HOME, PERMANENT LINES", "FARM-TO-FORK, FORK-TO-HERE", "IT'S A DRY HEAT (IT'S NOT OK)", "STILL BETTER THAN THE COLISEUM PLUMBING", "GO KINGS\u2014 WRONG SPORT", "TOWER BRIDGE GLOWS FOR YOU", "DELTA BREEZE INCOMING (PROMISE)", "FARM-TO-FORK CAPITAL, BABY", "MIDTOWN PARKING: GOOD LUCK", "CITY OF TREES, ROOM OF RELIEF"],
+  "Tropicana Field": ["RING THE BELL IF DRY", "CATWALK RULES APPLY", "GATOR IN LOT C AGAIN", "HURRICANE SEASON: HOLD EVERYTHING", "STINGRAY TOUCH TANK: NOT HERE", "COLUMBIA SANDWICH LATER", "THE SKYWAY AT NIGHT THO", "FLORIDA MAN WASHED HIS HANDS. YOU CAN TOO.", "SHUFFLEBOARD CAPITAL RULES APPLY", "ROWDIES FANS ALSO WELCOME"],
+  "Yankee Stadium": ["THE 4 TRAIN LEAVES WITHOUT YOU", "BLEACHER CREATURES WASH UP TOO", "$19 BEER, PRICELESS RELIEF", "JUDGE'S CHAMBERS → THAT WAY", "BODEGA CAT APPROVED", "THE EXPRESS SKIPS THIS STOP", "NO PIGEONS PAST THIS POINT", "FUGGEDABOUT THE LINE", "27 RINGS, ONE WORKING DRYER", "CHOPPED CHEESE AFTER?"],
+  "Progressive Field": ["THE LAND FORGIVES. THE LINE DOESN'T.", "BROWNS FANS: HUGS AVAILABLE", "FLATS BATHROOM RULES APPLY", "ROCK HALL SNUBBED US TOO", "LEBRON CAME BACK. SO WILL YOU.", "WEST SIDE MARKET RUNS", "IT'S PRONOUNCED CLEVE-LAND", "GUARDIANS OF THIS RESTROOM", "SNOW IN APRIL? CLASSIC.", "PIEROGI PIEROGI PIEROGI"],
+  "Comerica Park": ["CONEY: ONE UP, ONE DOWN", "313 REPRESENT", "FORD VS CHEVY: NOT IN HERE", "WE STILL BELIEVE (RESPECTFULLY)", "MOTOWN ACOUSTICS IN HERE", "VERNORS FIXES EVERYTHING", "8 MILE RULES APPLY", "LIONS FANS: HUGS INSIDE", "SQUARE PIZZA IS CORRECT PIZZA", "SAY YA TO DA U.P., EH"],
+  "Kauffman Stadium": ["BURNT ENDS CATCH UP FAST", "THE FOUNTAINS ARE NOT URINALS", "MAHOMES MENTION QUOTA: MET", "BOULEVARD BEFORE, REGRET AFTER", "PLAZA LIGHTS IN NOVEMBER", "TECH N9NE ON THE AUX", "GATES OR JOE'S? FIGHT OUTSIDE.", "FOUNTAIN CITY, BABY", "WIZARD OF OZ JOKES: BANNED", "BBQ NAPKIN DISPENSER EMPTY (SORRY)"],
+  "Target Field": ["YOU BETCHA WE'RE OUT OF SOAP", "DULUTH IS NOT A SUBURB", "THE SKYWAY CLOSES AT 7", "-20° IS JACKET WEATHER", "PRINCE WOULD'VE LOVED THIS ROOM", "LUTEFISK: NO REFUNDS", "OPE! JUST GONNA SNEAK PAST YA", "LAKE COUNT: 10,000-ISH", "JUICY LUCY BURNS TWICE", "DULUTH: STILL NOT A SUBURB"],
+  "Rate Field": ["SOUTH SIDE, BEST SIDE", "DA POPE IS A SOX FAN", "GIARDINIERA ON EVERYTHING", "35TH & SHIELDS FOREVER", "CUBS FANS: VISITORS' LINE →", "MULLET NIGHT EVERY NIGHT", "THE VENDOR KNOWS YOUR NAME", "BRIDGEPORT FOREVER", "ELOTES OUTSIDE GATE 5", "DISCO DEMOLITION SURVIVOR ROOM", "SOX MATH: 2005 = FOREVER"],
+  "Wrigley Field": ["THE TROUGHS RAISED LEGENDS", "IVY DON'T LIE", "CLARK & ADDISON: JUST WALK", "MALÖRT AFTER? BRAVE.", "GO CUBS GO PLAYS EITHER WAY", "BLEACHER BUMS WASH UP", "OLD STYLE IN A KOOZIE", "THE RED LINE DID ITS BEST", "EAMUS CATULI!", "NO KETCHUP ON HOT DOGS. EVER.", "SING-ALONG PRACTICE ROOM"],
+  "Great American Ball Park": ["SKYLINE: 4-WAY, HOLD THE REGRET", "FLYING PIGS LAND HERE", "GOETTA IN THE MORNING", "WHO DEY IN HERE TOO", "GRAETER'S AFTER THE GAME", "CHILI ON SPAGHETTI IS NORMAL HERE", "WKRP STILL IN OUR HEARTS", "THE BANKS AT SUNSET", "NATI PRIDE", "FLYING PIG MARATHON ALUMNI ROOM"],
+  "American Family Field": ["BRAT BEFORE BEER, YOU'RE IN THE CLEAR", "SPOTTED COW SMUGGLERS WELCOME", "THE RACING SAUSAGES CHANGED HERE", "KWIK TRIP GLAZERS → LOBBY", "BERNIE'S SLIDE: STAFF ONLY", "CHEESE CURDS SQUEAK IF FRESH", "SUMMERFEST TRAINING FACILITY", "OLD FASHIONED: BRANDY. OBVIOUSLY.", "THE BRONZE FONZ SAYS AYYY", "LAKE MICHIGAN IS OUR OCEAN"],
+  "PNC Park": ["YINZ WASH UP", "PUT FRIES ON IT", "THE INCLINE'S FASTER THAN THIS LINE", "STILLERS TALK PERMITTED YEAR-ROUND", "PIEROGI RACE PIT STOP", "IRON CITY IN THE COOLER", "COLESLAW GOES ON THE SANDWICH", "CLEMENTE FOREVER", "YINZER CERTIFIED", "KENNYWOOD'S OPEN (CHECK YOUR FLY)"],
+  "Busch Stadium": ["WHERE'D YOU GO TO HIGH SCHOOL?", "PROVEL IS CHEESE. FIGHT US.", "GOOEY BUTTER CAKE HITS DIFFERENT", "NO BATHROOM ATOP THE ARCH. PLAN AHEAD.", "TED DREWES AFTER. CONCRETE.", "IMO'S: THE SQUARE BEYOND COMPARE", "MEET ME AT THE ARCH", "CARDINAL NATION ANNEX", "TOASTED RAVIOLI ORIGIN CITY", "THE HILL KNOWS PASTA"],
+  "Coors Field": ["ALTITUDE HITS AT BEER TWO", "GREEN CHILE ON EVERYTHING", "TRAILHEAD ETIQUETTE APPLIES", "CASA BONITA DIVERS WASH UP TOO", "5,280 FEET CLOSER TO GOD", "ROCKY MOUNTAIN OYSTERS: NOT SEAFOOD", "BLUCIFER SEES ALL", "SKI TRAFFIC ON I-70: ETERNAL", "PURPLE ROW REPRESENT", "IT'S THE ALTITUDE. IT'S ALWAYS THE ALTITUDE."],
+  "Dodger Stadium": ["ARRIVE 3RD, LEAVE 7TH", "DODGER DOG FIRST, QUESTIONS LATER", "THE 110 IS A LIFESTYLE", "IN VIN WE TRUST", "TRAFFIC CLEARS BY 9. LOL.", "ELOTE MAN OUTSIDE LOT 7", "TOMMY LASORDA WATCHES OVER US", "FERNANDOMANIA LIVES", "MOOKIE MODE", "THE HOLLYWOOD SIGN CAN'T SEE YOU"],
+  "Petco Park": ["JUNE GLOOM CAN'T DAMPEN THIS", "CALI BURRITO: FRIES INSIDE", "SLOW DOWN. IT'S SAN DIEGO.", "THE GASLAMP LINE WAS WORSE", "TACOS > EVERYTHING", "70 AND SUNNY. AGAIN. SORRY.", "STAY CLASSY, SAN DIEGO", "THE ZOO HAS NICER BATHROOMS. BARELY.", "HODAD'S AFTER?", "SLAM DIEGO FOREVER"],
+  "Oracle Park": ["KARL THE FOG ROLLED IN HERE", "DON'T CALL IT FRISCO", "GARLIC FRIES: WORTH IT. MOSTLY.", "NO STANDUPS IN HERE, TECH BROS", "SOURDOUGH IS A PERSONALITY", "MUNI DID ITS BEST", "SEA LIONS JUDGE FROM PIER 39", "THE FOG COMES IN ON LITTLE CAT FEET", "CROISSANT LINE LONGER THAN THIS ONE", "SPLASH HIT: OUTSIDE ONLY PLEASE"],
+  "Chase Field": ["110° BUT IT'S A DRY HEAT", "THE POOL IS NOT A TROUGH", "SAGUAROS WAIT 75 YEARS FOR AN ARM. WAIT YOUR TURN.", "SNOWBIRDS: WELCOME BACK", "GOLF AT 5AM. IT'S COOLER.", "MISTERS ARE LIFE", "A JAVELINA ATE MY TRASH", "CACTUS LEAGUE VETERAN", "MONSOON SEASON: 10 MINUTES OF CHAOS", "IN-N-OUT VS WHATABURGER: WAR"],
+  "T-Mobile Park": ["NO UMBRELLA. WE KNOW.", "THE FISH GUYS THROW. YOU DODGE.", "SODO MOJO", "COFFEE IN, COFFEE OUT", "THE GUM WALL WAS WORSE THAN THIS", "KRAKEN FANS WELCOME", "FERRY TRAFFIC IS STILL TRAFFIC", "GRUNGE WAS BORN IN A ROOM LIKE THIS", "PIKE PLACE PEONIES FOR AFTER", "UMBRELLA = TOURIST"],
+  "Globe Life Field": ["EVERYTHING'S BIGGER. THE LINE TOO.", "BRISKET WAITS FOR NO MAN", "DR PEPPER IS A FOOD GROUP", "YEEHAW RESPONSIBLY", "SWEET TEA REFILLS ETERNAL", "COWBOYS TALK: TAKE IT OUTSIDE", "BLUEBONNETS IN SPRING", "FRIDAY NIGHT LIGHTS EVERYTHING", "THE BRISKET LINE FORMED AT 6AM", "HOWDY DOES IT ALL"],
+  "Fenway Park": ["WICKED LONG LINE, KID", "THE PIKE'S BACKED UP TOO", "DUNKS RUNS RIGHT THROUGH YOU", "YANKEES FANS: PORTA-POTTY OUTSIDE", "PAHK THE CAH FIRST", "SAY QUAHOG THREE TIMES FAST", "THE T STOPPED RUNNING. SHOCKER.", "LOBSTAH ROLL: COLD, BUTTERED", "THE CITGO SIGN GUIDES YOU HOME", "SWEET CAROLINE PRACTICE (BAH BAH BAH)", "MASSHOLE IS A TERM OF ENDEARMENT"],
+  "Camden Yards": ["OLD BAY ON EVERYTHING. EVERYTHING.", "NATTY BOH EYES ARE WATCHING", "HON, WASH YOUR HANDS", "PURPLE FRIDAYS HONORED HERE", "THE WIRE WAS FILMED NEARBY. OBVIOUSLY.", "BERGER COOKIES IN THE CAR", "CRAB MALLETS: LEAVE AT DOOR", "SNOWBALLS WITH MARSHMALLOW", "CHARM CITY CHARMS", "O! SAY CAN YOU SEE (THE LINE)"],
+  "Rogers Centre": ["SORRY, EH (FOR THE WAIT)", "THE 6IX FLUSHES CLEAN", "TIM'S DOUBLE-DOUBLE GOES RIGHT THROUGH", "DRAKE SAT HERE (COURTSIDE)", "RAPTORS BANDWAGON PARKING", "KENSINGTON MARKET AFTER", "POUTINE FIXES EVERYTHING", "GO LEAFS G\u2014 SORRY. HABIT.", "A LOONIE FOR THE CART? CLASSIC.", "THE PATH: UNDERGROUND MAZE CHAMPION"],
+  "Truist Park": ["THE CONNECTOR IS STILL JAMMED", "WAFFLE HOUSE AFTER: SCATTERED, SMOTHERED", "ITP / OTP TRUCE ZONE", "CHOP RESPONSIBLY", "OUTKAST ON THE SPEAKERS FOREVER", "SWEET TEA IS THE HOUSE WINE", "MARTA IS SMARTA", "LEMON PEPPER WET. YOU KNOW.", "PONCE CITY LINES TRAINED YOU FOR THIS", "SO FRESH AND SO CLEAN (CLEAN)"],
+  "loanDepot park": ["CAFECITO AT 3:05", "ABUELA SAYS WASH TWICE", "305 TILL I DIE", "PITBULL PLAYED THIS BATHROOM (UNVERIFIED)", "CROQUETAS AT THE VENTANITA", "ALLIGATOR IN THE POOL? TUESDAY.", "DALE!", "WYNWOOD WALLS, MEET THIS WALL", "NO SNOW EVER. EVER.", "HEAT CULTURE INCLUDES HYGIENE"],
+  "Citi Field": ["THE 7 TRAIN JUDGES NO ONE", "BACON EGG & CHEESE REPERCUSSIONS", "GRIMACE BLESSED THIS ROOM", "LGM: LET'S GO (FIRST)", "AMAZIN' EVERY 15 YEARS", "UTOPIA BAGELS: WORTH THE TRIP", "QUEENS: 800 LANGUAGES, ONE LINE", "MR. MET HAS SEEN THINGS", "FLUSHING: THE NAME WRITES ITSELF", "SHEA BRIDGE SELFIE SPOT"],
+  "Citizens Bank Park": ["JAWN CLEAN, HANDS CLEANER", "WATER ICE FIXES EVERYTHING", "GRITTY WATCHES. ALWAYS.", "WIT OR WITOUT, WASH UP", "BOO RESPONSIBLY", "ROCKY RAN. YOU CAN WALK.", "WAWA IS A LIFESTYLE", "BATTERY THROWING: BANNED INSIDE", "PAT'S OR GENO'S? JIM'S.", "TRUST THE PROCESS", "DELCO REPRESENT"],
+  "Nationals Park": ["FILIBUSTER-FREE ZONE", "METRO'S SINGLE-TRACKING AGAIN", "HALF-SMOKE > HOT DOG", "RACING PRESIDENTS PIT STOP", "CHERRY BLOSSOMS LAST 4 DAYS", "GO-GO ON THE SPEAKERS", "THE SMITHSONIAN IS FREE. SO IS THIS.", "TRAFFIC CIRCLE OF DOOM", "INTERNS EVERYWHERE", "MUMBO SAUCE ON EVERYTHING"],
 };
-function cityJokes(pk) { return (pk && CITY_JOKES[pk.park]) || []; }
+const CITY_TEMPLATES = [
+  p => `CLEANEST ROOM IN ${p.city}. LOW BAR.`,
+  p => `${p.chant}! (WASH FIRST)`,
+  p => `IN ${p.city} WE TRUST`,
+  p => `${p.team.toUpperCase()} GAME TONIGHT — GO ALREADY`,
+  p => `${p.park.toUpperCase()} SEAT UPGRADES: NICE TRY`,
+  p => `BATHROOM OF THE YEAR — ${p.city} FINALIST`,
+  p => `${p.city} PLUMBING UNION: WE TRIED`,
+  p => `WELCOME TO ${p.city}. MIND THE FLOOR.`,
+  p => `${p.team.toUpperCase()} SEASON TICKETS: ASK FOR JERRY`,
+  p => `THIS MIRROR ADDS 10 WINS TO THE ${p.team.toUpperCase()}`,
+  p => `${p.city} TAP WATER: ELITE. ALLEGEDLY.`,
+  p => `LOST? ${p.ap.toUpperCase()} IS THE OTHER WAY`,
+  p => `${p.st.toUpperCase()}: DELAYED. ALWAYS.`,
+  p => `THE ${p.team.toUpperCase()}: UNDEFEATED SINCE YOU WALKED IN`,
+  p => `${p.city} SLANG LESSONS: TUESDAYS`,
+  p => `PROPERTY OF ${p.team.toUpperCase()} FACILITIES DEPT.`,
+  p => `${p.city} MARATHON PORTA-POTTY ALUMNI ROOM`,
+  p => `HONK IF YOU LOVE THE ${p.team.toUpperCase()} (OUTSIDE)`,
+  p => `${p.city}'S BEST KEPT SECRET: THIS ROOM`,
+  p => `VOTED MOST IMPROVED RESTROOM, ${p.city} REGION`,
+];
+const cityJokeCache = {};
+function cityJokes(pk) {
+  if (!pk) return [];
+  if (!cityJokeCache[pk.park]) {
+    cityJokeCache[pk.park] = [...(CITY_JOKES[pk.park] || []), ...CITY_TEMPLATES.map(f => f(pk))];
+  }
+  return cityJokeCache[pk.park];
+}
 
 /* ---------- procedural set dressing ---------- */
 const POSTERS_GENERIC = ["EMPLOYEES MUST WASH HANDS", "OUT OF SOAP — BE BRAVE", "AIM. THANK YOU. — MGMT",
   "NOW HIRING: ATTENDANT", "FREE WIFI: 'guest123'", "NO PHONE CALLS. WE CAN ALL HEAR YOU.",
-  "THESE WALLS ARE LOAD-BEARING. DO NOT LEAN.", "SUGGESTION BOX REMOVED. YOU KNOW WHY."];
+  "THESE WALLS ARE LOAD-BEARING. DO NOT LEAN.", "SUGGESTION BOX REMOVED. YOU KNOW WHY.",
+  "HAND DRYER: DECORATIVE", "THE MIRROR IS HONEST. TOO HONEST.", "LOST & FOUND: ONE (1) DIGNITY",
+  "PLEASE DO NOT HIGH-FIVE STRANGERS IN HERE", "YELP REVIEWS WELCOME. BE KIND.", "CCTV-FREE ZONE (LEGALLY REQUIRED)",
+  "AIR FRESHENER ON BACKORDER SINCE 2019", "WHISTLING PERMITTED. ENCOURAGED, EVEN.", "THE FLOOR IS NOT LAVA. IT'S WORSE.",
+  "EMPLOYEE OF THE MONTH: THE ATTENDANT. AGAIN.", "TIK-TOK DANCES: OUTSIDE PLEASE", "OCCUPANCY LIMIT: VIBES ONLY",
+  "THINK FAST. GO FASTER.", "THIS SIGN INTENTIONALLY LEFT FUNNY", "PLUNGER LOCATION: CLASSIFIED",
+  "BE THE END URINAL YOU WISH TO SEE", "REAL MVPS FLUSH", "QUIET PLEASE: MEN CONCENTRATING",
+  "NO EYE CONTACT BEYOND THIS POINT", "HUM IF YOU'RE NERVOUS. EVERYONE DOES.", "EXIT INTERVIEWS AT THE SINKS"];
 const POSTERS_VENUE = {
   office: ["SYNERGY!", "TPS REPORTS DUE FRIDAY", "THE BREAK ROOM IS NOT A LOUNGE"],
   coffee: ["OAT MILK +$2", "POUR-OVER ONLY, PHILISTINES", "TIPS = GOOD KARMA"],
@@ -1786,7 +1822,10 @@ const POSTERS_VENUE = {
   festival: ["MERCH TENT: $80 TEES", "HYDRATE OR DIE-DRATE", "SET TIMES ARE A SUGGESTION"],
 };
 const GRAFFITI = ["for a good time, take the END urinal", "the code is real", "wash ur hands, king",
-  "REC guy was here 🔴", "trust no divider", "I survived the shame tub"];
+  "REC guy was here 🔴", "trust no divider", "I survived the shame tub",
+  "stall 3 is never free", "the flickering light knows your secrets", "he tipped $2 and became a legend",
+  "don't feed the moth", "the attendant remembers everything", "malört was involved",
+  "first rule: there IS a code", "my buffer, my rules", "the trough remembers"];
 
 function jerseySVG(color) {
   const num = rand(0, 44);
@@ -1842,8 +1881,10 @@ function dressScene(round) {
   anchors = anchors.sort(() => Math.random() - 0.5);
   const venueEmoji = (round.theme.backdrop || "").split(/\s+/).filter(Boolean).concat(season.frames);
   const cityEmoji = pk ? pk.land.split(" ") : [];
-  const posterPool = [...POSTERS_GENERIC, ...(POSTERS_VENUE[round.themeKey] || []), ...season.posters, ...season.posters];
-  const cityPosters = pk ? [`${pk.chant}!`, `${pk.team.toUpperCase()} GAME TONIGHT`, ...cityJokes(pk), ...cityJokes(pk)] : [];
+  const posterDeck2 = [...POSTERS_GENERIC, ...(POSTERS_VENUE[round.themeKey] || []), ...season.posters];
+  const cityDeck2 = pk ? [`${pk.chant}!`, ...cityJokes(pk)] : [];
+  const grafDeck2 = [...GRAFFITI, ...(pk ? cityJokes(pk).map(j => j.toLowerCase()) : [])];
+  const drawFrom = d => d.length ? d.splice(Math.floor(Math.random() * d.length), 1)[0] : "WASH YOUR HANDS";
   const n = rand(3, Math.min(5, anchors.length));
   let html = "";
   for (let i = 0; i < n; i++) {
@@ -1853,12 +1894,12 @@ function dressScene(round) {
     if (roll < 0.34 && (cityEmoji.length || venueEmoji.length)) {
       const e = Math.random() < 0.6 && cityEmoji.length ? pick(cityEmoji) : pick(venueEmoji) || "🧻";
       html += `<div class="frame ${Math.random() < .4 ? "metal" : ""}" style="left:${x}%;top:${y}%;transform:rotate(${rot}deg)">${e}</div>`;
-    } else if (roll < 0.42 && pk && cityPosters.length) {
-      html += `<div class="poster teamc" style="left:${x}%;top:${y}%;transform:rotate(${rot}deg);background:${pk.c}">${pick(cityPosters)}</div>`;
+    } else if (roll < 0.42 && pk && cityDeck2.length) {
+      html += `<div class="poster teamc" style="left:${x}%;top:${y}%;transform:rotate(${rot}deg);background:${pk.c}">${drawFrom(cityDeck2)}</div>`;
     } else if (roll < 0.88) {
-      html += `<div class="poster" style="left:${x}%;top:${y}%;transform:rotate(${rot}deg)">${pick(posterPool)}</div>`;
+      html += `<div class="poster" style="left:${x}%;top:${y}%;transform:rotate(${rot}deg)">${drawFrom(posterDeck2)}</div>`;
     } else {
-      html += `<div class="graffiti" style="left:${x}%;top:${y + 4}%;transform:rotate(${rnd(-9, 9).toFixed(1)}deg);color:${pick(["#7a2f2f", "#2f4a7a", "#3f6b3a"])}">${pick([...GRAFFITI, ...cityJokes(pk).map(j => j.toLowerCase())])}</div>`;
+      html += `<div class="graffiti" style="left:${x}%;top:${y + 4}%;transform:rotate(${rnd(-9, 9).toFixed(1)}deg);color:${pick(["#7a2f2f", "#2f4a7a", "#3f6b3a"])}">${drawFrom(grafDeck2)}</div>`;
     }
   }
   // hometown pride: pennant or framed jersey, random side (non-stadium rounds)
@@ -3139,6 +3180,8 @@ function build3D(round) {
   }
   // wall posters (canvas-text, from the same pools) — skipped when a stadium window takes the wall
   const pkJ = THEMES.stadium.parkRef;
+  const hasBoard3 = pkJ && (round.themeKey === "airport" || round.themeKey === "station");
+  const boardHalf3 = hasBoard3 ? Math.min(roomW - 1.6, 3.4 * Math.min(sgn, 1.5)) / 2 : 0;
   const posterDeck = [...POSTERS_GENERIC, ...(POSTERS_VENUE[round.themeKey] || []), ...cityJokes(pkJ)];
   const drawPoster = () => posterDeck.length ? posterDeck.splice(Math.floor(Math.random() * posterDeck.length), 1)[0] : "WASH YOUR HANDS";
   const stadiumWindow = pkJ && round.themeKey === "stadium";
@@ -3154,8 +3197,10 @@ function build3D(round) {
     }, 512, 320);
     const poster = new THREE.Mesh(new THREE.PlaneGeometry(1.15 * sgn, 0.72 * sgn), new THREE.MeshBasicMaterial({ map: pt, toneMapped: false }));
     const ppMax = Math.max(1, halfW0 - 0.68 * sgn);
-    const ppx = (k === 0 ? -1 : 1) * rnd(ppMax * 0.45, ppMax); // opposite halves - never stacked
-    poster.position.set(ppx, rnd(2.0, 2.3), 0.02);
+    const ppMin = Math.max(ppMax * 0.45, boardHalf3 + 0.62 * sgn);
+    if (ppMin >= ppMax) continue; // no clear wall space beside the board on narrow rooms
+    const ppx = (k === 0 ? -1 : 1) * rnd(ppMin, ppMax); // opposite halves, clear of the board
+    poster.position.set(ppx, rnd(2.0, 2.3), 0.055);
     poster.rotation.z = rnd(-0.05, 0.05);
     T3.group.add(poster);
   }
@@ -3296,7 +3341,7 @@ function build3D(round) {
     b.position.set(0, Math.min(2.3, 2.98 - bh / 2), 0.02);
     T3.group.add(b);
   }
-  if (pk3 && round.themeKey !== "stadium") {
+  if (pk3 && round.themeKey !== "stadium" && round.themeKey !== "airport" && round.themeKey !== "station") {
     const pc = "#" + new THREE.Color(pk3.c).getHexString();
     const penT = tex((x, w, h) => {
       x.fillStyle = pc; x.beginPath(); x.moveTo(10, 10); x.lineTo(w - 10, h / 2); x.lineTo(10, h - 10); x.fill();
@@ -3305,7 +3350,7 @@ function build3D(round) {
       x.fillText(pk3.team.toUpperCase(), 44, h / 2 + 18);
     }, 512, 200);
     const pen = new THREE.Mesh(new THREE.PlaneGeometry(1.15 * sgn, 0.44 * sgn), new THREE.MeshBasicMaterial({ map: penT, transparent: true, toneMapped: false }));
-    pen.position.set(-Math.max(1, halfW0 - 0.75 * sgn), 2.72, 0.03); pen.rotation.z = rnd(-0.05, 0.03);
+    pen.position.set(-Math.max(1, halfW0 - 0.75 * sgn), 2.72, 0.07); pen.rotation.z = rnd(-0.05, 0.03);
     T3.group.add(pen);
   }
   // sinks + mirror at the end of the row
@@ -3348,7 +3393,7 @@ function build3D(round) {
       x.fillText(pick([...GRAFFITI, ...cityJokes(THEMES.stadium.parkRef).map(j => j.toLowerCase())]).slice(0, 30), w / 2, h / 2 + 14);
     }, 1024, 128);
     const graf = new THREE.Mesh(new THREE.PlaneGeometry(1.7 * sgn, 0.21 * sgn), new THREE.MeshBasicMaterial({ map: gt, transparent: true, toneMapped: false }));
-    graf.position.set(rnd(-roomW / 4, roomW / 4), rnd(0.36, 0.5), 0.025);
+    graf.position.set(rnd(-roomW / 4, roomW / 4), rnd(0.36, 0.5), 0.065);
     graf.rotation.z = rnd(-0.08, 0.08);
     T3.group.add(graf);
   }
