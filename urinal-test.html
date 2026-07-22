@@ -503,6 +503,47 @@
     font-size: clamp(14px, 4vw, 17px); color: #fff; letter-spacing: 2px;
     text-shadow: 0 2px 8px rgba(0,0,0,.9); opacity: 0; animation: tapin .5s .9s both, pulse 1.3s 1.4s ease-in-out infinite; }
   @keyframes tapin { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* venue entrance cards */
+  .pp-custom { position: absolute; inset: 0; display: none; }
+  #parkphoto.custom .pp-custom { display: block; }
+  #parkphoto.custom .pp-img, #parkphoto.custom .pp-photo { display: none; }
+  .ea-wrap { position: absolute; inset: 0; background: #05080a; padding-top: 13%; text-align: center; }
+  .ea-wrap::after { content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 2px, transparent 2px 4px); }
+  .ea-big { font-size: clamp(19px, 6vw, 28px); color: #fff; letter-spacing: 3px; margin-bottom: 16px; font-weight: 900; }
+  .ea-row { font-family: "Courier New", monospace; font-weight: bold; color: #ffbf3f; letter-spacing: 2px;
+    font-size: clamp(15px, 4.6vw, 22px); margin: 9px 0; text-shadow: 0 0 14px rgba(255,191,63,.55); }
+  .ea-row.bad { color: #ff7a6f; text-shadow: 0 0 14px rgba(255,122,111,.55); }
+  .ea-row.dim { color: #8fe3a8; }
+  .es-wrap { position: absolute; inset: 0; background: #0e1830; padding-top: 12%; text-align: center; }
+  .es-h { font-size: clamp(17px, 5.4vw, 25px); font-weight: 900; color: #f4f7fb; letter-spacing: 2px; margin-bottom: 14px; }
+  .flap { display: inline-block; background: #1d2b4d; color: #f4f7fb; font-family: "Courier New", monospace;
+    font-weight: bold; padding: 9px 13px; margin: 5px; border-radius: 6px; font-size: clamp(14px, 4.4vw, 20px);
+    letter-spacing: 3px; box-shadow: inset 0 -12px 14px rgba(0,0,0,.5); }
+  .flap.bad { color: #ff9a90; }
+  .eb-wrap { position: absolute; inset: 0; padding-top: 15%; text-align: center;
+    background: repeating-linear-gradient(0deg, #2a1c14 0 26px, #221610 26px 30px),
+      repeating-linear-gradient(90deg, transparent 0 52px, rgba(0,0,0,.25) 52px 56px), #241811; }
+  .eb-neon { font-size: clamp(36px, 12vw, 60px); font-weight: 900; color: #ff5a7a; letter-spacing: 5px;
+    text-shadow: 0 0 8px #ff5a7a, 0 0 26px #ff2d5a, 0 0 70px #ff2d5a; animation: neonflick 3.2s infinite; }
+  .eb-neon2 { font-size: clamp(15px, 4.6vw, 21px); color: #6fe3ff; margin-top: 14px; letter-spacing: 5px;
+    text-shadow: 0 0 8px #6fe3ff, 0 0 24px #29b6e8; }
+  .eb-neon3 { font-size: clamp(13px, 4vw, 18px); color: #ffd76a; margin-top: 12px; letter-spacing: 4px;
+    text-shadow: 0 0 8px #ffd76a, 0 0 20px #e8a020; animation: neonflick 4.1s .7s infinite; }
+  @keyframes neonflick { 0%,100% { opacity: 1; } 91% { opacity: 1; } 92% { opacity: .35; } 93% { opacity: 1; } 96.5% { opacity: .7; } 97.5% { opacity: 1; } }
+  .ec-wrap { position: absolute; inset: 0; background: #223528; padding-top: 12%; text-align: center;
+    font-family: "Comic Sans MS", "Segoe Script", cursive; color: #ece6d4; }
+  .ec-h { font-size: clamp(22px, 7vw, 32px); font-weight: bold; margin-bottom: 16px; text-decoration: underline; }
+  .ec-m { font-size: clamp(15px, 4.4vw, 20px); margin: 10px 0; }
+  .ef-wrap { position: absolute; inset: 0; padding-top: 12%; text-align: center;
+    background: linear-gradient(160deg, #6b2d86, #d0356e 55%, #f2a03d); }
+  .ef-h { font-size: clamp(13px, 4vw, 18px); letter-spacing: 7px; color: rgba(255,255,255,.9); margin-bottom: 12px; }
+  .ef-a1 { font-size: clamp(26px, 8.4vw, 40px); font-weight: 900; color: #fff; text-shadow: 3px 4px 0 rgba(0,0,0,.35); }
+  .ef-a2 { font-size: clamp(20px, 6.4vw, 30px); font-weight: 900; color: #ffe9a0; margin-top: 10px; text-shadow: 2px 3px 0 rgba(0,0,0,.3); transform: rotate(-1.4deg); }
+  .ef-a3 { font-size: clamp(16px, 5vw, 24px); font-weight: 900; color: #c9f0ff; margin-top: 10px; text-shadow: 2px 3px 0 rgba(0,0,0,.3); transform: rotate(1deg); }
+  #lessontrip { position: absolute; top: -15px; right: 14px; font-family: inherit; font-size: 12px; font-weight: bold;
+    color: #e8b3a3; background: #3a2822; border: 1px solid #7a4f40; border-radius: 10px; padding: 4px 11px; cursor: pointer; z-index: 3; }
   /* the doors swing open */
   #doorwipe { position: absolute; inset: 0; z-index: 37; display: none; pointer-events: none; overflow: hidden; border-radius: 14px; }
   #doorwipe.show { display: block; }
@@ -758,6 +799,7 @@
       <div id="parkphoto">
         <div class="pp-img"></div>
         <div class="pp-photo"></div>
+        <div class="pp-custom"></div>
         <div class="pp-shade"></div>
         <div class="pp-text">
           <div class="pp-now">NOW ENTERING</div>
@@ -771,6 +813,7 @@
       <div id="announce"><div class="aicon"></div><div class="atitle"></div><div class="asub"></div></div>
       <div id="verdict"></div>
       <div id="lesson">
+        <button id="lessontrip" class="hiddenrow">🗺️ change city</button>
         <div class="ltitle"><span class="lpts" id="lpts"></span><span id="ltitle"></span></div>
         <div id="ltext"></div>
         <div id="attrow">
@@ -1279,7 +1322,9 @@ function roadtripUnlocked() {
 function unlockRoadtrip() {
   try { localStorage.setItem("ut_roadtrip", "1"); } catch (e) {}
 }
-function openParkPicker() {
+let pickerCtx = "start";
+function openParkPicker(ctx) {
+  pickerCtx = ctx || "start";
   const list = $("picklist");
   const cur = THEMES.stadium.parkRef;
   list.innerHTML = "";
@@ -1294,7 +1339,15 @@ function openParkPicker() {
       try { localStorage.setItem("ut_park", JSON.stringify({ park: p.park, km: null })); } catch (e) {}
       closeParkPicker();
       updateStartLines();
-      toast(`🗺️ Road trip: ${p.park}. Safe travels, hold it on the flight.`);
+      if (pickerCtx === "end") {
+        // wheels up: straight into the next run, no menu detour
+        resetGame(G.mode);
+        setTimeout(() => announce("🛫", "ROAD TRIP", `Next stop: ${p.park}. Hold it on the flight.`, 1600, "good"), 300);
+      } else if (pickerCtx === "mid") {
+        announce("🗺️", "NEXT STOP: " + p.city, `${p.park} takes over from the next round. No restart needed.`, 1800, "good");
+      } else {
+        toast(`🗺️ Road trip: ${p.park}. Safe travels.`);
+      }
     });
     list.appendChild(b);
   });
@@ -1346,7 +1399,7 @@ function endlessPlan(r) {
   const trough = !waitRound && !tub && roll < 0.40;
   const theme = tub ? gpick(["stadium", "festival", "divebar"])
     : trough ? gpick(["divebar", "stadium", "festival", "station"])
-    : gpick(Object.keys(THEMES));
+    : gpick(["stadium", "stadium", "divebar", "divebar", "airport", "airport", "station", "station", "festival", "festival", "coffee", "coffee", "mall", "office", "tech"]);
   const traveler = (theme === "airport" || theme === "station") ? .65 : .18;
   if (waitRound) return { theme, n: [5, 6], occ: [2, 2], div: 0, time: Math.max(5, 8 - r * .15), waitRound: true, traveler };
   const lo = Math.min(9, (tub ? 6 : 4) + Math.floor(r / 3));
@@ -2195,6 +2248,7 @@ function showLesson(title, text, pts) {
   $("lpts").textContent = pts > 0 ? `+${pts}` : (pts < 0 ? `${pts}` : "");
   $("lesson").classList.add("show");
   $("scene").classList.add("scoring"); // soften the room — we're reviewing now
+  $("lessontrip").classList.toggle("hiddenrow", !roadtripUnlocked());
   const r = G.cur;
   if (!r.isWaitRound) {
     r.bestSpots.forEach(i => { const el = slotEl(i); if (el) el.classList.add("best-mark"); });
@@ -2596,22 +2650,25 @@ function startRound() {
   G.pendingSecs = secs;
   // the clock does NOT start until every overlay is gone — read first, sweat second
   const stages = [];
-  const p = G.cur.themeKey === "stadium" ? THEMES.stadium.parkRef : null;
+  const ent = buildEntrance(G.cur);
   const clockNote = G.cur.clock ? `🕐 ${G.cur.clock} — ` : "";
   const infoLine = `${clockNote}${roundLabel} — ${layoutNote}${hazardNote}${chantNote}${muskNote}`;
-  if (p) {
-    // the photo IS the whole announcement — and it holds until you tap
+  if (ent) {
+    // the entrance card IS the whole announcement — and it holds until you tap
     stages.push({ ms: 9000, tap: true, run: () => {
       if (announceT) clearTimeout(announceT);
       $("announce").classList.remove("show");
       const pp = $("parkphoto");
-      const url = parkPhotoURL(p);
-      pp.querySelector(".pp-img").style.backgroundImage = `url('${url}')`;
-      pp.querySelector(".pp-photo").style.backgroundImage = `url('${url}')`;
-      pp.querySelector(".pp-name").textContent = p.park.toUpperCase();
-      pp.querySelector(".pp-sub").textContent = `⚾ ${p.flavor}`;
+      pp.className = (ent.cls ? "custom " + ent.cls : "");
+      if (ent.photo) {
+        pp.querySelector(".pp-img").style.backgroundImage = `url('${ent.photo}')`;
+        pp.querySelector(".pp-photo").style.backgroundImage = `url('${ent.photo}')`;
+      }
+      pp.querySelector(".pp-custom").innerHTML = ent.html || "";
+      pp.querySelector(".pp-name").textContent = ent.name;
+      pp.querySelector(".pp-sub").textContent = ent.sub;
       pp.querySelector(".pp-round").textContent = infoLine;
-      pp.classList.remove("show"); void pp.offsetWidth; pp.classList.add("show");
+      void pp.offsetWidth; pp.classList.add("show");
       G.ppShownAt = performance.now();
     }, end: () => $("parkphoto").classList.remove("show") });
   } else {
@@ -2633,6 +2690,47 @@ function startRound() {
     G.introT = setTimeout(advance, st.ms);
   };
   runStage();
+}
+
+
+/* entrance cards: which venues earn the tap-to-enter ritual, and what they show */
+function buildEntrance(r) {
+  const pk = THEMES.stadium.parkRef;
+  const t = r.themeKey;
+  if (t === "stadium" && pk) return { photo: parkPhotoURL(pk), name: pk.park.toUpperCase(), sub: `\u26be ${pk.flavor}` };
+  if (t === "airport") {
+    const ap = (pk ? pk.ap : "Terminal C").toUpperCase();
+    return { cls: "ent-air", name: ap, sub: "\u2708 boarding group C is boarding", html:
+      `<div class="ea-wrap"><div class="ea-big">\u2708 ${ap}</div>` +
+      `<div class="ea-row">B12&nbsp;&nbsp;BOARDING</div>` +
+      `<div class="ea-row bad">C07&nbsp;&nbsp;DELAYED</div>` +
+      `<div class="ea-row">A03&nbsp;&nbsp;FINAL CALL \u2014 RUN</div>` +
+      `<div class="ea-row dim">RESTROOM&nbsp;&nbsp;\u2192&nbsp;&nbsp;RIGHT HERE</div></div>` };
+  }
+  if (t === "station") {
+    const st = (pk ? pk.st : "Central Station").toUpperCase();
+    return { cls: "ent-sta", name: st, sub: "\ud83d\ude86 the 5:15 waits for no bladder", html:
+      `<div class="es-wrap"><div class="es-h">\ud83d\ude86 ${st}</div>` +
+      `<div><span class="flap">5:15</span><span class="flap">ON TIME</span></div>` +
+      `<div><span class="flap">5:45</span><span class="flap bad">DELAYED</span></div>` +
+      `<div><span class="flap">6:10</span><span class="flap bad">CANCELED</span></div></div>` };
+  }
+  if (t === "divebar") return { cls: "ent-bar", name: "THE DIVE", sub: "\ud83c\udf7a est. 1972 \u00b7 cash only", html:
+    `<div class="eb-wrap"><div class="eb-neon">DIVE BAR</div>` +
+    `<div class="eb-neon2">OPEN LATE \u00b7 COLD BEER</div>` +
+    `<div class="eb-neon3">\ud83c\udfaf DARTS TUESDAYS</div></div>` };
+  if (t === "coffee") return { cls: "ent-cof", name: "THE ROASTERY", sub: "\u2615 it WILL go right through you", html:
+    `<div class="ec-wrap"><div class="ec-h">\u2615 TODAY'S MENU</div>` +
+    `<div class="ec-m">cortado ..... $7</div>` +
+    `<div class="ec-m">oat milk ..... +$2</div>` +
+    `<div class="ec-m">cold brew ..... regret</div>` +
+    `<div class="ec-m">wifi ..... ask nicely</div></div>` };
+  if (t === "festival") return { cls: "ent-fes", name: "MAIN STAGE", sub: "\ud83c\udfb8 set times are a suggestion", html:
+    `<div class="ef-wrap"><div class="ef-h">\u2014 TONIGHT \u2014</div>` +
+    `<div class="ef-a1">THE REC GUYS</div>` +
+    `<div class="ef-a2">SHAME TUB COLLECTIVE</div>` +
+    `<div class="ef-a3">DJ FLICKER & THE DIVIDERS</div></div>` };
+  return null;
 }
 
 /* tap on the interstitial: swing the doors open and walk in */
@@ -2894,7 +2992,7 @@ function boardMesh(title, rows, w, h) {
     x.font = "bold 46px Courier New";
     rows.forEach((r2, i) => { x.fillStyle = r2.bad ? "#ff9a90" : "#8fe3a8"; x.fillText(r2.t, 36, 158 + i * 62); });
   }, 1024, 512);
-  return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t }));
+  return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t, toneMapped: false }));
 }
 function t3Person(persona, shirtHex) {
   const g = new THREE.Group();
@@ -2939,7 +3037,7 @@ function t3Person(persona, shirtHex) {
 }
 function t3Urinal() {
   const g = new THREE.Group();
-  const porcelain = pmat(0xf4f7f9, 0.14, 1, { side: THREE.DoubleSide });
+  const porcelain = pmat(0xeef2f5, 0.32, 0.7, { side: THREE.DoubleSide, envMapIntensity: 0.65 });
   const chrome = smat(0xdde4ea, 0.15, 1);
   // smooth lathe-turned porcelain bowl, half-revolution facing the room
   const pts = [];
@@ -3035,16 +3133,17 @@ function build3D(round) {
   for (const lx of [-roomW / 4, roomW / 4]) {
     const lamp = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.06, 0.3), new THREE.MeshBasicMaterial({ color: 0xf4f9ff }));
     lamp.position.set(lx, 2.98, 1.2);
-    const glow = glowSprite("rgba(255,246,214,.85)", 1.7);
-    glow.position.set(lx, 2.88, 1.28);
+    const glow = glowSprite("rgba(255,246,214,.45)", 1.0);
+    glow.position.set(lx, 2.96, 1.3);
     T3.group.add(lamp, glow);
   }
   // wall posters (canvas-text, from the same pools) — skipped when a stadium window takes the wall
   const pkJ = THEMES.stadium.parkRef;
-  const posterPool = [...POSTERS_GENERIC, ...(POSTERS_VENUE[round.themeKey] || []), ...cityJokes(pkJ), ...cityJokes(pkJ)];
+  const posterDeck = [...POSTERS_GENERIC, ...(POSTERS_VENUE[round.themeKey] || []), ...cityJokes(pkJ)];
+  const drawPoster = () => posterDeck.length ? posterDeck.splice(Math.floor(Math.random() * posterDeck.length), 1)[0] : "WASH YOUR HANDS";
   const stadiumWindow = pkJ && round.themeKey === "stadium";
-  for (let k = 0; k < (stadiumWindow ? 0 : (pkJ ? 3 : 2)); k++) {
-    const txt = pick(posterPool);
+  for (let k = 0; k < (stadiumWindow ? 0 : 2); k++) {
+    const txt = drawPoster();
     const pt = tex((x, w, h) => {
       x.fillStyle = "#f7f4e8"; x.fillRect(0, 0, w, h);
       x.fillStyle = "#3a3428"; x.font = "bold 64px Trebuchet MS"; x.textAlign = "center";
@@ -3053,11 +3152,10 @@ function build3D(round) {
       lines.push(line);
       lines.forEach((l, i) => x.fillText(l.trim(), w / 2, h / 2 - (lines.length - 1) * 36 + i * 72 + 10));
     }, 512, 320);
-    const poster = new THREE.Mesh(new THREE.PlaneGeometry(1.15 * sgn, 0.72 * sgn), new THREE.MeshLambertMaterial({ map: pt }));
-    let ppx = (k % 2 === 0 ? -1 : 1) * rnd(roomW / 6, roomW / 2.6);
+    const poster = new THREE.Mesh(new THREE.PlaneGeometry(1.15 * sgn, 0.72 * sgn), new THREE.MeshBasicMaterial({ map: pt, toneMapped: false }));
     const ppMax = Math.max(1, halfW0 - 0.68 * sgn);
-    ppx = Math.max(-ppMax, Math.min(ppMax, ppx));
-    poster.position.set(ppx, rnd(1.95, 2.45), 0.02);
+    const ppx = (k === 0 ? -1 : 1) * rnd(ppMax * 0.45, ppMax); // opposite halves - never stacked
+    poster.position.set(ppx, rnd(2.0, 2.3), 0.02);
     poster.rotation.z = rnd(-0.05, 0.05);
     T3.group.add(poster);
   }
@@ -3079,7 +3177,7 @@ function build3D(round) {
       if (s.blockType === "bag") {
         const bag = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.75, 0.3), mat(0xb9cddc, { transparent: true, opacity: 0.55 }));
         bag.position.set(x, 0.9, 0.1);
-        const sign = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.2), new THREE.MeshLambertMaterial({ map: tex((c2, w, h) => {
+        const sign = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.2), new THREE.MeshBasicMaterial({ toneMapped: false, map: tex((c2, w, h) => {
           c2.fillStyle = "#f5e04e"; c2.fillRect(0, 0, w, h);
           c2.fillStyle = "#7a1f1f"; c2.font = "bold 40px Trebuchet MS"; c2.textAlign = "center";
           c2.fillText("OUT OF", w / 2, 50); c2.fillText("ORDER", w / 2, 100);
@@ -3169,7 +3267,7 @@ function build3D(round) {
       x.font = "bold 38px Trebuchet MS"; x.fillStyle = "rgba(255,255,255,.9)";
       x.fillText("HOME OF THE " + pk3.team.toUpperCase(), w / 2, 140);
     }, 1024, 168);
-    const sign = new THREE.Mesh(new THREE.PlaneGeometry(Math.min(roomW - 1.2, 2.6 * sgn), Math.min(roomW - 1.2, 2.6 * sgn) * 0.165, 1), new THREE.MeshBasicMaterial({ map: signT, transparent: true }));
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(Math.min(roomW - 1.2, 2.6 * sgn), Math.min(roomW - 1.2, 2.6 * sgn) * 0.165, 1), new THREE.MeshBasicMaterial({ map: signT, transparent: true, toneMapped: false }));
     sign.position.set(0, Math.min(2.86, 3.0 - sign.geometry.parameters.height / 2), 0.05); sign.rotation.z = -0.012;
     T3.group.add(sign);
     if (pk3.sig === "ivy") {
@@ -3206,8 +3304,8 @@ function build3D(round) {
       x.fillStyle = "#fff"; x.font = "bold 52px Trebuchet MS"; x.textAlign = "left";
       x.fillText(pk3.team.toUpperCase(), 44, h / 2 + 18);
     }, 512, 200);
-    const pen = new THREE.Mesh(new THREE.PlaneGeometry(1.15 * sgn, 0.44 * sgn), new THREE.MeshBasicMaterial({ map: penT, transparent: true }));
-    pen.position.set(-Math.max(1, halfW0 - 0.75 * sgn), 2.5, 0.03); pen.rotation.z = rnd(-0.06, 0.03);
+    const pen = new THREE.Mesh(new THREE.PlaneGeometry(1.15 * sgn, 0.44 * sgn), new THREE.MeshBasicMaterial({ map: penT, transparent: true, toneMapped: false }));
+    pen.position.set(-Math.max(1, halfW0 - 0.75 * sgn), 2.72, 0.03); pen.rotation.z = rnd(-0.05, 0.03);
     T3.group.add(pen);
   }
   // sinks + mirror at the end of the row
@@ -3249,7 +3347,7 @@ function build3D(round) {
       x.font = "italic bold 52px Comic Sans MS, cursive"; x.textAlign = "center";
       x.fillText(pick([...GRAFFITI, ...cityJokes(THEMES.stadium.parkRef).map(j => j.toLowerCase())]).slice(0, 30), w / 2, h / 2 + 14);
     }, 1024, 128);
-    const graf = new THREE.Mesh(new THREE.PlaneGeometry(1.7 * sgn, 0.21 * sgn), new THREE.MeshBasicMaterial({ map: gt, transparent: true }));
+    const graf = new THREE.Mesh(new THREE.PlaneGeometry(1.7 * sgn, 0.21 * sgn), new THREE.MeshBasicMaterial({ map: gt, transparent: true, toneMapped: false }));
     graf.position.set(rnd(-roomW / 4, roomW / 4), rnd(0.36, 0.5), 0.025);
     graf.rotation.z = rnd(-0.08, 0.08);
     T3.group.add(graf);
@@ -3257,14 +3355,14 @@ function build3D(round) {
   // time-of-day light grade
   const tod = round.tod || "day";
   const grades = {
-    morning: { amb: 0.85, col: 0xfff0d0, pt: 10 }, day: { amb: 0.95, col: 0xffffff, pt: 12 },
-    evening: { amb: 0.7, col: 0xffd7b0, pt: 13 }, night: { amb: 0.38, col: 0xbfd0ff, pt: 16 },
+    morning: { amb: 0.9, col: 0xfff0d0, pt: 6.5 }, day: { amb: 1.0, col: 0xffffff, pt: 7.5 },
+    evening: { amb: 0.75, col: 0xffd7b0, pt: 8 }, night: { amb: 0.42, col: 0xbfd0ff, pt: 10 },
   };
   const g2 = grades[tod];
   T3.amb.intensity = g2.amb; T3.amb.color.setHex(g2.col);
-  T3.dir.intensity = tod === "night" ? 0.25 : 0.7;
+  T3.dir.intensity = tod === "night" ? 0.22 : 0.55;
   const roomW2 = roomW;
-  T3.p1.position.set(-roomW2 / 4, 2.7, 1.2); T3.p2.position.set(roomW2 / 4, 2.7, 1.2);
+  T3.p1.position.set(-roomW2 / 4, 2.6, 2.4); T3.p2.position.set(roomW2 / 4, 2.6, 2.4);
   T3.p1.intensity = T3.p2.intensity = g2.pt;
   // the flicker hazard is a genuinely flickering light
   if (round.flickerAt >= 0) {
@@ -3397,9 +3495,10 @@ $("att-walk").addEventListener("click", () => attWalk());
 $("sharebtn").addEventListener("click", () => doShare(resultText()));
 $("certbtn").addEventListener("click", () => shareCertificate());
 $("chalbtn").addEventListener("click", () => shareChallenge());
-$("roadtripbtn").addEventListener("click", () => openParkPicker());
-$("endroadtripbtn").addEventListener("click", () => openParkPicker());
+$("roadtripbtn").addEventListener("click", () => openParkPicker("start"));
+$("endroadtripbtn").addEventListener("click", () => openParkPicker("end"));
 $("pickclose").addEventListener("click", () => closeParkPicker());
+$("lessontrip").addEventListener("click", () => openParkPicker("mid"));
 </script>
 </body>
 </html>
