@@ -261,11 +261,46 @@
     background: transparent; box-shadow: 0 0 8px rgba(160,220,255,.7); height: 11px; }
   #scene.tub #row .slot.free:not(.blocked)::after { bottom: 6%; }
 
-  /* ---------- door / wait ---------- */
+  /* ---------- the stall gamble ---------- */
   #waitbtn { margin: 8px 12px 10px; font-family: inherit; font-size: clamp(13px, 3.6vw, 16px); font-weight: bold;
     color: #eef2f6; background: #223047; border: 1px solid #3a4a63; border-radius: 12px; padding: 12px; cursor: pointer; }
   #waitbtn:active { background: #2c3d5a; }
   #waitbtn.danger { background: #47222a; border-color: #a03a3a; color: #ff9a90; }
+  #waitbtn .hint { display: block; font-weight: normal; font-size: clamp(10px, 2.8vw, 12px); color: #9fb0c3; margin-top: 2px; }
+  #waitbtn.danger .hint { color: #ff9a90; }
+  #waitbtn:disabled { opacity: .55; cursor: default; }
+  #stalldoor { position: absolute; right: 1%; bottom: 9%; width: clamp(46px, 13vw, 66px); height: 33%;
+    z-index: 6; cursor: pointer; }
+  #stalldoor .doorframe { position: absolute; inset: 0; background: linear-gradient(#8a6a4a, #6b4f34);
+    border: 3px solid #4d3822; border-radius: 6px 6px 0 0; box-shadow: -3px 4px 8px rgba(0,0,0,.35); }
+  #stalldoor .panel { position: absolute; left: 14%; right: 14%; top: 9%; bottom: 42%;
+    border: 2px solid rgba(0,0,0,.25); border-radius: 4px; }
+  #stalldoor .panel2 { position: absolute; left: 14%; right: 14%; top: 64%; bottom: 8%;
+    border: 2px solid rgba(0,0,0,.25); border-radius: 4px; }
+  #stalldoor .knob { position: absolute; right: 16%; top: 52%; width: 8px; height: 8px; border-radius: 50%;
+    background: radial-gradient(#f5d76e, #b8952e); }
+  #stalldoor .sign { position: absolute; left: 50%; top: -12%; transform: translateX(-50%);
+    background: #1a2130; border: 1px solid #57b8ff; color: #cfe8ff; border-radius: 6px;
+    font-size: clamp(9px, 2.4vw, 11px); font-weight: bold; padding: 2px 6px; white-space: nowrap; }
+  #stalldoor.avail .doorframe { animation: doorpulse 1.6s ease-in-out infinite; }
+  @keyframes doorpulse { 0%,100% { box-shadow: -3px 4px 8px rgba(0,0,0,.35); }
+    50% { box-shadow: -3px 4px 8px rgba(0,0,0,.35), 0 0 16px rgba(87,184,255,.8); } }
+  #stalldoor.spent { filter: grayscale(1) brightness(.7); cursor: default; }
+  #stalldoor.knocking { animation: knock .5s ease-in-out 2; }
+  @keyframes knock { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+
+  /* ---------- center-stage announcements ---------- */
+  #announce { position: absolute; left: 50%; top: 38%; transform: translate(-50%,-50%) scale(.7);
+    opacity: 0; z-index: 35; pointer-events: none; text-align: center;
+    background: rgba(13,17,24,.94); border: 2px solid #3a4a63; border-radius: 16px;
+    padding: 14px 24px; min-width: 62%; max-width: 92%;
+    transition: transform .22s cubic-bezier(.2,1.4,.4,1), opacity .18s; }
+  #announce.show { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+  #announce.warn { border-color: #e6483d; box-shadow: 0 0 26px rgba(230,72,61,.55); }
+  #announce.good { border-color: #2fb46b; box-shadow: 0 0 22px rgba(47,180,107,.45); }
+  #announce .aicon { font-size: clamp(28px, 9vw, 42px); line-height: 1.1; }
+  #announce .atitle { font-weight: 900; font-size: clamp(16px, 5vw, 24px); letter-spacing: 1px; margin-top: 2px; }
+  #announce .asub { color: #b9c6d4; font-size: clamp(12px, 3.4vw, 14px); margin-top: 4px; line-height: 1.4; }
 
   /* ---------- feedback ---------- */
   #verdict { position: absolute; left: 50%; top: 34%; transform: translate(-50%,-50%) scale(.6); opacity: 0;
@@ -312,15 +347,15 @@
   #attendantbox .chip { position: absolute; left: 50%; transform: translateX(-50%); bottom: 101%;
     background: rgba(20,26,36,.9); border: 1px solid #6b5a2e; color: #ffd76a; border-radius: 8px;
     font-size: 10px; padding: 2px 6px; white-space: nowrap; animation: bob 1.8s ease-in-out infinite; }
-  #attrow { display: none; margin-top: 10px; }
-  #attrow.show { display: block; }
-  #attrow .attq { font-weight: bold; color: #ffd76a; margin-bottom: 8px; }
-  #attrow .attbtns { display: flex; gap: 6px; }
-  #attrow button { flex: 1; font-family: inherit; font-weight: bold; font-size: clamp(11px, 3vw, 13px);
+  #attrow, #drinkrow { display: none; margin-top: 10px; }
+  #attrow.show, #drinkrow.show { display: block; }
+  .attq { font-weight: bold; color: #ffd76a; margin-bottom: 8px; }
+  .attbtns { display: flex; gap: 6px; }
+  .attbtns button { flex: 1; font-family: inherit; font-weight: bold; font-size: clamp(11px, 3vw, 13px);
     padding: 9px 4px; border: none; border-radius: 10px; color: #fff; cursor: pointer; line-height: 1.25; }
-  #attrow .tip { background: linear-gradient(#37c97a, #229458); }
-  #attrow .col { background: linear-gradient(#8a6fd0, #6247a8); }
-  #attrow .walk { background: linear-gradient(#5a6a80, #425063); }
+  .attbtns .tip { background: linear-gradient(#37c97a, #229458); }
+  .attbtns .col { background: linear-gradient(#8a6fd0, #6247a8); }
+  .attbtns .walk { background: linear-gradient(#5a6a80, #425063); }
   #attnote { margin-top: 8px; color: #cdd8e4; display: none; }
   #attnote.show { display: block; }
   #shieldchip { display: none; border-color: #37c97a; color: #8ff0b4; }
@@ -372,9 +407,9 @@
       <li>Guy in <b>Meta smart glasses</b> (🔴 REC)? Extra distance. Dividers don't help.</li>
       <li><b>Luggage</b> blocks spots in airports & stations. Suitcases take ankles.</li>
       <li>The <b>trough</b> is lawless. The <b>shame tub</b> is worse — <b>never face a man across the water</b>. 👁️</li>
-      <li>Perfect picks <b>earn drinks</b> 🍺☕ — each one is <b>+10% score buzz</b>… and one more thing in your bladder.</li>
-      <li>At 🍺×3 you're <b>desperate</b>: the clock flies and <b>walking away means catastrophe</b>. Going while desperate vents 2 drinks.</li>
-      <li>No decent option (and sober-ish)? A master <b>holds it and walks away</b>. 🚪</li>
+      <li>After a win, <b>you choose</b>: take the drink 🍺 (+10% score buzz each) or pass. Every drink fills your bladder and <b>speeds the clock</b>.</li>
+      <li>At 🍺×3 you're <b>desperate</b> — run out of time and you <b>piss yourself</b>. Going relieves the pressure.</li>
+      <li>No decent option? Gamble on the <b>stall</b> 🚻 — 3 waits per run, each burns ~2.5s, and <b>sometimes it's occupied</b>.</li>
     </div>
     <button class="bigbtn" id="startbtn">🏆 THE GAUNTLET — 10 rounds</button>
     <button class="bigbtn daily" id="dailybtn">📅 DAILY CHALLENGE</button>
@@ -467,6 +502,14 @@
       <div id="flash"></div>
       <div id="fx"></div>
       <div id="attendantbox"></div>
+      <div id="stalldoor">
+        <div class="sign">🚻 STALL</div>
+        <div class="doorframe"></div>
+        <div class="panel"></div>
+        <div class="panel2"></div>
+        <div class="knob"></div>
+      </div>
+      <div id="announce"><div class="aicon"></div><div class="atitle"></div><div class="asub"></div></div>
       <div id="verdict"></div>
       <div id="lesson">
         <div class="ltitle"><span class="lpts" id="lpts"></span><span id="ltitle"></span></div>
@@ -480,12 +523,19 @@
           </div>
         </div>
         <div id="attnote"></div>
+        <div id="drinkrow">
+          <div class="attq" id="drinkq"></div>
+          <div class="attbtns">
+            <button class="col" id="dr-yes"></button>
+            <button class="walk" id="dr-no">🚱 Pass<br><small>stay light</small></button>
+          </div>
+        </div>
         <button id="nextbtn">NEXT →</button>
       </div>
     </div>
   </div>
 
-  <button id="waitbtn">🚪 Hold it &amp; walk away <span style="color:#9fb0c3">(pro move… sometimes)</span></button>
+  <button id="waitbtn">🚻 WAIT FOR A STALL ×3<span class="hint">burns ~2.5s · sometimes occupied</span></button>
 </div>
 
 <script>
@@ -912,8 +962,8 @@ function endlessPlan(r) {
 const G = {
   mode: "gauntlet",
   round: 0, score: 0, streak: 0, lives: 3, drinks: 0, pissed: false,
-  splashes: 0, perfects: 0, trail: [], seed: null, city: null,
-  cur: null, timer: null, timeLeft: 0, locked: false,
+  splashes: 0, perfects: 0, trail: [], seed: null, city: null, stalls: 3,
+  cur: null, timer: null, timeLeft: 0, timerTotal: 10, introT: null, locked: false,
 };
 function desperate() { return G.drinks >= 3; }
 
@@ -1284,9 +1334,13 @@ function updateHUD() {
   $("shieldchip").classList.toggle("on", !!G.shield);
   const wb = $("waitbtn");
   wb.classList.toggle("danger", desperate());
-  wb.innerHTML = desperate()
-    ? `🚪 Hold it &amp; walk away <span style="color:#ff9a90">(⚠️ ${G.drinks} drinks deep — you CANNOT hold it)</span>`
-    : `🚪 Hold it &amp; walk away <span style="color:#9fb0c3">(pro move… sometimes)</span>`;
+  wb.disabled = G.stalls <= 0;
+  wb.innerHTML = G.stalls > 0
+    ? `🚻 WAIT FOR A STALL ×${G.stalls}<span class="hint">burns ~${STALL_COST}s · sometimes occupied${desperate() ? " · ⚠️ you're desperate, tick tock" : ""}</span>`
+    : `🚻 NO STALL WAITS LEFT<span class="hint">you've knocked enough tonight — pick a spot</span>`;
+  const door = $("stalldoor");
+  door.classList.toggle("avail", G.stalls > 0);
+  door.classList.toggle("spent", G.stalls <= 0);
 }
 
 function toast(msg) {
@@ -1296,22 +1350,44 @@ function toast(msg) {
   setTimeout(() => t.remove(), 1700);
 }
 
+/* Center-stage announcement — the way we tell players something they MUST see. */
+let announceT = null;
+function announce(icon, title, sub, ms, cls) {
+  const a = $("announce");
+  a.querySelector(".aicon").textContent = icon || "";
+  a.querySelector(".atitle").textContent = title || "";
+  a.querySelector(".asub").innerHTML = sub || "";
+  a.className = cls || "";
+  void a.offsetWidth;
+  a.classList.add("show");
+  if (announceT) clearTimeout(announceT);
+  announceT = setTimeout(() => a.classList.remove("show"), ms || 1600);
+}
+
 /* ---------- timer ---------- */
 function startTimer(sec) {
   stopTimer();
   G.timeLeft = sec;
+  G.timerTotal = sec;
+  runTimer();
+}
+function resumeTimer() { stopTimer(); runTimer(); }
+function runTimer() {
   const wrap = $("bladderwrap");
   const bar = $("bladder");
-  bar.style.width = "100%"; wrap.classList.remove("low");
+  wrap.classList.remove("low");
   G.timer = setInterval(() => {
     G.timeLeft -= 0.1;
-    const p = Math.max(0, G.timeLeft / sec * 100);
+    const p = Math.max(0, G.timeLeft / G.timerTotal * 100);
     bar.style.width = p + "%";
     if (p < 30) wrap.classList.add("low");
     if (G.timeLeft <= 0) { stopTimer(); onTimeout(); }
   }, 100);
 }
-function stopTimer() { if (G.timer) { clearInterval(G.timer); G.timer = null; } }
+function stopTimer() {
+  if (G.timer) { clearInterval(G.timer); G.timer = null; }
+  if (G.introT) { clearTimeout(G.introT); G.introT = null; }
+}
 
 /* ---------- FX ---------- */
 function splashFX(big) {
@@ -1453,17 +1529,37 @@ function neighborDesc(r, i) {
 function relieve() {
   if (desperate()) {
     G.drinks = Math.max(0, G.drinks - 2);
-    setTimeout(() => toast("😮‍💨 Emergency relief: −2 drinks"), 900);
+    setTimeout(() => announce("😮‍💨", "EMERGENCY RELIEF", `−2 drinks. Bladder at ${G.drinks}. You live to sip again.`, 1500, "good"), 800);
   }
 }
-/* Perfect picks earn a reward drink: +10% score buzz each… and one more thing in the tank. */
-function earnDrink() {
-  const beerVenue = !!THEMES[G.cur.themeKey].drinks;
-  G.drinks++;
-  const icon = beerVenue ? "🍺" : "☕";
-  setTimeout(() => toast(`${icon} Reward drink earned! Buzz +10% score… and +1 bladder.`), 1400);
-}
 function buzzMult() { return 1 + 0.1 * G.drinks; }
+
+/* The drink is YOUR call: buzz bonus vs. bladder. Consequences are all yours. */
+function showDrinkOffer() {
+  const t = THEMES[G.cur.themeKey];
+  const n = t.drinks || 1;
+  const beer = !!t.drinks;
+  $("drinkq").innerHTML = beer
+    ? `🍺 ${t.drinkMsg || "The boys are ordering another round…"} Join in?`
+    : `☕ Victory cold brew from the lobby cart? It <i>will</i> go right through you.`;
+  $("dr-yes").innerHTML = `${beer ? "🍺" : "☕"} Drink${n > 1 ? ` ×${n}` : ""}<br><small>+${n * 10}% buzz · +${n} bladder</small>`;
+  $("dr-yes").dataset.n = n;
+  $("drinkrow").classList.add("show");
+}
+function drinkYes() {
+  const n = Number($("dr-yes").dataset.n) || 1;
+  G.drinks += n;
+  $("drinkrow").classList.remove("show");
+  buzz([20, 30, 20]); sfx.ok();
+  if (desperate()) announce("🍺", `+${n} — YOU'RE AT ${G.drinks}`, "Buzz +" + G.drinks * 10 + "% score… and you are now DESPERATE. Clock will fly.", 2000, "warn");
+  else announce("🍺", `+${n} DRINK${n > 1 ? "S" : ""}`, `Buzz +${G.drinks * 10}% score · bladder at ${G.drinks}. Your choice, champ.`, 1500);
+  updateHUD();
+}
+function drinkNo() {
+  $("drinkrow").classList.remove("show");
+  announce("🚱", "STAYING LIGHT", "No buzz bonus, no bladder. The disciplined path.", 1300);
+  updateHUD();
+}
 
 function resolveChoice(i) {
   const r = G.cur;
@@ -1471,8 +1567,9 @@ function resolveChoice(i) {
   const speedBonus = Math.min(50, Math.round(G.timeLeft * 5));
 
   if (r.isWaitRound) {
-    if (desperate() && sc.comfort >= r.bestComfort - 0.01) {
-      // no good spots, but with a full bladder the least-bad pick is survival
+    // taking the least-bad spot is honorable ONLY once the stall has failed you,
+    // you're desperate, or you're out of stall waits — otherwise the stall was the play
+    if ((r.stallTried || desperate() || G.stalls <= 0) && sc.comfort >= r.bestComfort - 0.01) {
       const drinksAtPick = G.drinks;
       G.streak++; G.trail.push("😬");
       const pts = Math.round(80 * buzzMult());
@@ -1482,14 +1579,16 @@ function resolveChoice(i) {
       verdict("GRITTED TEETH 😬", "ok");
       markSlot(i, "chosen-good");
       showLesson("Desperate times.",
-        `No good options, but ${drinksAtPick} drinks past the point of no return, the door wasn't one either. ` +
-        `You took the least-bad spot, stared straight ahead, and said nothing. Respect.`, pts);
-      if (r.attendant) showAttendant();
+        (r.stallTried ? `The stall betrayed you, so you took the least-bad spot, ` :
+         desperate() ? `${drinksAtPick} drinks past the point of no return, so you took the least-bad spot, ` :
+         `Out of stall waits, you took the least-bad spot, `) +
+        `stared straight ahead, and said nothing. Respect.`, pts);
+      if (r.attendant) showAttendant(); else showDrinkOffer();
       updateHUD();
       return;
     }
     relieve(); // you went — messily
-    fail(i, "SPLASHED!", `There was no good option — <b>walking away</b> was the play. ` +
+    fail(i, "SPLASHED!", `There was no good option — <b>the stall</b> 🚻 was the play. ` +
       `You wedged in next to ${neighborDesc(r, i)} and paid the price.`);
     return;
   }
@@ -1501,13 +1600,12 @@ function resolveChoice(i) {
     const buzzNote = G.drinks > 0 ? ` 🍺 +${G.drinks * 10}% buzz bonus!` : "";
     G.score += pts; G.perfects++;
     relieve();
-    earnDrink();
     buzz(30); sfx.good();
     verdict("PERFECT!", "good");
     markSlot(i, "chosen-good");
     showLesson("Textbook etiquette. 👌",
       `Optimal pick: ${describeBest(r)}.${buzzNote} ${G.streak >= 3 ? `🔥 ${G.streak}-streak multiplier active!` : ""}`, pts);
-    if (r.attendant) showAttendant();
+    if (r.attendant) showAttendant(); else showDrinkOffer();
   } else if (sc.eff > 1.0) {
     G.streak = 0; G.trail.push("🟨");
     const pts = Math.round(40 * buzzMult());
@@ -1517,9 +1615,8 @@ function resolveChoice(i) {
     verdict("ACCEPTABLE", "ok");
     markSlot(i, "chosen-good");
     showLesson("Fine. Technically fine.",
-      `No splash zone, but the pros would take ${describeBest(r)}. Streak reset — and no reward drink, ` +
-      `which honestly might be the smart play for your bladder.`, pts);
-    if (r.attendant) showAttendant();
+      `No splash zone, but the pros would take ${describeBest(r)}. Streak reset.`, pts);
+    if (r.attendant) showAttendant(); else showDrinkOffer();
   } else {
     relieve();
     const eyeContact = r.layout === "tub" &&
@@ -1593,34 +1690,69 @@ function onSlot(i) {
   resolveChoice(i);
 }
 
-function onWait() {
+/* ---------- the stall gamble: limited, slow, and sometimes occupied ---------- */
+const STALL_COST = 2.5;   // seconds burned per attempt
+const STALL_ODDS = 0.6;   // chance the stall is actually free
+
+function onStall() {
   if (G.locked) return;
-  if (desperate()) {
-    // you had WAY too much to drink. The door was never an option.
-    pissSelf("walkaway");
+  if (G.stalls <= 0) {
+    announce("🚻", "NO STALL WAITS LEFT", "You've knocked on that door enough tonight. Pick a spot.", 1500, "warn");
+    buzz(40);
     return;
   }
   G.locked = true;
   stopTimer();
+  G.stalls--;
+  G.cur.stallTried = true;
+  const door = $("stalldoor");
+  door.classList.add("knocking");
+  announce("✊", "KNOCK KNOCK…", "waiting on the stall…", 1000);
+  sfx.chicken();
+  setTimeout(() => {
+    door.classList.remove("knocking");
+    // stall luck is unseeded on purpose — daily/challenge boards stay identical, your luck is your own
+    if (Math.random() < STALL_ODDS) stallSuccess();
+    else stallOccupied();
+  }, 1050);
+}
+
+function stallSuccess() {
   const r = G.cur;
+  const door = $("stalldoor");
+  door.classList.add("spent");
+  sfx.flush();
+  buzz([30, 60, 30]);
+  G.drinks = 0; // a stall is a proper visit — full relief
   if (r.isWaitRound) {
-    G.streak++; G.trail.push("🚪");
-    const pts = 150;
+    G.streak++; G.trail.push("🚻");
+    const pts = Math.round(150 * buzzMult());
     G.score += pts; G.perfects++;
-    buzz([30, 60, 30]); sfx.flush();
-    verdict("PRO MOVE 🚪", "good");
+    verdict("PRO MOVE 🚻", "good");
     showLesson("Grandmaster patience.",
       `Every open spot meant standing shoulder-to-shoulder${r.spots.some(s => s.persona === "glasses") ? " (one of them was <b>recording</b>)" : ""}. ` +
-      `Walking away costs nothing but time — <b>as long as your bladder can cash that check</b>. Legends hold it.`, pts);
+      `The stall was the only dignified exit — and you gambled right. Bladder reset to zero.`, pts);
   } else {
-    G.streak = 0; G.trail.push("🐔");
-    buzz([200]); sfx.chicken();
-    verdict("CHICKENED OUT 🐔", "ok");
-    showLesson("You bailed on a solvable board.",
-      `There was a perfectly comfortable spot: ${describeBest(r)}. ` +
-      `Your bladder will remember this betrayal. No points, and you still haven't gone.`, 0);
+    G.streak = 0; G.trail.push("🚻");
+    const pts = 30;
+    G.score += pts;
+    verdict("STALL REFUGE 🚻", "ok");
+    showLesson("It worked… but the board was solvable.",
+      `The stall opened and nobody can take that from you. Still, the pros would take ${describeBest(r)} ` +
+      `and keep the streak alive. Streak reset. Bladder reset to zero, though — not nothing.`, pts);
   }
   updateHUD();
+}
+
+function stallOccupied() {
+  G.timeLeft = Math.max(0.8, G.timeLeft - STALL_COST);
+  G.locked = false;
+  buzz([80, 50, 80]);
+  tone(160, .35, "sawtooth", .09);
+  announce("🚫", "OCCUPIED.", `"…someone's IN here!" — you lost ~${STALL_COST}s and a stall wait. ` +
+    `${G.stalls > 0 ? `${G.stalls} left. ` : "That was your last one. "}Pick a spot. NOW.`, 2000, "warn");
+  updateHUD();
+  resumeTimer();
 }
 
 function onTimeout() {
@@ -1636,6 +1768,7 @@ function startRound() {
   G.locked = false;
   $("lesson").classList.remove("show");
   $("attrow").classList.remove("show");
+  $("drinkrow").classList.remove("show");
   $("attnote").classList.remove("show");
   $("nextbtn").style.display = "";
   $("verdict").className = "";
@@ -1643,19 +1776,27 @@ function startRound() {
   renderRound(G.cur);
   updateHUD();
   let factor = Math.max(0.5, 1 - 0.12 * G.drinks); // every drink makes the clock meaner
-  if (G.musk) { factor *= 0.88; G.musk = false; toast("🧴 The cologne cloud precedes you. Timer −12%."); }
-  startTimer(G.cur.time * factor);
-  if (desperate()) toast(`🚨 ${G.drinks} drinks deep — you CANNOT walk away from this one!`);
+  let muskNote = "";
+  if (G.musk) { factor *= 0.88; G.musk = false; muskNote = " · 🧴 cologne cloud: −12% time"; }
+  $("bladder").style.width = "100%";
+  $("bladderwrap").classList.remove("low");
+  // big round-intro card — THE readable moment, before any pressure starts
+  const layoutNote = G.cur.layout === "trough" ? "old-school trough"
+    : G.cur.layout === "tub" ? "⚠️ THE SHAME TUB"
+    : G.cur.dividers ? "dividers installed" : (G.cur.theme.flavor || "standard urinal row");
+  const roundLabel = G.mode === "endless" ? `ROUND ${G.round + 1}` : `ROUND ${G.round + 1} / 10`;
+  announce(G.cur.theme.icon, G.cur.theme.name, `${roundLabel} — ${layoutNote}${muskNote}`, 1300);
+  const secs = G.cur.time * factor;
+  G.timeLeft = secs; G.timerTotal = secs; // clicking during the intro still earns full speed bonus
+  G.introT = setTimeout(() => {
+    G.introT = null;
+    startTimer(secs);
+    if (desperate()) announce("🚨", "YOU'RE DESPERATE", `${G.drinks} drinks deep — clock is flying. Run out of time and it's over. GO.`, 1900, "warn");
+  }, 1250);
 }
 
 function nextRound() {
   if (G.lives <= 0) { endGame(false); return; }
-  // leaving the venue: whatever you drank there catches up with you
-  const t = THEMES[G.cur.themeKey];
-  if (t.drinks) {
-    G.drinks += t.drinks;
-    setTimeout(() => toast(t.drinkMsg), 350);
-  }
   G.round++;
   if (G.mode !== "endless" && G.round >= ROUND_PLAN.length) { endGame(true); return; }
   startRound();
@@ -1732,7 +1873,7 @@ function resetGame(mode, seed) {
     : (Math.floor(Math.random() * 2147483647));
   setSeed(s);
   Object.assign(G, { mode: m, seed: s, round: 0, score: 0, streak: 0, lives: 3, drinks: 0, pissed: false,
-    shield: false, musk: false, splashes: 0, perfects: 0, trail: [], locked: false });
+    shield: false, musk: false, stalls: 3, splashes: 0, perfects: 0, trail: [], locked: false });
   $("end").classList.add("hidden");
   $("start").classList.add("hidden");
   $("respawnrow").classList.add("hiddenrow");
@@ -1772,7 +1913,10 @@ $("endlessbtn").addEventListener("click", () => { audio(); buzz(20); resetGame("
 $("againbtn").addEventListener("click", () => { buzz(20); resetGame(undefined, undefined); });
 $("menubtn").addEventListener("click", () => { $("end").classList.add("hidden"); $("start").classList.remove("hidden"); updateStartLines(); });
 $("nextbtn").addEventListener("click", () => nextRound());
-$("waitbtn").addEventListener("click", () => onWait());
+$("waitbtn").addEventListener("click", () => onStall());
+$("stalldoor").addEventListener("click", () => onStall());
+$("dr-yes").addEventListener("click", () => drinkYes());
+$("dr-no").addEventListener("click", () => drinkNo());
 $("locbtn").addEventListener("click", () => localizeStadium());
 $("att-tip").addEventListener("click", () => attTip());
 $("att-col").addEventListener("click", () => attCologne());

@@ -23,15 +23,22 @@ and **Endless Rush** (procedurally generated rounds until the rush claims you).
 - **The Meta smart-glasses guy** (🔴 REC) needs extra distance — dividers don't
   help, you're on his livestream. **Travelers' rolling luggage** blocks spots
   in airports & stations (pick one and you trip).
-- **The drink economy**: perfect picks *earn* beers/cold brew — each is +10%
-  score buzz *and* one more thing in your bladder. Every drink speeds up the
-  round timer; at 🍺×3 you're **desperate** — walk away (or dawdle) and you
+- **The drink economy is your choice**: after a winning pick, the round
+  offers you a drink ("the boys got a round going… +2 🍺?"). Accept for +10%
+  score buzz per drink held, or pass and stay light. Every drink speeds up
+  the round timer; at 🍺×3 you're **desperate** — run out of time and you
   **piss yourself: instant game over** ("🌊 Puddle Maker"). Going while
-  desperate vents 2 drinks, and deliberately taking an *Acceptable* spot to
-  skip the reward drink is legitimate bladder management.
-- **The pro move**: some boards have no acceptable spot — the 🚪 *"Hold it &
-  walk away"* door is correct… if you can hold it. While desperate, gritting
-  your teeth at the least-bad spot is the right answer instead.
+  desperate vents 2 drinks.
+- **The stall gamble**: a stall door sits at the end of every row (plus a big
+  button). You get **3 stall waits per run**; each burns ~2.5 seconds and
+  ~40% of the time it's occupied ("…someone's IN here!"). On unwinnable
+  boards the stall is the *correct* play — and if it fails you, gritting the
+  least-bad spot is honorable. On solvable boards a successful stall is a
+  low-score refuge that resets your streak (but empties your bladder).
+- **Center-stage announcements**: every round opens with a big intro card
+  (venue, layout, warnings) before the timer starts, and critical events —
+  desperation, stall verdicts, drink consequences — hit as animated
+  center-screen banners you can't miss.
 - **📍 Play your home ballpark**: opt-in geolocation (on-device only) finds
   the nearest of all 30 MLB parks and turns stadium rounds into *your* park —
   a big marquee sign ("WRIGLEY FIELD — HOME OF THE CUBS"), team-colored
