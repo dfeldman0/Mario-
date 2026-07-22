@@ -211,7 +211,23 @@
   #backdrop { position: absolute; top: 10%; left: 0; right: 0; text-align: center;
     font-size: clamp(22px, 7vw, 34px); opacity: .75; letter-spacing: 14px; }
 
-  /* ---------- ballpark branding ---------- */
+  /* ---------- city & ballpark branding ---------- */
+  #citydeco { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+  .pennant { position: absolute; top: 8.5%; left: 3%; width: clamp(74px, 22vw, 110px); filter: drop-shadow(2px 3px 3px rgba(0,0,0,.35)); }
+  .wallbadge { position: absolute; top: 26%; right: 4%; background: rgba(16,20,27,.82); border: 2px solid rgba(255,255,255,.6);
+    border-radius: 12px; padding: 6px 12px; text-align: center; transform: rotate(2deg);
+    box-shadow: 0 4px 8px rgba(0,0,0,.35); }
+  .wallbadge .wb-e { font-size: clamp(20px, 6vw, 30px); }
+  .wallbadge .wb-l { font-size: clamp(9px, 2.6vw, 12px); font-weight: 900; letter-spacing: 1px; color: #ffd76a; white-space: nowrap; }
+  .depboard { position: absolute; top: 11%; left: 50%; transform: translateX(-50%) rotate(-.6deg);
+    background: #0d1b12; border: 3px solid #c8d0d7; border-radius: 8px; padding: 8px 16px;
+    box-shadow: 0 5px 12px rgba(0,0,0,.45); text-align: left; max-width: 92%; }
+  .depboard .db-t { color: #ffd76a; font-weight: 900; letter-spacing: 2px; font-size: clamp(12px, 3.4vw, 16px);
+    white-space: nowrap; border-bottom: 1px solid rgba(255,255,255,.25); padding-bottom: 3px; margin-bottom: 4px; }
+  .depboard .db-r { color: #8fe3a8; font-family: "Courier New", monospace; font-weight: bold;
+    font-size: clamp(10px, 2.9vw, 13px); white-space: nowrap; letter-spacing: 1px; }
+  .depboard .db-r .bad { color: #ff9a90; }
+  .parksign .landline { font-size: clamp(13px, 4vw, 18px); letter-spacing: 6px; margin-top: 3px; }
   #parkdeco { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
   .bunt { position: absolute; top: 6.8%; left: 0; right: 0; height: 4.2%; }
   .bunt svg { width: 100%; height: 100%; }
@@ -253,8 +269,13 @@
     white-space: nowrap; pointer-events: none; animation: bob 1.6s ease-in-out infinite; }
   @keyframes bob { 0%,100% { transform: translate(-50%,0); } 50% { transform: translate(-50%,-4px); } }
 
+  .slot .fixture { transition: filter .15s, transform .15s; }
   .slot.free:not(.blocked):hover .fixture, .slot.free:not(.blocked):active .fixture {
-    filter: drop-shadow(0 5px 5px rgba(0,0,0,.28)) drop-shadow(0 0 9px rgba(87,184,255,.95)); }
+    filter: drop-shadow(0 5px 5px rgba(0,0,0,.28)) drop-shadow(0 0 9px rgba(87,184,255,.95));
+    transform: translateX(-50%) scale(1.06); }
+  /* cinematic vignette over the whole room */
+  #scene::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 8;
+    box-shadow: inset 0 0 70px rgba(0,0,0,.38), inset 0 -20px 50px rgba(0,0,0,.22); border-radius: 14px; }
   .slot.free:not(.blocked)::after { content: ""; position: absolute; left: 50%; bottom: 8%; width: 34px; height: 10px;
     transform: translateX(-50%); border-radius: 50%; background: rgba(87,184,255,.35); animation: pulse 1.4s ease-in-out infinite; }
   @keyframes pulse { 0%,100% { opacity: .25; } 50% { opacity: .8; } }
@@ -421,7 +442,10 @@
   #verdict { position: absolute; left: 50%; top: 34%; transform: translate(-50%,-50%) scale(.6); opacity: 0;
     font-size: clamp(26px, 8vw, 44px); font-weight: 900; letter-spacing: 1px; text-shadow: 0 3px 6px rgba(0,0,0,.5);
     pointer-events: none; z-index: 20; transition: transform .18s ease-out, opacity .18s; white-space: nowrap; }
-  #verdict.show { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+  #verdict.show { animation: vpop .42s cubic-bezier(.2,1.6,.4,1) both; }
+  @keyframes vpop { 0% { transform: translate(-50%,-50%) scale(.4); opacity: 0; }
+    65% { transform: translate(-50%,-50%) scale(1.12); opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(1); opacity: 1; } }
   #verdict.good { color: #6fe3a1; } #verdict.ok { color: #ffd76a; } #verdict.bad { color: #ff7a6f; }
 
   #lesson { position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 25;
@@ -605,6 +629,7 @@
       <div class="lightpool" style="left:33%"></div>
       <div class="lightpool" style="left:63%"></div>
       <div id="backdrop"></div>
+      <div id="citydeco"></div>
       <div id="parkdeco"></div>
       <div class="floorline"></div>
       <div class="floor"><div class="plane"></div><div class="floorglow"></div></div>
@@ -1001,36 +1026,36 @@ const THEMES = {
 
 /* ---------- MLB ballpark localization (opt-in, on-device only) ---------- */
 const MLB_PARKS = [
-  { park: "Angel Stadium", team: "Angels", lat: 33.8003, lon: -117.8827, c: "#ba0021", flavor: "the Big A is watching", city: "ANAHEIM", ap: "John Wayne Airport", st: "Anaheim ARTIC" },
-  { park: "Daikin Park", team: "Astros", lat: 29.7573, lon: -95.3555, c: "#eb6e1f", flavor: "no banging on the divider", city: "HOUSTON", ap: "Bush Intercontinental", st: "Houston Amtrak Station" },
-  { park: "Sutter Health Park", team: "Athletics", lat: 38.5802, lon: -121.5133, c: "#003831", flavor: "temporary home, permanent code", city: "SACRAMENTO", ap: "Sacramento International", st: "Sacramento Valley Station" },
-  { park: "Tropicana Field", team: "Rays", lat: 27.7683, lon: -82.6534, c: "#092c5c", flavor: "under the dome, everyone hears", city: "TAMPA BAY", ap: "Tampa International", st: "Tampa Union Station" },
-  { park: "Yankee Stadium", team: "Yankees", lat: 40.8296, lon: -73.9262, c: "#0c2340", flavor: "27 rings of pressure", sig: "frieze", city: "NEW YORK", ap: "LaGuardia Airport", st: "Grand Central Terminal" },
-  { park: "Progressive Field", team: "Guardians", lat: 41.4962, lon: -81.6852, c: "#00385d", flavor: "guard your spacing", city: "CLEVELAND", ap: "Cleveland Hopkins", st: "Tower City Station" },
-  { park: "Comerica Park", team: "Tigers", lat: 42.3390, lon: -83.0485, c: "#0c2340", flavor: "the tigers can smell fear", city: "DETROIT", ap: "Detroit Metro Airport", st: "Michigan Central Station" },
-  { park: "Kauffman Stadium", team: "Royals", lat: 39.0517, lon: -94.4803, c: "#004687", flavor: "fountains outside, pressure inside", city: "KANSAS CITY", ap: "Kansas City International", st: "Union Station Kansas City" },
-  { park: "Target Field", team: "Twins", lat: 44.9817, lon: -93.2776, c: "#002b5c", flavor: "Minnesota nice ends at the door", city: "MINNEAPOLIS", ap: "MSP International", st: "Target Field Station" },
-  { park: "Rate Field", team: "White Sox", lat: 41.8299, lon: -87.6338, c: "#27251f", flavor: "South Side rules apply", city: "CHICAGO", ap: "Midway International", st: "Union Station Chicago" },
-  { park: "Wrigley Field", team: "Cubs", lat: 41.9484, lon: -87.6553, c: "#0e3386", flavor: "the ivy is judging you", sig: "ivy", signc: "#d31145", city: "CHICAGO", ap: "O'Hare International", st: "Union Station Chicago" },
-  { park: "Great American Ball Park", team: "Reds", lat: 39.0975, lon: -84.5066, c: "#c6011f", flavor: "great American responsibility", city: "CINCINNATI", ap: "CVG International", st: "Cincinnati Union Terminal" },
-  { park: "American Family Field", team: "Brewers", lat: 43.0280, lon: -87.9712, c: "#12284b", flavor: "brats and beers catching up fast", city: "MILWAUKEE", ap: "Mitchell International", st: "Milwaukee Intermodal Station" },
-  { park: "PNC Park", team: "Pirates", lat: 40.4469, lon: -80.0057, c: "#fdb827", flavor: "prettiest park, same old rules", city: "PITTSBURGH", ap: "Pittsburgh International", st: "Pittsburgh Union Station" },
-  { park: "Busch Stadium", team: "Cardinals", lat: 38.6226, lon: -90.1928, c: "#c41e3a", flavor: "the best fans expect the best picks", city: "ST. LOUIS", ap: "St. Louis Lambert", st: "Gateway Station" },
-  { park: "Coors Field", team: "Rockies", lat: 39.7559, lon: -104.9942, c: "#33006f", flavor: "everything flows faster at altitude", city: "DENVER", ap: "Denver International", st: "Denver Union Station" },
-  { park: "Dodger Stadium", team: "Dodgers", lat: 34.0739, lon: -118.2400, c: "#005a9c", flavor: "go now, beat the traffic", city: "LOS ANGELES", ap: "LAX", st: "LA Union Station" },
-  { park: "Petco Park", team: "Padres", lat: 32.7076, lon: -117.1570, c: "#2f241d", flavor: "the fish tacos were a choice", city: "SAN DIEGO", ap: "San Diego International", st: "Santa Fe Depot" },
-  { park: "Oracle Park", team: "Giants", lat: 37.7786, lon: -122.3893, c: "#fd5a1e", flavor: "McCovey Cove is not an option", city: "SAN FRANCISCO", ap: "SFO International", st: "Salesforce Transit Center" },
-  { park: "Chase Field", team: "D-backs", lat: 33.4453, lon: -112.0667, c: "#a71930", flavor: "the pool is NOT a trough", city: "PHOENIX", ap: "Sky Harbor", st: "Phoenix Union Station" },
-  { park: "T-Mobile Park", team: "Mariners", lat: 47.5914, lon: -122.3325, c: "#0c2c56", flavor: "stay calm under the retractable roof", city: "SEATTLE", ap: "Sea-Tac International", st: "King Street Station" },
-  { park: "Globe Life Field", team: "Rangers", lat: 32.7473, lon: -97.0842, c: "#003278", flavor: "everything's bigger, including the line", city: "DALLAS–FT. WORTH", ap: "DFW International", st: "Dallas Union Station" },
-  { park: "Fenway Park", team: "Red Sox", lat: 42.3467, lon: -71.0972, c: "#bd3039", flavor: "the Green Monster looms", sig: "monster", wallc: ["#9fc4ab", "#86ad92"], city: "BOSTON", ap: "Logan International", st: "South Station" },
-  { park: "Camden Yards", team: "Orioles", lat: 39.2839, lon: -76.6217, c: "#df4601", flavor: "Boog's BBQ was a mistake", city: "BALTIMORE", ap: "BWI Marshall", st: "Penn Station Baltimore" },
-  { park: "Rogers Centre", team: "Blue Jays", lat: 43.6414, lon: -79.3894, c: "#134a8e", flavor: "politeness will not save you", city: "TORONTO", ap: "Pearson International", st: "Union Station Toronto" },
-  { park: "Truist Park", team: "Braves", lat: 33.8907, lon: -84.4677, c: "#ce1141", flavor: "the Battery is watching", city: "ATLANTA", ap: "Hartsfield–Jackson", st: "Peachtree Station" },
-  { park: "loanDepot park", team: "Marlins", lat: 25.7781, lon: -80.2196, c: "#00a3e0", flavor: "humidity changes nothing", city: "MIAMI", ap: "Miami International", st: "MiamiCentral Station" },
-  { park: "Citi Field", team: "Mets", lat: 40.7571, lon: -73.8458, c: "#002d72", flavor: "ya gotta believe in spacing", city: "NEW YORK", ap: "JFK International", st: "Penn Station New York" },
-  { park: "Citizens Bank Park", team: "Phillies", lat: 39.9061, lon: -75.1665, c: "#e81828", flavor: "Philly WILL boo a bad pick", city: "PHILADELPHIA", ap: "Philadelphia International", st: "30th Street Station" },
-  { park: "Nationals Park", team: "Nationals", lat: 38.8730, lon: -77.0074, c: "#ab0003", flavor: "a capital offense awaits", city: "WASHINGTON D.C.", ap: "Reagan National", st: "Washington Union Station" },
+  { park: "Angel Stadium", team: "Angels", lat: 33.8003, lon: -117.8827, c: "#ba0021", flavor: "the Big A is watching", city: "ANAHEIM", ap: "John Wayne Airport", st: "Anaheim ARTIC", land: "🎢 🌴 😇", chant: "GO ANGELS" },
+  { park: "Daikin Park", team: "Astros", lat: 29.7573, lon: -95.3555, c: "#eb6e1f", flavor: "no banging on the divider", city: "HOUSTON", ap: "Bush Intercontinental", st: "Houston Amtrak Station", land: "🚀 🤠 ⭐", chant: "GO ASTROS" },
+  { park: "Sutter Health Park", team: "Athletics", lat: 38.5802, lon: -121.5133, c: "#003831", flavor: "temporary home, permanent code", city: "SACRAMENTO", ap: "Sacramento International", st: "Sacramento Valley Station", land: "🌾 🐻 ☀️", chant: "GO A'S" },
+  { park: "Tropicana Field", team: "Rays", lat: 27.7683, lon: -82.6534, c: "#092c5c", flavor: "under the dome, everyone hears", city: "TAMPA BAY", ap: "Tampa International", st: "Tampa Union Station", land: "🌴 ⚡ 🐟", chant: "GO RAYS" },
+  { park: "Yankee Stadium", team: "Yankees", lat: 40.8296, lon: -73.9262, c: "#0c2340", flavor: "27 rings of pressure", sig: "frieze", city: "NEW YORK", ap: "LaGuardia Airport", st: "Grand Central Terminal", land: "🗽 🚕 🌆", chant: "GO YANKEES" },
+  { park: "Progressive Field", team: "Guardians", lat: 41.4962, lon: -81.6852, c: "#00385d", flavor: "guard your spacing", city: "CLEVELAND", ap: "Cleveland Hopkins", st: "Tower City Station", land: "🎸 🌉 🏭", chant: "GO GUARDIANS" },
+  { park: "Comerica Park", team: "Tigers", lat: 42.3390, lon: -83.0485, c: "#0c2340", flavor: "the tigers can smell fear", city: "DETROIT", ap: "Detroit Metro Airport", st: "Michigan Central Station", land: "🚗 🐯 🏭", chant: "GO TIGERS" },
+  { park: "Kauffman Stadium", team: "Royals", lat: 39.0517, lon: -94.4803, c: "#004687", flavor: "fountains outside, pressure inside", city: "KANSAS CITY", ap: "Kansas City International", st: "Union Station Kansas City", land: "⛲ 🍖 👑", chant: "GO ROYALS" },
+  { park: "Target Field", team: "Twins", lat: 44.9817, lon: -93.2776, c: "#002b5c", flavor: "Minnesota nice ends at the door", city: "MINNEAPOLIS", ap: "MSP International", st: "Target Field Station", land: "❄️ 🛶 🎣", chant: "GO TWINS" },
+  { park: "Rate Field", team: "White Sox", lat: 41.8299, lon: -87.6338, c: "#27251f", flavor: "South Side rules apply", city: "CHICAGO", ap: "Midway International", st: "Union Station Chicago", land: "🌭 🌬️ 🏙️", chant: "GO SOX" },
+  { park: "Wrigley Field", team: "Cubs", lat: 41.9484, lon: -87.6553, c: "#0e3386", flavor: "the ivy is judging you", sig: "ivy", signc: "#d31145", city: "CHICAGO", ap: "O'Hare International", st: "Union Station Chicago", land: "🌭 🐻 🏙️", chant: "GO CUBS GO" },
+  { park: "Great American Ball Park", team: "Reds", lat: 39.0975, lon: -84.5066, c: "#c6011f", flavor: "great American responsibility", city: "CINCINNATI", ap: "CVG International", st: "Cincinnati Union Terminal", land: "🌶️ 🍝 🐷", chant: "GO REDS" },
+  { park: "American Family Field", team: "Brewers", lat: 43.0280, lon: -87.9712, c: "#12284b", flavor: "brats and beers catching up fast", city: "MILWAUKEE", ap: "Mitchell International", st: "Milwaukee Intermodal Station", land: "🍺 🧀 🥨", chant: "GO BREWERS" },
+  { park: "PNC Park", team: "Pirates", lat: 40.4469, lon: -80.0057, c: "#fdb827", flavor: "prettiest park, same old rules", city: "PITTSBURGH", ap: "Pittsburgh International", st: "Pittsburgh Union Station", land: "🌉 🏴‍☠️ 🥪", chant: "LET'S GO BUCS" },
+  { park: "Busch Stadium", team: "Cardinals", lat: 38.6226, lon: -90.1928, c: "#c41e3a", flavor: "the best fans expect the best picks", city: "ST. LOUIS", ap: "St. Louis Lambert", st: "Gateway Station", land: "🎺 🍺 🐦", chant: "GO CARDS" },
+  { park: "Coors Field", team: "Rockies", lat: 39.7559, lon: -104.9942, c: "#33006f", flavor: "everything flows faster at altitude", city: "DENVER", ap: "Denver International", st: "Denver Union Station", land: "⛰️ 🏔️ 🦬", chant: "GO ROCKIES" },
+  { park: "Dodger Stadium", team: "Dodgers", lat: 34.0739, lon: -118.2400, c: "#005a9c", flavor: "go now, beat the traffic", city: "LOS ANGELES", ap: "LAX", st: "LA Union Station", land: "🌴 🎬 ☀️", chant: "GO DODGERS" },
+  { park: "Petco Park", team: "Padres", lat: 32.7076, lon: -117.1570, c: "#2f241d", flavor: "the fish tacos were a choice", city: "SAN DIEGO", ap: "San Diego International", st: "Santa Fe Depot", land: "🌊 🏄 🌮", chant: "GO PADRES" },
+  { park: "Oracle Park", team: "Giants", lat: 37.7786, lon: -122.3893, c: "#fd5a1e", flavor: "McCovey Cove is not an option", city: "SAN FRANCISCO", ap: "SFO International", st: "Salesforce Transit Center", land: "🌉 🌁 ⛵", chant: "GO GIANTS" },
+  { park: "Chase Field", team: "D-backs", lat: 33.4453, lon: -112.0667, c: "#a71930", flavor: "the pool is NOT a trough", city: "PHOENIX", ap: "Sky Harbor", st: "Phoenix Union Station", land: "🌵 ☀️ 🦎", chant: "GO D-BACKS" },
+  { park: "T-Mobile Park", team: "Mariners", lat: 47.5914, lon: -122.3325, c: "#0c2c56", flavor: "stay calm under the retractable roof", city: "SEATTLE", ap: "Sea-Tac International", st: "King Street Station", land: "🗼 ☕ 🐟", chant: "GO M'S" },
+  { park: "Globe Life Field", team: "Rangers", lat: 32.7473, lon: -97.0842, c: "#003278", flavor: "everything's bigger, including the line", city: "DALLAS–FT. WORTH", ap: "DFW International", st: "Dallas Union Station", land: "🤠 ⭐ 🐎", chant: "GO RANGERS" },
+  { park: "Fenway Park", team: "Red Sox", lat: 42.3467, lon: -71.0972, c: "#bd3039", flavor: "the Green Monster looms", sig: "monster", wallc: ["#9fc4ab", "#86ad92"], city: "BOSTON", ap: "Logan International", st: "South Station", land: "🦞 ⛵ 🍀", chant: "GO SOX" },
+  { park: "Camden Yards", team: "Orioles", lat: 39.2839, lon: -76.6217, c: "#df4601", flavor: "Boog's BBQ was a mistake", city: "BALTIMORE", ap: "BWI Marshall", st: "Penn Station Baltimore", land: "🦀 ⚓ 🐦", chant: "LET'S GO O'S" },
+  { park: "Rogers Centre", team: "Blue Jays", lat: 43.6414, lon: -79.3894, c: "#134a8e", flavor: "politeness will not save you", city: "TORONTO", ap: "Pearson International", st: "Union Station Toronto", land: "🗼 🍁 🏒", chant: "GO JAYS GO" },
+  { park: "Truist Park", team: "Braves", lat: 33.8907, lon: -84.4677, c: "#ce1141", flavor: "the Battery is watching", city: "ATLANTA", ap: "Hartsfield–Jackson", st: "Peachtree Station", land: "🍑 ✈️ 🎬", chant: "GO BRAVES" },
+  { park: "loanDepot park", team: "Marlins", lat: 25.7781, lon: -80.2196, c: "#00a3e0", flavor: "humidity changes nothing", city: "MIAMI", ap: "Miami International", st: "MiamiCentral Station", land: "🌴 🏖️ 🐠", chant: "GO MARLINS" },
+  { park: "Citi Field", team: "Mets", lat: 40.7571, lon: -73.8458, c: "#002d72", flavor: "ya gotta believe in spacing", city: "NEW YORK", ap: "JFK International", st: "Penn Station New York", land: "🗽 🚇 🍎", chant: "LET'S GO METS" },
+  { park: "Citizens Bank Park", team: "Phillies", lat: 39.9061, lon: -75.1665, c: "#e81828", flavor: "Philly WILL boo a bad pick", city: "PHILADELPHIA", ap: "Philadelphia International", st: "30th Street Station", land: "🔔 🥪 🦅", chant: "GO PHILS" },
+  { park: "Nationals Park", team: "Nationals", lat: 38.8730, lon: -77.0074, c: "#ab0003", flavor: "a capital offense awaits", city: "WASHINGTON D.C.", ap: "Reagan National", st: "Washington Union Station", land: "🏛️ 🍒 🦅", chant: "GO NATS" },
 ];
 function mixWhite(hex, t) {
   const n = parseInt(hex.slice(1), 16);
@@ -1560,6 +1585,15 @@ function analyze(round) {
 /* ---------- rendering ---------- */
 function slotEl(i) { return $("scene").querySelector(`.slot[data-i="${i}"]`); }
 
+function pennantSVG(color, text) {
+  return `<svg viewBox="0 0 120 44" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="6" cy="8" r="3" fill="#8d97a1"/>
+    <path d="M8 4 L116 20 L8 38 Z" fill="${color}" stroke="rgba(255,255,255,.75)" stroke-width="2.5"/>
+    <text x="46" y="25" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff"
+      letter-spacing="1">${text}</text>
+  </svg>`;
+}
+
 function buntingSVG(c) {
   let t = "";
   for (let x = 0; x < 400; x += 25) {
@@ -1580,6 +1614,8 @@ function renderRound(round) {
   rootStyle.setProperty("--floor2", round.theme.floor2);
   // ballpark branding: bunting, marquee sign, and park-signature set dressing
   const deco = $("parkdeco");
+  const cd = $("citydeco");
+  const pk = THEMES.stadium.parkRef; // active city, if any
   if (round.themeKey === "stadium") {
     const p = round.theme.parkRef;
     const c = p ? p.c : "#1f6b3a";
@@ -1592,11 +1628,35 @@ function renderRound(round) {
       (p && p.sig === "ivy" ? `<div class="ivyband"></div>` : "") +
       (p && p.sig === "monster"
         ? `<div class="monsterboard"><span>BOS 3</span><span>OPP 2</span><span>▪ ▪ ▪</span><span>H 7</span><span>E 0</span></div>` : "") +
-      `<div class="parksign" style="--signbg:${signbg}"><div class="big">${name}</div><div class="sub">${sub}</div></div>`;
+      `<div class="parksign" style="--signbg:${signbg}"><div class="big">${name}</div><div class="sub">${sub}</div>` +
+      (p && p.land ? `<div class="landline">${p.land}</div>` : "") + `</div>` +
+      (p && p.chant ? `<div class="wallbadge"><div class="wb-e">${p.land ? p.land.split(" ")[0] : "⚾"}</div><div class="wb-l">${p.chant}!</div></div>` : "");
+    $("backdrop").textContent = "";
+    cd.innerHTML = "";
+  } else if (pk && round.themeKey === "airport") {
+    // localized airport: live departures board + city pennant
+    cd.innerHTML =
+      `<div class="pennant">${pennantSVG(pk.c, pk.team.toUpperCase())}</div>` +
+      `<div class="depboard"><div class="db-t">✈ ${pk.ap.toUpperCase()} — DEPARTURES</div>` +
+      `<div class="db-r">B12 &nbsp;BOARDING</div>` +
+      `<div class="db-r">C07 &nbsp;<span class="bad">DELAYED</span></div>` +
+      `<div class="db-r">A03 &nbsp;FINAL CALL — that's yours</div></div>`;
+    deco.innerHTML = "";
+    $("backdrop").textContent = "";
+  } else if (pk && round.themeKey === "station") {
+    cd.innerHTML =
+      `<div class="pennant">${pennantSVG(pk.c, pk.team.toUpperCase())}</div>` +
+      `<div class="depboard"><div class="db-t">🚆 ${pk.st.toUpperCase()}</div>` +
+      `<div class="db-r">5:15 &nbsp;ON TIME — hurry</div>` +
+      `<div class="db-r">5:45 &nbsp;<span class="bad">DELAYED</span></div>` +
+      `<div class="db-r">6:10 &nbsp;<span class="bad">CANCELED</span></div></div>`;
+    deco.innerHTML = "";
     $("backdrop").textContent = "";
   } else {
+    // any other venue in a localized city: team pennant on the wall + hometown backdrop
     deco.innerHTML = "";
-    $("backdrop").textContent = round.theme.backdrop;
+    cd.innerHTML = pk ? `<div class="pennant">${pennantSVG(pk.c, pk.team.toUpperCase())}</div>` : "";
+    $("backdrop").textContent = (pk && pk.land) ? pk.land.replace(/ /g, "  ") : round.theme.backdrop;
   }
   $("themebar").innerHTML = `${round.theme.icon} <b>${round.theme.name}</b>` +
     (round.layout === "trough" ? " — old-school trough"
@@ -1834,6 +1894,12 @@ function verdict(text, cls) {
   v.textContent = text; v.className = cls;
   void v.offsetWidth; v.classList.add("show");
 }
+function flashTint(color) {
+  const f = $("flash");
+  f.style.background = color;
+  f.classList.remove("go"); void f.offsetWidth; f.classList.add("go");
+  setTimeout(() => { f.style.background = ""; }, 550);
+}
 
 /* ---------- outcome handling ---------- */
 function showLesson(title, text, pts) {
@@ -2024,6 +2090,7 @@ function resolveChoice(i) {
     verdict("PERFECT!", "good");
     markSlot(i, "chosen-good");
     sparkleAt(i);
+    flashTint("rgba(47,180,107,.22)");
     showLesson("Textbook etiquette. 👌",
       `Optimal pick: ${describeBest(r)}.${buzzNote} ${G.streak >= 3 ? `🔥 ${G.streak}-streak multiplier active!` : ""}`, pts);
     if (r.attendant) showAttendant(); else showDrinkOffer();
@@ -2226,6 +2293,8 @@ function startRound() {
   if (G.cur.constructionAt >= 0) hazards.push("🚧 construction zone");
   if (G.cur.flickerAt >= 0) hazards.push("💡 flickering light");
   const hazardNote = hazards.length ? ` · ${hazards.join(" · ")}` : "";
+  const pkIntro = THEMES.stadium.parkRef;
+  const chantNote = (pkIntro && G.cur.themeKey === "stadium") ? ` · ${pkIntro.chant}!` : "";
   const roundLabel = G.mode === "endless" ? `ROUND ${G.round + 1}` : `ROUND ${G.round + 1} / 10`;
   const secs = G.cur.time * factor;
   G.timeLeft = secs; G.timerTotal = secs; // clicking during the intro still earns full speed bonus
@@ -2244,7 +2313,7 @@ function startRound() {
     sfx.flush();
   }, end: () => $("parkphoto").classList.remove("show") });
   stages.push({ ms: hazards.length ? 1900 : 1500, run: () =>
-    announce(G.cur.theme.icon, G.cur.theme.name, `${roundLabel} — ${layoutNote}${hazardNote}${muskNote}`, hazards.length ? 1850 : 1450),
+    announce(G.cur.theme.icon, G.cur.theme.name, `${roundLabel} — ${layoutNote}${hazardNote}${chantNote}${muskNote}`, hazards.length ? 1850 : 1450),
     end: () => {} });
   if (desperate()) stages.push({ ms: 1800, run: () =>
     announce("🚨", "YOU'RE DESPERATE", `${G.drinks} drinks deep — the clock will FLY. Run out of time and it's over.`, 1750, "warn"),
