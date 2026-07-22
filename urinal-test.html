@@ -175,6 +175,18 @@
   .slot.free:not(.blocked)::after { content: ""; position: absolute; left: 50%; bottom: 8%; width: 34px; height: 10px;
     transform: translateX(-50%); border-radius: 50%; background: rgba(87,184,255,.35); animation: pulse 1.4s ease-in-out infinite; }
   @keyframes pulse { 0%,100% { opacity: .25; } 50% { opacity: .8; } }
+  .slot .bagwrap { position: absolute; left: 50%; transform: translateX(-50%); bottom: 26%; width: 82%; max-width: 74px;
+    z-index: 5; pointer-events: none; }
+  .slot .tape { position: absolute; left: -6%; right: -6%; bottom: 46%; height: 13px; z-index: 6; pointer-events: none;
+    background: repeating-linear-gradient(45deg, #f5c518 0 12px, #15151a 12px 24px);
+    box-shadow: 0 1px 3px rgba(0,0,0,.4); transform: rotate(-2deg); }
+  .slot .tape2 { bottom: 32%; transform: rotate(1.5deg); }
+  .slot .cone { position: absolute; left: 50%; transform: translateX(-50%); bottom: 5%; width: 48%; max-width: 46px;
+    z-index: 6; pointer-events: none; }
+  .slot .flick { position: absolute; left: 2%; right: 2%; top: 32%; bottom: 18%; border-radius: 14px;
+    background: radial-gradient(ellipse at 50% 40%, rgba(5,8,18,.5), rgba(5,8,18,.25) 70%, transparent);
+    pointer-events: none; z-index: 4; animation: flickA 1.1s steps(3, end) infinite; }
+  @keyframes flickA { 0%,100% { opacity: .55; } 40% { opacity: .05; } 55% { opacity: .7; } 70% { opacity: .15; } }
   .slot.chosen-good .fixture { filter: drop-shadow(0 0 12px rgba(47,180,107,1)); }
   .slot.chosen-bad .fixture  { filter: drop-shadow(0 0 12px rgba(230,72,61,1)); }
   .slot.best-mark::before { content: "✔ best"; position: absolute; top: 2%; left: 50%; transform: translateX(-50%);
@@ -405,7 +417,7 @@
       <li><b>Maximize distance</b> from every occupied spot. <b>Ends are elite.</b></li>
       <li><b>Dividers</b> soften a bad neighbor. Soften. Not fix.</li>
       <li>Guy in <b>Meta smart glasses</b> (🔴 REC)? Extra distance. Dividers don't help.</li>
-      <li><b>Luggage</b> blocks spots in airports & stations. Suitcases take ankles.</li>
+      <li><b>Hazards are real</b>: 🧳 luggage takes ankles, 🛍️ bagged urinals are <i>broken</i>, 🚧 caution tape means NO, and 💡 nobody prefers the flickering light.</li>
       <li>The <b>trough</b> is lawless. The <b>shame tub</b> is worse — <b>never face a man across the water</b>. 👁️</li>
       <li>After a win, <b>you choose</b>: take the drink 🍺 (+10% score buzz each) or pass. Every drink fills your bladder and <b>speeds the clock</b>.</li>
       <li>At 🍺×3 you're <b>desperate</b> — run out of time and you <b>piss yourself</b>. Going relieves the pressure.</li>
@@ -803,6 +815,34 @@ function attendantSVG() {
   </svg>`;
 }
 
+/* Plastic bag + OUT OF ORDER sign — this one's been broken since 2019. */
+function bagSVG() {
+  return `<svg viewBox="0 0 80 132" xmlns="http://www.w3.org/2000/svg">
+    <path d="M30 20 q10 -12 20 0 l-3 9 q-7 -5 -14 0 z" fill="rgba(165,185,200,.75)"/>
+    <path d="M16 26 q-7 32 5 64 q19 15 38 0 q12 -32 5 -64 q-24 -11 -48 0 z"
+      fill="rgba(185,205,220,.55)" stroke="rgba(120,140,155,.85)" stroke-width="2"/>
+    <path d="M24 34 q-3 24 3 46 M56 34 q3 24 -3 46 M40 30 q-1 30 1 56"
+      stroke="rgba(255,255,255,.4)" stroke-width="1.6" fill="none"/>
+    <g transform="rotate(-7 40 70)">
+      <rect x="14" y="58" width="52" height="24" rx="3" fill="#f5e04e" stroke="#b8a020" stroke-width="2"/>
+      <text x="40" y="69" text-anchor="middle" font-size="9" font-weight="bold" fill="#7a1f1f">OUT OF</text>
+      <text x="40" y="79" text-anchor="middle" font-size="9" font-weight="bold" fill="#7a1f1f">ORDER</text>
+    </g>
+    <rect x="8" y="52" width="10" height="4" rx="1" fill="rgba(200,60,50,.8)" transform="rotate(-30 13 54)"/>
+    <rect x="62" y="52" width="10" height="4" rx="1" fill="rgba(200,60,50,.8)" transform="rotate(30 67 54)"/>
+  </svg>`;
+}
+
+function coneSVG() {
+  return `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="30" cy="54" rx="22" ry="5" fill="rgba(0,0,0,.28)"/>
+    <path d="M30 6 L45 52 L15 52 Z" fill="#f07818"/>
+    <path d="M24 26 L36 26 L38.5 35 L21.5 35 Z" fill="#f5f7f9"/>
+    <path d="M30 6 L36 24 L24 24 Z" fill="#d86a10"/>
+    <rect x="10" y="50" width="40" height="7" rx="3.5" fill="#c65f0e"/>
+  </svg>`;
+}
+
 function suitcaseSVG() {
   const c = pick(["#c0392b", "#2c5f8a", "#3b7a4a", "#7a4a8a", "#333"]);
   const cd = "rgba(0,0,0,.28)";
@@ -923,14 +963,14 @@ function localizeStadium() {
 const ROUND_PLAN = [
   { theme: "office",  n: [5, 5],  occ: [0, 0], div: 0,   time: 10 },                              // 1: empty tutorial
   { theme: "coffee",  n: [4, 5],  occ: [1, 1], div: 0,   time: 9 },                               // 2
-  { theme: "mall",    n: [5, 6],  occ: [2, 2], div: 0,   time: 9 },                               // 3
-  { theme: "office",  n: [6, 7],  occ: [2, 2], div: 1,   time: 8 },                               // 4: dividers
-  { theme: "tech",    n: [6, 7],  occ: [2, 3], div: .4,  time: 8, glasses: true, attendant: .5 }, // 5: REC guy
-  { theme: "divebar", n: [6, 8],  occ: [2, 3], div: 0,   time: 8, trough: true },                 // 6: trough
-  { theme: "airport", n: [7, 8],  occ: [3, 3], div: .3,  time: 7, traveler: true, attendant: .7 },// 7: luggage
-  { theme: "station", n: [5, 6],  occ: [2, 3], div: 0,   time: 7, waitRound: true, traveler: .5 },// 8: walk away
+  { theme: "mall",    n: [5, 6],  occ: [2, 2], div: 0,   time: 9, bags: .5 },                     // 3: first bagged urinal
+  { theme: "office",  n: [6, 7],  occ: [2, 2], div: 1,   time: 8, bags: .3 },                     // 4: dividers
+  { theme: "tech",    n: [6, 7],  occ: [2, 3], div: .4,  time: 8, glasses: true, attendant: .5, flicker: .5 }, // 5: REC guy
+  { theme: "divebar", n: [6, 8],  occ: [2, 3], div: 0,   time: 8, trough: true, construction: .3 },// 6: trough
+  { theme: "airport", n: [7, 8],  occ: [3, 3], div: .3,  time: 7, traveler: true, attendant: .7, construction: .55 },// 7: luggage + renovation
+  { theme: "station", n: [5, 6],  occ: [2, 3], div: 0,   time: 7, waitRound: true, traveler: .5 },// 8: the stall play
   { theme: "stadium", n: [7, 9],  occ: [3, 4], div: 0,   time: 7, tub: true, glasses: .4 },       // 9: the shame tub
-  { theme: "festival",n: [10,10], occ: [4, 5], div: .3,  time: 6, glasses: .5, traveler: .4, trough: .25, attendant: .5 }, // 10
+  { theme: "festival",n: [10,10], occ: [4, 5], div: .3,  time: 6, glasses: .5, traveler: .4, trough: .25, attendant: .5, bags: .5, construction: .35, flicker: .4 }, // 10
 ];
 
 /* ---------- endless plan generator: infinite combinations ---------- */
@@ -954,6 +994,9 @@ function endlessPlan(r) {
     glasses: Math.min(.7, .12 + r * .05),
     traveler: tub ? 0 : traveler,
     attendant: r >= 2 ? .25 : 0,
+    bags: r >= 2 ? Math.min(.35, .08 + r * .04) : 0,
+    construction: r >= 4 ? .22 : 0,
+    flicker: r >= 3 ? .3 : 0,
     time: Math.max(4.5, 9 - r * 0.3),
   };
 }
@@ -1171,12 +1214,43 @@ function makeRound(idx) {
       occupiedIdx.forEach(i => {
         if (spots[i].persona === "traveler" && luggageAt < 0) {
           const sides = [i - 1, i + 1].filter(j => j >= 0 && j < n && !spots[j].occupant);
-          if (sides.length) { luggageAt = gpick(sides); spots[luggageAt].blocked = true; }
+          if (sides.length) { luggageAt = gpick(sides); spots[luggageAt].blocked = true; spots[luggageAt].blockType = "luggage"; }
         }
       });
     }
 
+    const freeIdx = () => spots.map((s, i) => (!s.occupant && !s.blocked) ? i : -1).filter(i => i >= 0);
+
+    // out-of-order urinal: bagged, with the sign to prove it (wall rows only)
+    let hasBag = false;
+    if (layout === "wall" && !plan.waitRound && chance(plan.bags) && freeIdx().length > 3) {
+      const b = gpick(freeIdx());
+      spots[b].blocked = true; spots[b].blockType = "bag";
+      hasBag = true;
+    }
+
+    // construction zone: two adjacent spots behind caution tape (wall or trough)
+    let constructionAt = -1;
+    if (layout !== "tub" && !plan.waitRound && chance(plan.construction)) {
+      const starts = [];
+      for (let j = 0; j < n - 1; j++) {
+        if (!spots[j].occupant && !spots[j].blocked && !spots[j + 1].occupant && !spots[j + 1].blocked) starts.push(j);
+      }
+      if (starts.length && freeIdx().length > 4) {
+        constructionAt = gpick(starts);
+        [constructionAt, constructionAt + 1].forEach(j => { spots[j].blocked = true; spots[j].blockType = "construction"; });
+        spots[constructionAt].coneHere = true;
+      }
+    }
+
+    // flickering light: one usable-but-cursed spot (comfort penalty, no splash risk)
+    let flickerAt = -1;
+    if (layout === "wall" && !plan.waitRound && chance(plan.flicker) && freeIdx().length > 2) {
+      flickerAt = gpick(freeIdx());
+    }
+
     round = { idx, theme, themeKey: plan.theme, plan, n, spots, dividers, layout, luggageAt, time: plan.time,
+      hasBag, constructionAt, flickerAt,
       attendant: layout === "wall" && chance(plan.attendant) };
     analyze(round);
 
@@ -1222,7 +1296,9 @@ function comfortOf(round, i) {
   } else {
     isEnd = (i === 0 || i === n - 1);
   }
-  return { raw: minRaw, eff, comfort: eff + (isEnd ? 0.25 : 0), isEnd };
+  // the flickering-light spot is usable, but nobody in their right mind prefers it
+  const flickerPenalty = (round.flickerAt === i) ? 0.45 : 0;
+  return { raw: minRaw, eff, comfort: eff + (isEnd ? 0.25 : 0) - flickerPenalty, isEnd, flicker: round.flickerAt === i };
 }
 
 function analyze(round) {
@@ -1305,10 +1381,18 @@ function renderRound(round) {
         (chip ? `<div class="chip">${chip}</div>` : "") + `</div>`;
     } else if (s.blocked) {
       slot.classList.add("blocked");
-      inner += `<div class="person">${suitcaseSVG()}</div>`;
+      if (s.blockType === "bag") {
+        inner += `<div class="bagwrap">${bagSVG()}</div>`;
+      } else if (s.blockType === "construction") {
+        inner += `<div class="tape"></div><div class="tape tape2"></div>` +
+          (s.coneHere ? `<div class="cone">${coneSVG()}</div>` : "");
+      } else {
+        inner += `<div class="person">${suitcaseSVG()}</div>`;
+      }
     } else {
       slot.classList.add("free");
     }
+    if (round.flickerAt === i) inner += `<div class="flick"></div>`;
     slot.innerHTML = inner;
     slot.addEventListener("click", () => onSlot(i));
     (far ? rowfar : row).appendChild(slot);
@@ -1615,7 +1699,8 @@ function resolveChoice(i) {
     verdict("ACCEPTABLE", "ok");
     markSlot(i, "chosen-good");
     showLesson("Fine. Technically fine.",
-      `No splash zone, but the pros would take ${describeBest(r)}. Streak reset.`, pts);
+      `No splash zone, but the pros would take ${describeBest(r)}. Streak reset.` +
+      (sc.flicker ? ` Also: you chose the spot under the <b>dying fluorescent light</b>. On purpose. Bold.` : ""), pts);
     if (r.attendant) showAttendant(); else showDrinkOffer();
   } else {
     relieve();
@@ -1681,9 +1766,19 @@ function onSlot(i) {
   G.locked = true;
   stopTimer();
   if (s.blocked) {
-    fail(i, "TRIPPED!", `You went over the rolling luggage like a bowling pin. ` +
-      `In airports and stations, <b>a suitcase claims the spot next to its owner.</b> ` +
-      `The right call was ${describeBest(r)}.`);
+    if (s.blockType === "bag") {
+      fail(i, "IT'S BAGGED!", `That urinal has been out of order since the previous administration. ` +
+        `You… you moved <b>the bag</b>?! The sign was RIGHT THERE. ` +
+        `The right call was ${describeBest(r)}.`);
+    } else if (s.blockType === "construction") {
+      fail(i, "HARD HAT AREA! 🚧", `You ducked under two layers of caution tape into an active plumbing repair. ` +
+        `The contractor will be telling this story for years. ` +
+        `The right call was ${describeBest(r)}.`);
+    } else {
+      fail(i, "TRIPPED!", `You went over the rolling luggage like a bowling pin. ` +
+        `In airports and stations, <b>a suitcase claims the spot next to its owner.</b> ` +
+        `The right call was ${describeBest(r)}.`);
+    }
     updateHUD();
     return;
   }
@@ -1784,8 +1879,13 @@ function startRound() {
   const layoutNote = G.cur.layout === "trough" ? "old-school trough"
     : G.cur.layout === "tub" ? "⚠️ THE SHAME TUB"
     : G.cur.dividers ? "dividers installed" : (G.cur.theme.flavor || "standard urinal row");
+  const hazards = [];
+  if (G.cur.hasBag) hazards.push("🛍️ one's out of order");
+  if (G.cur.constructionAt >= 0) hazards.push("🚧 construction zone");
+  if (G.cur.flickerAt >= 0) hazards.push("💡 flickering light");
+  const hazardNote = hazards.length ? ` · ${hazards.join(" · ")}` : "";
   const roundLabel = G.mode === "endless" ? `ROUND ${G.round + 1}` : `ROUND ${G.round + 1} / 10`;
-  announce(G.cur.theme.icon, G.cur.theme.name, `${roundLabel} — ${layoutNote}${muskNote}`, 1300);
+  announce(G.cur.theme.icon, G.cur.theme.name, `${roundLabel} — ${layoutNote}${hazardNote}${muskNote}`, hazards.length ? 1650 : 1300);
   const secs = G.cur.time * factor;
   G.timeLeft = secs; G.timerTotal = secs; // clicking during the intro still earns full speed bonus
   G.introT = setTimeout(() => {
