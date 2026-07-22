@@ -310,6 +310,25 @@
   /* cinematic vignette over the whole room */
   #scene::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 8;
     box-shadow: inset 0 0 70px rgba(0,0,0,.38), inset 0 -20px 50px rgba(0,0,0,.22); border-radius: 14px; }
+
+  /* ---------- time of day: the room lives on a clock ---------- */
+  #tod { position: absolute; inset: 0; pointer-events: none; z-index: 7; transition: background 1s; }
+  #scene.tod-morning #tod { background: linear-gradient(160deg, rgba(255,205,130,.18), rgba(255,235,190,.06) 55%, rgba(120,140,200,.06)); }
+  #scene.tod-evening #tod { background: linear-gradient(200deg, rgba(255,140,90,.2), rgba(180,80,140,.12) 60%, rgba(60,40,110,.14)); }
+  #scene.tod-night #tod { background: linear-gradient(rgba(9,14,38,.34), rgba(9,14,38,.48)); }
+  #scene.tod-night .lamp { box-shadow: 0 0 34px 14px rgba(220,240,255,.85); }
+  #scene.tod-night .lightpool { background: radial-gradient(ellipse at 50% 0%, rgba(255,255,245,.28), transparent 70%); }
+  .moth { position: absolute; font-size: 13px; opacity: .8; z-index: 7; pointer-events: none;
+    animation: mothorbit 3.4s ease-in-out infinite; }
+  @keyframes mothorbit {
+    0% { transform: translate(0, 0) rotate(-10deg); } 25% { transform: translate(16px, 8px) rotate(15deg); }
+    50% { transform: translate(-4px, 14px) rotate(-15deg); } 75% { transform: translate(-18px, 5px) rotate(10deg); }
+    100% { transform: translate(0, 0) rotate(-10deg); } }
+  #fly { position: absolute; font-size: clamp(15px, 4vw, 19px); z-index: 16; cursor: pointer;
+    filter: drop-shadow(1px 2px 2px rgba(0,0,0,.4)); user-select: none; }
+  #fly.squish { transition: transform .25s; transform: scale(0) rotate(180deg) !important; }
+  .tinsel { position: absolute; top: 6.8%; left: 0; right: 0; text-align: center; font-size: clamp(13px, 4vw, 18px);
+    letter-spacing: 6px; opacity: .9; text-shadow: 0 0 8px rgba(255,220,120,.7); }
   .slot.free:not(.blocked)::after { content: ""; position: absolute; left: 50%; bottom: 8%; width: 34px; height: 10px;
     transform: translateX(-50%); border-radius: 50%; background: rgba(87,184,255,.35); animation: pulse 1.4s ease-in-out infinite; }
   @keyframes pulse { 0%,100% { opacity: .25; } 50% { opacity: .8; } }
@@ -684,6 +703,7 @@
       </div>
       <div id="rowfar"></div>
       <div id="row"></div>
+      <div id="tod"></div>
       <div id="dim"></div>
       <div id="flash"></div>
       <div id="fx"></div>
@@ -1642,6 +1662,16 @@ function jerseySVG(color) {
   </svg>`;
 }
 
+/* seasonal decor packs, keyed to the real calendar */
+function seasonPack() {
+  const m = new Date().getMonth() + 1;
+  if (m === 3 || m === 4) return { posters: ["OPENING WEEK ⚾", "FIRST PITCH 1:05"], frames: ["🌸", "⚾"], props: [] };
+  if (m >= 6 && m <= 8) return { posters: ["GRILL SEASON 🔥", "FIREWORKS FRIDAY 🎆", `HYDRATE. IT'S ${rand(93, 111)}° OUT.`], frames: ["☀️", "🎆", "🍉"], props: ["🧊"] };
+  if (m === 10) return { posters: ["OCTOBER BASEBALL", "CLINCH TONIGHT", "PLAYOFF PARKING $80"], frames: ["🎃", "⚾"], props: ["🎃"], bunting: true };
+  if (m === 12) return { posters: ["HOLIDAY PARTY FRI 6PM", "SECRET SANTA: $20 CAP"], frames: ["🎄", "❄️"], props: ["🎁"], tinsel: true };
+  return { posters: [], frames: [], props: [] };
+}
+
 function dressScene(round) {
   const scene = $("scene");
   const pk = THEMES.stadium.parkRef;
@@ -1649,23 +1679,35 @@ function dressScene(round) {
   scene.classList.remove("wall-v1", "wall-v2");
   const wv = pick([null, null, "wall-v1", "wall-v2"]);
   if (wv) scene.classList.add(wv);
-  // ceiling lights: 2–4, spread with jitter
+  // time of day: full-room light grade (ballparks skew to game time)
+  scene.classList.remove("tod-morning", "tod-evening", "tod-night");
+  const tod = round.themeKey === "stadium" || round.themeKey === "divebar" || round.themeKey === "festival"
+    ? pick(["day", "evening", "evening", "night", "night"])
+    : pick(["morning", "day", "day", "day", "evening", "night"]);
+  if (tod !== "day") scene.classList.add("tod-" + tod);
+  round.tod = tod;
+  const clocks = { morning: `${rand(6, 9)}:${String(rand(10, 59))} AM`, day: `${rand(11, 12)}:${String(rand(10, 59))} PM`,
+    evening: `${rand(5, 8)}:${String(rand(10, 59))} PM`, night: `${rand(9, 11)}:${String(rand(10, 59))} PM` };
+  round.clock = clocks[tod];
+  // ceiling lights: 2–4, spread with jitter (+ a moth at night)
   const ln = rand(2, 4);
   let lh = "";
   for (let i = 0; i < ln; i++) {
     const left = 6 + (i + 0.5) * (88 / ln) + rnd(-4, 4);
     lh += `<div class="lamp" style="left:${left - 7}%"></div><div class="lightpool" style="left:${left - 17}%"></div>`;
+    if (tod === "night" && i === 0) lh += `<div class="moth" style="left:${left - 2}%;top:4.5%">🦟</div>`;
   }
   $("lights").innerHTML = lh;
+  const season = seasonPack();
   // wall decor: framed art, posters, graffiti — never the same twice
   const sd = $("setdress");
   const busyCenter = round.themeKey === "stadium" || (pk && (round.themeKey === "airport" || round.themeKey === "station"));
   let anchors = [[5, 24], [24, 19], [43, 23], [62, 18], [78, 25], [10, 43], [68, 45], [40, 41]];
   if (busyCenter) anchors = anchors.filter(([x, y]) => y > 38 || x < 14 || x > 72);
   anchors = anchors.sort(() => Math.random() - 0.5);
-  const venueEmoji = (round.theme.backdrop || "").split(/\s+/).filter(Boolean);
+  const venueEmoji = (round.theme.backdrop || "").split(/\s+/).filter(Boolean).concat(season.frames);
   const cityEmoji = pk ? pk.land.split(" ") : [];
-  const posterPool = [...POSTERS_GENERIC, ...(POSTERS_VENUE[round.themeKey] || [])];
+  const posterPool = [...POSTERS_GENERIC, ...(POSTERS_VENUE[round.themeKey] || []), ...season.posters, ...season.posters];
   const cityPosters = pk ? [`${pk.chant}!`, `${pk.team.toUpperCase()} GAME TONIGHT`, `${pk.city} 💙 YOU`] : [];
   const n = rand(3, Math.min(5, anchors.length));
   let html = "";
@@ -1691,14 +1733,57 @@ function dressScene(round) {
       ? `<div class="pennant" style="${side};top:${rnd(7, 11).toFixed(0)}%;transform:rotate(${rnd(-5, 5).toFixed(1)}deg)">${pennantSVG(pk.c, pk.team.toUpperCase())}</div>`
       : `<div class="jerseyframe" style="${side};top:${rnd(7, 12).toFixed(0)}%;transform:rotate(${rnd(-4, 4).toFixed(1)}deg)">${jerseySVG(pk.c)}</div>`;
   }
-  // floor props: 0–2 at the edges
-  const props = ["🪣", "🧹", "🪴", "🗑️", "🧻", "📦"];
+  // floor props: 0–2 at the edges (seasonal props join the pool)
+  const props = ["🪣", "🧹", "🪴", "🗑️", "🧻", "📦", ...(season.props || [])];
   const np = rand(0, 2);
   for (let i = 0; i < np; i++) {
     const leftSide = Math.random() < 0.5;
     html += `<div class="floorprop" style="${leftSide ? `left:${rnd(1, 5).toFixed(0)}%` : `right:calc(${rnd(1, 4).toFixed(0)}% + var(--stall-lane))`};bottom:${rnd(4, 16).toFixed(0)}%">${pick(props)}</div>`;
   }
+  // october: playoff bunting over every venue; december: a proud strand of tinsel
+  if (season.bunting && round.themeKey !== "stadium") html += `<div class="bunt">${buntingSVG("#b03030")}</div>`;
+  if (season.tinsel) html += `<div class="tinsel">✨🎄✨🎄✨🎄✨</div>`;
   sd.innerHTML = html;
+}
+
+/* ---------- the fly. tap it. you know you want to. ---------- */
+let flyTimer = null;
+function scheduleFly() {
+  clearTimeout(flyTimer);
+  flyTimer = setTimeout(spawnFly, rnd(11000, 26000));
+}
+function spawnFly() {
+  if (G.locked || !G.timer || document.getElementById("fly")) { scheduleFly(); return; }
+  const scene = $("scene");
+  const f = document.createElement("div");
+  f.id = "fly"; f.textContent = "🪰";
+  scene.appendChild(f);
+  const fromLeft = Math.random() < 0.5;
+  const baseY = rnd(18, 46), amp = rnd(4, 9), dur = rnd(3800, 5600);
+  const t0 = performance.now();
+  let dead = false;
+  f.addEventListener("click", e => {
+    e.stopPropagation();
+    if (dead) return;
+    dead = true;
+    G.score += 5;
+    f.classList.add("squish");
+    buzz(25); tone(900, .07, "square", .06); tone(300, .12, "square", .05, .06);
+    toast("🪰 SPLAT. +5. You're disgusting. Respect.");
+    updateHUD();
+    setTimeout(() => f.remove(), 300);
+  });
+  const step = now => {
+    if (dead || !f.isConnected) return;
+    const t = (now - t0) / dur;
+    if (t >= 1) { f.remove(); scheduleFly(); return; }
+    const x = fromLeft ? -6 + t * 112 : 106 - t * 112;
+    const y = baseY + Math.sin(t * Math.PI * rnd(5, 6)) * amp + Math.sin(t * 31) * 1.2;
+    f.style.left = x + "%"; f.style.top = y + "%";
+    f.style.transform = `rotate(${Math.sin(t * 40) * 24}deg) ${fromLeft ? "" : "scaleX(-1)"}`;
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }
 
 function pennantSVG(color, text) {
@@ -2427,8 +2512,9 @@ function startRound() {
     pp.classList.remove("show"); void pp.offsetWidth; pp.classList.add("show");
     sfx.flush();
   }, end: () => $("parkphoto").classList.remove("show") });
+  const clockNote = G.cur.clock ? `🕐 ${G.cur.clock} — ` : "";
   stages.push({ ms: hazards.length ? 1900 : 1500, run: () =>
-    announce(G.cur.theme.icon, G.cur.theme.name, `${roundLabel} — ${layoutNote}${hazardNote}${chantNote}${muskNote}`, hazards.length ? 1850 : 1450),
+    announce(G.cur.theme.icon, G.cur.theme.name, `${clockNote}${roundLabel} — ${layoutNote}${hazardNote}${chantNote}${muskNote}`, hazards.length ? 1850 : 1450),
     end: () => {} });
   if (desperate()) stages.push({ ms: 1800, run: () =>
     announce("🚨", "YOU'RE DESPERATE", `${G.drinks} drinks deep — the clock will FLY. Run out of time and it's over.`, 1750, "warn"),
@@ -2546,6 +2632,7 @@ function resetGame(mode, seed) {
   $("end").classList.add("hidden");
   $("start").classList.add("hidden");
   $("respawnrow").classList.add("hiddenrow");
+  scheduleFly();
   startRound();
 }
 
