@@ -2234,7 +2234,11 @@ function describeBest(r) {
   const s = r.scores[b];
   let why = [];
   if (s.raw >= 99) why.push("empty room — claim an end so future arrivals have somewhere to go");
-  else why.push(`${s.raw >= 2 ? Math.floor(s.raw) + " spots of buffer" : "the biggest buffer available"}`);
+  else {
+    // people count the EMPTY spots between them and the neighbor, not the slot distance
+    const buf = Math.max(0, Math.floor(s.raw) - 1);
+    why.push(buf >= 1 ? `${buf} empty spot${buf === 1 ? "" : "s"} between you` : "the biggest buffer available");
+  }
   if (s.isEnd) why.push(r.layout === "tub" ? "corner position" : "wall on one side");
   if (r.dividers && s.raw === 1) why.push("divider coverage");
   return `${spotName(r, b)} (${why.join(", ")})`;
