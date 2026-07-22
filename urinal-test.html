@@ -66,6 +66,26 @@
     background: #223047; border: 1px solid #3a4a63; border-radius: 12px; padding: 10px 14px; cursor: pointer; line-height: 1.3; }
   .sharebtn:active { background: #2c3d5a; }
   .sharebtn small { color: #9fb0c3; font-weight: normal; }
+  .bigbtn.roadtrip { background: linear-gradient(#d0846f, #a85a47); box-shadow: 0 4px 0 #7a3f30; margin-top: 12px; font-size: clamp(13px, 3.4vw, 16px); }
+  .bigbtn.roadtrip:active { box-shadow: 0 1px 0 #7a3f30; }
+  #roadtripline { color: #e8b3a3; font-size: 13px; margin-top: 6px; min-height: 16px; }
+  #unlockline { color: #ffd76a; font-weight: bold; font-size: clamp(14px, 4vw, 17px); margin-bottom: 10px; min-height: 20px; }
+  #parkpicker { position: fixed; inset: 0; background: rgba(5,8,12,.94); z-index: 110;
+    display: flex; align-items: center; justify-content: center; padding: 18px; }
+  #parkpicker.show { display: flex !important; }
+  .pickbox { background: #1a2130; border: 2px solid #3a4a63; border-radius: 16px; padding: 16px;
+    width: 100%; max-width: 440px; max-height: 86vh; display: flex; flex-direction: column; }
+  .picktitle { font-size: clamp(17px, 4.6vw, 21px); font-weight: 900; text-align: center; }
+  .picksub { color: #9fb0c3; font-size: 12px; text-align: center; margin: 4px 0 10px; }
+  #picklist { overflow-y: auto; flex: 1; min-height: 0; -webkit-overflow-scrolling: touch; }
+  .pickrow { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    font-family: inherit; color: #eef2f6; background: #212a3c; border: 1px solid #2b3547;
+    border-radius: 10px; padding: 10px 12px; margin-bottom: 6px; cursor: pointer; font-size: clamp(13px, 3.6vw, 15px); }
+  .pickrow:active { background: #2c3d5a; }
+  .pickrow .dot { width: 14px; height: 14px; border-radius: 50%; flex: 0 0 14px; border: 2px solid rgba(255,255,255,.5); }
+  .pickrow .pn { font-weight: bold; }
+  .pickrow .pc { color: #9fb0c3; font-size: 12px; margin-left: auto; white-space: nowrap; }
+  .pickrow.current { border-color: #37c97a; box-shadow: 0 0 8px rgba(55,201,122,.4); }
   #admodal { position: fixed; inset: 0; background: rgba(5,8,12,.92); z-index: 100;
     display: flex; align-items: center; justify-content: center; }
   #admodal.show { display: flex !important; }
@@ -448,7 +468,9 @@
     <button class="bigbtn daily" id="dailybtn">📅 DAILY CHALLENGE</button>
     <button class="bigbtn alt" id="endlessbtn">♾️ ENDLESS RUSH</button>
     <button class="bigbtn loc" id="locbtn">📍 PLAY YOUR HOME BALLPARK</button>
+    <button class="bigbtn roadtrip hiddenrow" id="roadtripbtn">🗺️ ROAD TRIP — CHOOSE ANY CITY</button>
     <div id="locline"></div>
+    <div id="roadtripline"></div>
     <div id="towelline"></div>
     <div id="bestline"></div>
     <div class="subnote">📱 Best on a phone — wrong picks trigger haptic splash feedback.</div>
@@ -462,6 +484,10 @@
     <div class="statline" id="stattext"></div>
     <div id="trailline"></div>
     <div id="chalresult"></div>
+    <div id="unlockline"></div>
+    <div id="endroadtriprow" class="hiddenrow" style="margin-bottom:14px">
+      <button class="bigbtn roadtrip" id="endroadtripbtn">🗺️ ROAD TRIP — CHOOSE YOUR NEXT CITY</button>
+    </div>
     <div id="respawnrow" class="hiddenrow">
       <button class="bigbtn respawn" id="respawnbtn"></button>
     </div>
@@ -474,6 +500,16 @@
     <button class="bigbtn" id="againbtn">WASH HANDS &amp; RETRY</button>
     <button class="bigbtn alt" id="menubtn">🚪 BACK TO MENU</button>
     <div class="subnote">You washed your hands, right? …Right?</div>
+  </div>
+
+  <!-- road trip park picker -->
+  <div id="parkpicker" class="hiddenrow">
+    <div class="pickbox">
+      <div class="picktitle">🗺️ ROAD TRIP — pick a ballpark</div>
+      <div class="picksub">Its photos, colors, airport &amp; station come with it.</div>
+      <div id="picklist"></div>
+      <button class="bigbtn alt" id="pickclose" style="min-width:0;width:100%;margin-top:10px">CLOSE</button>
+    </div>
   </div>
 
   <!-- rewarded ad placeholder (wire Google AdMob / Ad Manager here) -->
@@ -980,6 +1016,41 @@ function applyPark(p, km) {
   $("locline").textContent = line;
   $("locbtn").textContent = "📍 " + p.park.toUpperCase() + " LOADED ✓";
 }
+/* ---------- road trip: earn a good score, play any city ---------- */
+const ROADTRIP_SCORE = 650;
+function roadtripUnlocked() {
+  try { return localStorage.getItem("ut_roadtrip") === "1"; } catch (e) { return false; }
+}
+function unlockRoadtrip() {
+  try { localStorage.setItem("ut_roadtrip", "1"); } catch (e) {}
+}
+function openParkPicker() {
+  const list = $("picklist");
+  const cur = THEMES.stadium.parkRef;
+  list.innerHTML = "";
+  [...MLB_PARKS].sort((a, b) => a.city.localeCompare(b.city)).forEach(p => {
+    const b = document.createElement("button");
+    b.className = "pickrow" + (cur && cur.park === p.park ? " current" : "");
+    b.innerHTML = `<span class="dot" style="background:${p.c}"></span>` +
+      `<span><span class="pn">${p.park}</span><br><small>${p.team}</small></span>` +
+      `<span class="pc">${p.city}</span>`;
+    b.addEventListener("click", () => {
+      applyPark(p, null);
+      try { localStorage.setItem("ut_park", JSON.stringify({ park: p.park, km: null })); } catch (e) {}
+      closeParkPicker();
+      updateStartLines();
+      toast(`🗺️ Road trip: ${p.park}. Safe travels, hold it on the flight.`);
+    });
+    list.appendChild(b);
+  });
+  const pp = $("parkpicker");
+  pp.classList.remove("hiddenrow"); pp.classList.add("show");
+}
+function closeParkPicker() {
+  const pp = $("parkpicker");
+  pp.classList.remove("show"); pp.classList.add("hiddenrow");
+}
+
 function localizeStadium() {
   if (!navigator.geolocation) { $("locline").textContent = "Location isn't available in this browser."; return; }
   $("locline").textContent = "📡 Finding your ballpark…";
@@ -1190,6 +1261,9 @@ let pendingChallenge = null;
 function updateStartLines() {
   const t = getTowels();
   $("towelline").textContent = t > 0 ? `🧻 ${t} free towel${t === 1 ? "" : "s"} (respawns) banked` : "";
+  const rt = roadtripUnlocked();
+  $("roadtripbtn").classList.toggle("hiddenrow", !rt);
+  $("roadtripline").textContent = rt ? "" : `🔒 Road Trip: score ${ROADTRIP_SCORE}+ in any mode to play every ballpark`;
   try {
     const daily = JSON.parse(localStorage.getItem("ut_daily_" + dailyKey()) || "null");
     $("dailybtn").innerHTML = daily
@@ -2019,6 +2093,17 @@ function endGame(survived) {
   }
   // respawn offer on any loss (rewarded-ad slot / free towels)
   if (!survived) offerRespawn(); else $("respawnrow").classList.add("hiddenrow");
+  // road trip: a good score earns the right to pick any city
+  const wasUnlocked = roadtripUnlocked();
+  if (G.score >= ROADTRIP_SCORE && !wasUnlocked) {
+    unlockRoadtrip();
+    $("unlockline").textContent = `🗺️ ROAD TRIP UNLOCKED — ${G.score} pts! You've earned the right to pick any ballpark.`;
+  } else if (G.score >= ROADTRIP_SCORE) {
+    $("unlockline").textContent = "";
+  } else {
+    $("unlockline").textContent = roadtripUnlocked() ? "" : `🔒 Score ${ROADTRIP_SCORE}+ to unlock Road Trip (play any ballpark)`;
+  }
+  $("endroadtriprow").classList.toggle("hiddenrow", !roadtripUnlocked());
   $("end").classList.remove("hidden");
   if (survived && G.mode !== "endless") sfx.flush();
 }
@@ -2081,6 +2166,9 @@ $("att-walk").addEventListener("click", () => attWalk());
 $("sharebtn").addEventListener("click", () => doShare(resultText()));
 $("certbtn").addEventListener("click", () => shareCertificate());
 $("chalbtn").addEventListener("click", () => shareChallenge());
+$("roadtripbtn").addEventListener("click", () => openParkPicker());
+$("endroadtripbtn").addEventListener("click", () => openParkPicker());
+$("pickclose").addEventListener("click", () => closeParkPicker());
 </script>
 </body>
 </html>

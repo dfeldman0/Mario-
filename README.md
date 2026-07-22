@@ -46,9 +46,14 @@ and **Endless Rush** (procedurally generated rounds until the rush claims you).
   Monster + scoreboard, Yankee Stadium's frieze.
 - **🏟️ Photo interstitials**: ballpark rounds open with a full-screen iconic
   photo of *your* park ("NOW ENTERING WRIGLEY FIELD… find the head, hero")
-  with a slow cinematic zoom before the restroom appears. All 30 parks ship
-  in `parks/` (sources & licenses in `parks/CREDITS.md`) — drop in your own
-  JPG named `<park-name-slug>.jpg` to replace any of them.
+  with a slow cinematic zoom before the restroom appears. Up to 4 photo
+  variants per park (106 images) rotate randomly per visit — all in `parks/`
+  (sources & licenses in `parks/CREDITS.md`); drop in your own JPG named
+  `<park-slug>-<n>.jpg` to replace any of them.
+- **🗺️ Road Trip**: score 650+ in any mode to permanently unlock the park
+  picker — play *any* of the 30 ballparks, with its photos, team colors,
+  airport, station and city banner. Your home turf is earned; the league is
+  a reward.
 - **Orientation is obvious**: guys facing you at the shame tub hold a
   ballpark frank at waist level with both hands. That's what the hands are
   doing. It's a hot dog. Rated E for Everyone.
