@@ -84,6 +84,18 @@ and **Endless Rush** (procedurally generated rounds until the rush claims you).
   Grand Central, 30th Street…), and stamps a "CHICAGO EDITION" banner on the
   title screen.
 
+### 🧪 3D Mode (beta)
+
+Toggle on the start screen. Wall-urinal rounds render as a low-poly 3D room
+(three.js, lazy-loaded from `vendor/` only when enabled): first-person
+walk-in from the door, corridor POV down the row, capsule people with
+personas (the REC guy's LED blinks in 3D), hazards as real meshes, the
+flickering-light hazard as an actually flickering point light,
+time-of-day-graded lighting, drag-to-look, tap-to-pick via raycasting, and
+the stall door standing at the end of the corridor. Trough and shame-tub
+rounds automatically fall back to the classic 2D view. All scoring, HUD,
+FX and game logic are shared with 2D.
+
 Open `urinal-test.html` in any browser — best on a phone, where wrong picks
 trigger real haptic feedback.
 
