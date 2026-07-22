@@ -66,6 +66,57 @@
     background: #223047; border: 1px solid #3a4a63; border-radius: 12px; padding: 10px 14px; cursor: pointer; line-height: 1.3; }
   .sharebtn:active { background: #2c3d5a; }
   .sharebtn small { color: #9fb0c3; font-weight: normal; }
+  .bigbtn.howto { background: linear-gradient(#8593a8, #5d6b80); box-shadow: 0 4px 0 #414c5c; margin-bottom: 16px; font-size: clamp(13px, 3.4vw, 16px); }
+  .bigbtn.howto:active { box-shadow: 0 1px 0 #414c5c; }
+
+  /* ---------- swipeable rules deck ---------- */
+  #rulesdeck { position: fixed; inset: 0; background: radial-gradient(ellipse at 50% -10%, rgba(87,184,255,.12), transparent 55%), #10141b;
+    z-index: 120; display: flex; flex-direction: column; padding: 16px 0 18px; }
+  #rulesdeck.show { display: flex !important; }
+  #rulesskip { position: absolute; top: 14px; right: 16px; z-index: 5; font-family: inherit; font-size: 13px;
+    color: #9fb0c3; background: #1a2130; border: 1px solid #2b3547; border-radius: 10px; padding: 6px 12px; cursor: pointer; }
+  #ruletrack { flex: 1; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; min-height: 0; }
+  #ruletrack::-webkit-scrollbar { display: none; }
+  .rulecard { flex: 0 0 100%; scroll-snap-align: center; scroll-snap-stop: always; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; padding: 12px 26px; }
+  .rc-emoji { font-size: clamp(40px, 12vw, 64px); margin-bottom: 6px; }
+  .rc-title { font-size: clamp(20px, 6vw, 30px); font-weight: 900; letter-spacing: 1px; margin-bottom: 6px; }
+  .rc-title .hl { color: #ffd76a; }
+  .rc-text { color: #b9c6d4; font-size: clamp(14px, 3.9vw, 17px); line-height: 1.5; max-width: 420px; }
+  .rc-text b { color: #eef2f6; }
+  .rc-art { width: 100%; max-width: 400px; height: clamp(140px, 26vh, 220px); margin: 14px 0; position: relative;
+    background: linear-gradient(rgba(255,255,255,.06), rgba(0,0,0,.12)), #1a2130;
+    border: 1px solid #2b3547; border-radius: 16px; overflow: hidden;
+    display: flex; align-items: flex-end; justify-content: center; }
+  .rc-row { display: flex; align-items: flex-end; justify-content: center; gap: 2px; width: 94%; height: 88%; }
+  .rc-slot { position: relative; flex: 1 1 0; max-width: 70px; height: 100%; }
+  .rc-slot svg:first-child { position: absolute; left: 50%; transform: translateX(-50%); bottom: 30%; width: 90%; }
+  .rc-person { position: absolute; left: 50%; transform: translateX(-50%); bottom: 2%; width: 100%; z-index: 2; }
+  .rc-ring { position: absolute; left: 50%; transform: translateX(-50%); bottom: 6%; width: 30px; height: 12px;
+    border-radius: 50%; border: 3.5px solid #2fb46b; background: rgba(47,180,107,.25);
+    box-shadow: 0 0 12px rgba(47,180,107,.9); animation: pulse 1.2s ease-in-out infinite; }
+  .rc-x { position: absolute; left: 50%; top: 12%; transform: translateX(-50%); color: #ff7a6f;
+    font-size: 30px; font-weight: 900; text-shadow: 0 2px 4px #000; z-index: 3; }
+  .rc-big { position: relative; width: 40%; max-width: 130px; align-self: center; }
+  .rc-caption { position: absolute; top: 8px; left: 0; right: 0; text-align: center; color: #ffd76a;
+    font-weight: 900; font-size: clamp(12px, 3.4vw, 15px); letter-spacing: 2px; text-shadow: 0 2px 4px #000; z-index: 4; }
+  #ruledots { display: flex; justify-content: center; gap: 7px; margin: 10px 0; }
+  #ruledots .dot { width: 8px; height: 8px; border-radius: 50%; background: #2b3547; transition: .2s; }
+  #ruledots .dot.on { background: #57b8ff; transform: scale(1.3); }
+  #rulenext { margin: 0 auto; min-width: 240px; }
+
+  /* ---------- scoring mode: soften the room, keep the row lit ---------- */
+  #dim { position: absolute; inset: 0; background: rgba(6,9,14,.55); backdrop-filter: blur(1.5px);
+    opacity: 0; transition: opacity .35s; pointer-events: none; z-index: 10; }
+  #scene.scoring #dim { opacity: 1; }
+  #scene.scoring #rowfar { z-index: 11; }
+  #scene.scoring #tub { z-index: 12; }
+  #scene.scoring #row { z-index: 13; }
+  #scene.scoring #troughfront { z-index: 14; }
+  #scene.scoring #attendantbox { z-index: 15; }
+  #scene.scoring #stalldoor { z-index: 11; }
+
   .bigbtn.roadtrip { background: linear-gradient(#d0846f, #a85a47); box-shadow: 0 4px 0 #7a3f30; margin-top: 12px; font-size: clamp(13px, 3.4vw, 16px); }
   .bigbtn.roadtrip:active { box-shadow: 0 1px 0 #7a3f30; }
   #roadtripline { color: #e8b3a3; font-size: 13px; margin-top: 6px; min-height: 16px; }
@@ -465,17 +516,7 @@
     <div class="tagline">One sacred code. Infinite bathrooms. Do you have what it takes?</div>
     <div id="cityline"></div>
     <div id="chalbanner" class="hiddenrow"></div>
-    <div class="rules">
-      <b>The Rules of the Restroom:</b>
-      <li><b>Maximize distance</b> from every occupied spot. <b>Ends are elite.</b></li>
-      <li><b>Dividers</b> soften a bad neighbor. Soften. Not fix.</li>
-      <li>Guy in <b>Meta smart glasses</b> (🔴 REC)? Extra distance. Dividers don't help.</li>
-      <li><b>Hazards are real</b>: 🧳 luggage takes ankles, 🛍️ bagged urinals are <i>broken</i>, 🚧 caution tape means NO, and 💡 nobody prefers the flickering light.</li>
-      <li>The <b>trough</b> is lawless. The <b>shame tub</b> is worse — <b>never face a man across the water</b>. 👁️</li>
-      <li>After a win, <b>you choose</b>: take the drink 🍺 (+10% score buzz each) or pass. Every drink fills your bladder and <b>speeds the clock</b>.</li>
-      <li>At 🍺×3 you're <b>desperate</b> — run out of time and you <b>piss yourself</b>. Going relieves the pressure.</li>
-      <li>No decent option? Gamble on the <b>stall</b> 🚻 — 3 waits per run, each burns ~2.5s, and <b>sometimes it's occupied</b>.</li>
-    </div>
+    <button class="bigbtn howto" id="howtobtn">📖 HOW TO PLAY — the sacred code</button>
     <button class="bigbtn" id="startbtn">🏆 THE GAUNTLET — 10 rounds</button>
     <button class="bigbtn daily" id="dailybtn">📅 DAILY CHALLENGE</button>
     <button class="bigbtn alt" id="endlessbtn">♾️ ENDLESS RUSH</button>
@@ -512,6 +553,14 @@
     <button class="bigbtn" id="againbtn">WASH HANDS &amp; RETRY</button>
     <button class="bigbtn alt" id="menubtn">🚪 BACK TO MENU</button>
     <div class="subnote">You washed your hands, right? …Right?</div>
+  </div>
+
+  <!-- swipeable rules deck -->
+  <div id="rulesdeck" class="hiddenrow">
+    <button id="rulesskip">skip ✕</button>
+    <div id="ruletrack"></div>
+    <div id="ruledots"></div>
+    <button class="bigbtn" id="rulenext">NEXT →</button>
   </div>
 
   <!-- road trip park picker -->
@@ -580,6 +629,7 @@
       </div>
       <div id="rowfar"></div>
       <div id="row"></div>
+      <div id="dim"></div>
       <div id="flash"></div>
       <div id="fx"></div>
       <canvas id="fxc"></canvas>
@@ -1029,6 +1079,76 @@ function applyPark(p, km) {
   $("locline").textContent = line;
   $("locbtn").textContent = "📍 " + p.park.toUpperCase() + " LOADED ✓";
 }
+/* ---------- rules deck: swipe the sacred code, once ---------- */
+let rulesLaunch = null;
+function rulesSeen() { try { return localStorage.getItem("ut_rules_seen") === "1"; } catch (e) { return true; } }
+function buildRulesDeck() {
+  const artRow = () => {
+    let s = '<div class="rc-row">';
+    for (let i = 0; i < 5; i++) {
+      s += `<div class="rc-slot">${urinalSVG()}` +
+        (i === 1 ? `<div class="rc-person">${personSVG("regular", "back")}</div>` : "") +
+        (i === 2 ? `<div class="rc-x">✗</div>` : "") +
+        (i === 4 ? `<div class="rc-ring"></div>` : "") + `</div>`;
+    }
+    return s + "</div>";
+  };
+  const artRec = () => `<div class="rc-caption">🔴 REC — YOU'RE CONTENT NOW</div>` +
+    `<div class="rc-big">${personSVG("glasses", "front")}</div>`;
+  const artHazards = () => `<div class="rc-row">` +
+    `<div class="rc-slot">${urinalSVG()}<div class="rc-person">${bagSVG()}</div></div>` +
+    `<div class="rc-slot">${urinalSVG()}<div class="rc-x">🚧</div></div>` +
+    `<div class="rc-slot">${suitcaseSVG()}</div>` +
+    `<div class="rc-slot">${coneSVG()}</div></div>`;
+  const artTub = () => `<div class="rc-caption">👁️ NEVER ACROSS THE WATER</div>` +
+    `<div class="rc-big">${personSVG("regular", "front")}</div><div class="rc-big">${personSVG("headphones", "front")}</div>`;
+  const artAtt = () => `<div class="rc-caption">💵 TIP THE MAN</div><div class="rc-big" style="max-width:200px">${attendantSVG()}</div>`;
+  const CARDS = [
+    { e: "🚹", t: `THE <span class="hl">SACRED</span> CODE`, x: `Pick the right spot. <b>Maximize distance</b> from every occupied one — <b>ends are elite</b>, dividers only soften. Choose fast: the bladder waits for no man.`, art: artRow },
+    { e: "🕶️", t: `THE <span class="hl">REC</span> GUY`, x: `Meta smart glasses means he's <b>streaming</b>. Extra distance. Always. Dividers don't help — his followers can still see you.`, art: artRec },
+    { e: "⚠️", t: `<span class="hl">HAZARDS</span> ARE REAL`, x: `🛍️ Bagged = <b>broken</b>. 🚧 Tape = <b>an active crime scene</b>. 🧳 Luggage takes ankles. 💡 And nobody — <i>nobody</i> — prefers the flickering light.`, art: artHazards },
+    { e: "🛁", t: `THE <span class="hl">SHAME TUB</span>`, x: `Some venues have a tub. People stand <b>all the way around it</b>. Eye contact across the water is the one unforgivable sin. (The hot dogs are for orientation. And safety.)`, art: artTub },
+    { e: "🍺", t: `DRINKS ARE A <span class="hl">CHOICE</span>`, x: `Wins earn a drink offer: <b>+10% score buzz each</b>… and one more thing in the tank. Every drink makes the clock meaner. Nobody pours it for you.`, art: null },
+    { e: "🚨", t: `<span class="hl">DESPERATION</span>`, x: `At 🍺×3 you're desperate. The clock <b>flies</b>. Run out of time and you will <b>piss yourself</b> in front of everyone. Going relieves 2 drinks. Plan accordingly.`, art: null },
+    { e: "🚻", t: `THE <span class="hl">STALL</span> GAMBLE`, x: `No decent spot? Knock on the stall — <b>3 waits per run</b>, each burns ~2.5 seconds, and sometimes… <i>"someone's IN here!"</i>`, art: null },
+    { e: "🧖", t: `TIP THE <span class="hl">ATTENDANT</span>`, x: `Towel? Cologne? Gum? <b>$2 buys a towel blessing</b> that saves your pants from one splash. Walk past at your own risk. He's seen things.`, art: artAtt },
+  ];
+  $("ruletrack").innerHTML = CARDS.map(c =>
+    `<div class="rulecard"><div class="rc-emoji">${c.e}</div><div class="rc-title">${c.t}</div>` +
+    (c.art ? `<div class="rc-art">${c.art()}</div>` : "") +
+    `<div class="rc-text">${c.x}</div></div>`).join("");
+  $("ruledots").innerHTML = CARDS.map((_, i) => `<div class="dot${i === 0 ? " on" : ""}"></div>`).join("");
+}
+function ruleIndex() {
+  const t = $("ruletrack");
+  return Math.round(t.scrollLeft / Math.max(1, t.clientWidth));
+}
+function updateRuleUI() {
+  const i = ruleIndex(), n = $("ruledots").children.length;
+  [...$("ruledots").children].forEach((d, k) => d.classList.toggle("on", k === i));
+  $("rulenext").textContent = i >= n - 1 ? (rulesLaunch ? "LET'S GO 🚹" : "GOT IT 👌") : "NEXT →";
+}
+function openRules(launch) {
+  rulesLaunch = launch || null;
+  buildRulesDeck();
+  const d = $("rulesdeck");
+  d.classList.remove("hiddenrow"); d.classList.add("show");
+  $("ruletrack").scrollLeft = 0;
+  updateRuleUI();
+}
+function closeRules() {
+  try { localStorage.setItem("ut_rules_seen", "1"); } catch (e) {}
+  const d = $("rulesdeck");
+  d.classList.remove("show"); d.classList.add("hiddenrow");
+  const go = rulesLaunch; rulesLaunch = null;
+  if (go) go();
+}
+function maybeStart(mode) {
+  audio(); buzz(20);
+  if (!rulesSeen()) openRules(() => resetGame(mode));
+  else resetGame(mode);
+}
+
 /* ---------- road trip: earn a good score, play any city ---------- */
 const ROADTRIP_SCORE = 650;
 function roadtripUnlocked() {
@@ -1544,7 +1664,7 @@ function updateHUD() {
   $("shieldchip").classList.toggle("on", !!G.shield);
   const wb = $("waitbtn");
   wb.classList.toggle("danger", desperate());
-  wb.disabled = G.stalls <= 0;
+  wb.disabled = G.stalls <= 0 || G.locked;
   wb.innerHTML = G.stalls > 0
     ? `🚻 WAIT FOR A STALL ×${G.stalls}<span class="hint">burns ~${STALL_COST}s · sometimes occupied${desperate() ? " · ⚠️ you're desperate, tick tock" : ""}</span>`
     : `🚻 NO STALL WAITS LEFT<span class="hint">you've knocked enough tonight — pick a spot</span>`;
@@ -1599,8 +1719,20 @@ function runTimer() {
 function stopTimer() {
   if (G.timer) { clearInterval(G.timer); G.timer = null; }
   if (G.introT) { clearTimeout(G.introT); G.introT = null; }
-  $("parkphoto").classList.remove("show"); // never strand the interstitial over a live board
+  G.pausedForHide = false;
+  $("parkphoto").classList.remove("show"); // never strand overlays over a live board
+  $("announce").classList.remove("show");
 }
+
+/* fairness: switching apps pauses the bladder, coming back resumes it */
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    if (G.timer) { clearInterval(G.timer); G.timer = null; G.pausedForHide = true; }
+  } else if (G.pausedForHide && !G.locked) {
+    G.pausedForHide = false;
+    resumeTimer();
+  }
+});
 
 /* ---------- FX: canvas particle engine (gravity, floor splats, sparkles) ---------- */
 const FXC = { parts: [], running: false, dpr: 1 };
@@ -1709,6 +1841,7 @@ function showLesson(title, text, pts) {
   $("ltext").innerHTML = text;
   $("lpts").textContent = pts > 0 ? `+${pts}` : (pts < 0 ? `${pts}` : "");
   $("lesson").classList.add("show");
+  $("scene").classList.add("scoring"); // soften the room — we're reviewing now
   const r = G.cur;
   if (!r.isWaitRound) r.bestSpots.forEach(i => { const el = slotEl(i); if (el) el.classList.add("best-mark"); });
 }
@@ -2065,6 +2198,7 @@ function onTimeout() {
 /* ---------- flow ---------- */
 function startRound() {
   G.locked = false;
+  $("scene").classList.remove("scoring");
   $("lesson").classList.remove("show");
   $("attrow").classList.remove("show");
   $("drinkrow").classList.remove("show");
@@ -2095,17 +2229,11 @@ function startRound() {
   const roundLabel = G.mode === "endless" ? `ROUND ${G.round + 1}` : `ROUND ${G.round + 1} / 10`;
   const secs = G.cur.time * factor;
   G.timeLeft = secs; G.timerTotal = secs; // clicking during the intro still earns full speed bonus
-  const proceed = () => {
-    announce(G.cur.theme.icon, G.cur.theme.name, `${roundLabel} — ${layoutNote}${hazardNote}${muskNote}`, hazards.length ? 1650 : 1300);
-    G.introT = setTimeout(() => {
-      G.introT = null;
-      startTimer(secs);
-      if (desperate()) announce("🚨", "YOU'RE DESPERATE", `${G.drinks} drinks deep — clock is flying. Run out of time and it's over. GO.`, 1900, "warn");
-    }, 1250);
-  };
-  // ballpark rounds with a home park set get the full photo interstitial first
+  G.pendingSecs = secs;
+  // the clock does NOT start until every overlay is gone — read first, sweat second
+  const stages = [];
   const p = G.cur.themeKey === "stadium" ? THEMES.stadium.parkRef : null;
-  if (p) {
+  if (p) stages.push({ ms: 2300, run: () => {
     if (announceT) clearTimeout(announceT);
     $("announce").classList.remove("show"); // the photo IS the announcement
     const pp = $("parkphoto");
@@ -2114,10 +2242,31 @@ function startRound() {
     pp.querySelector(".pp-sub").textContent = `⚾ ${p.flavor} — find the head, hero`;
     pp.classList.remove("show"); void pp.offsetWidth; pp.classList.add("show");
     sfx.flush();
-    G.introT = setTimeout(() => { pp.classList.remove("show"); proceed(); }, 2300);
-  } else {
-    proceed();
-  }
+  }, end: () => $("parkphoto").classList.remove("show") });
+  stages.push({ ms: hazards.length ? 1900 : 1500, run: () =>
+    announce(G.cur.theme.icon, G.cur.theme.name, `${roundLabel} — ${layoutNote}${hazardNote}${muskNote}`, hazards.length ? 1850 : 1450),
+    end: () => {} });
+  if (desperate()) stages.push({ ms: 1800, run: () =>
+    announce("🚨", "YOU'RE DESPERATE", `${G.drinks} drinks deep — the clock will FLY. Run out of time and it's over.`, 1750, "warn"),
+    end: () => {} });
+  let si = 0;
+  const runStage = () => {
+    if (si >= stages.length) { G.introT = null; startTimer(secs); return; }
+    const st = stages[si++];
+    st.run();
+    G.introT = setTimeout(() => { st.end(); runStage(); }, st.ms);
+  };
+  runStage();
+}
+
+/* tap anywhere (not a spot) during the intro overlays to skip straight to the clock */
+function skipIntro() {
+  if (!G.introT || G.locked) return;
+  clearTimeout(G.introT); G.introT = null;
+  $("parkphoto").classList.remove("show");
+  if (announceT) clearTimeout(announceT);
+  $("announce").classList.remove("show");
+  startTimer(G.pendingSecs || G.cur.time);
 }
 
 function nextRound() {
@@ -2235,17 +2384,26 @@ try {
       `<button class="bigbtn" style="min-width:0;padding:8px 16px;font-size:14px;margin-top:8px" id="acceptbtn">ACCEPT</button>`;
     $("acceptbtn").addEventListener("click", () => {
       audio(); buzz(20);
-      pendingChallenge.active = true;
-      resetGame(pendingChallenge.mode, pendingChallenge.seed);
+      const launch = () => { pendingChallenge.active = true; resetGame(pendingChallenge.mode, pendingChallenge.seed); };
+      if (!rulesSeen()) openRules(launch); else launch();
     });
   }
 } catch (e) {}
 updateStartLines();
 
 /* ---------- wire up ---------- */
-$("startbtn").addEventListener("click", () => { audio(); buzz(20); resetGame("gauntlet"); });
-$("dailybtn").addEventListener("click", () => { audio(); buzz(20); resetGame("daily"); });
-$("endlessbtn").addEventListener("click", () => { audio(); buzz(20); resetGame("endless"); });
+$("startbtn").addEventListener("click", () => maybeStart("gauntlet"));
+$("dailybtn").addEventListener("click", () => maybeStart("daily"));
+$("endlessbtn").addEventListener("click", () => maybeStart("endless"));
+$("howtobtn").addEventListener("click", () => openRules(null));
+$("rulesskip").addEventListener("click", () => closeRules());
+$("rulenext").addEventListener("click", () => {
+  const t = $("ruletrack"), i = ruleIndex();
+  if (i >= $("ruledots").children.length - 1) closeRules();
+  else t.scrollTo({ left: (i + 1) * t.clientWidth, behavior: "smooth" });
+});
+$("ruletrack").addEventListener("scroll", () => updateRuleUI(), { passive: true });
+$("scene").addEventListener("click", () => skipIntro());
 $("againbtn").addEventListener("click", () => { buzz(20); resetGame(undefined, undefined); });
 $("menubtn").addEventListener("click", () => { $("end").classList.add("hidden"); $("start").classList.remove("hidden"); updateStartLines(); });
 $("nextbtn").addEventListener("click", () => nextRound());
