@@ -150,6 +150,13 @@
   .subnote { margin-top: 12px; color: #66788d; font-size: 12px; }
   #bestline { color: #57b8ff; font-size: 13px; margin-top: 10px; min-height: 16px; }
 
+  /* ---------- review spotlight: the pros' pick, lit like a museum piece ---------- */
+  .spotbeam { position: absolute; left: 50%; transform: translateX(-50%); bottom: 42%; width: 200%; height: 320%;
+    z-index: 1; pointer-events: none; opacity: 0; animation: beamon .5s ease .15s forwards;
+    background: linear-gradient(rgba(197,244,215,.02), rgba(197,244,215,.2) 62%, rgba(197,244,215,.4));
+    clip-path: polygon(41% 0, 59% 0, 100% 100%, 0 100%); }
+  @keyframes beamon { to { opacity: 1; } }
+
   /* ---------- career mechanics ---------- */
   .wetsign { position: absolute; left: 50%; transform: translateX(-50%); bottom: -4px; z-index: 4;
     background: linear-gradient(#ffe14e, #e8c018); color: #7a1f1f; border-radius: 4px 4px 2px 2px;
@@ -453,7 +460,10 @@
 
   /* ---------- 3D mode (beta) ---------- */
   #three3d { position: absolute; inset: 0; width: 100%; height: 100%; display: none; z-index: 3; }
-  #scene.mode3d #three3d { display: block; }
+  #scene.mode3d #three3d { display: block; filter: saturate(1.14) contrast(1.06) brightness(1.02); }
+  /* filmic vignette over the 3D view — post-processing on a budget */
+  #scene.mode3d::after { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 42%, transparent 52%, rgba(6,8,12,.34) 100%); }
   #scene.mode3d #row { visibility: hidden; }
   #hint3d { display: none; position: absolute; left: 10px; bottom: 10px; z-index: 6;
     background: rgba(16,20,27,.85); border: 1px solid #3a4a63; border-radius: 8px;
@@ -1984,7 +1994,7 @@ function makeRound(idx) {
     // levels 11-20: the room keeps learning new tricks
     const taken = j => j === wetAt;
     let iceAt = -1, dogAt = -1, pipeAt = -1;
-    if (mechanicOn("ice") && plan.theme === "stadium" && layout === "wall" && chance(0.4)) {
+    if (mechanicOn("ice") && plan.theme === "stadium" && layout === "wall" && idx > 0 && chance(0.4)) {
       const cand = freeIdx().filter(j => !taken(j));
       if (cand.length) iceAt = gpick(cand);
     }
@@ -1998,9 +2008,9 @@ function makeRound(idx) {
     }
     const fogged = mechanicOn("fog") && idx > 0 && chance(plan.theme === "festival" ? 0.5 : 0.1);
     let newsSide = -1;
-    if (mechanicOn("news") && layout === "wall" && !plan.waitRound && n >= 5 && chance(0.18)) newsSide = gpick([0, 1]);
+    if (mechanicOn("news") && layout === "wall" && !plan.waitRound && n >= 5 && idx > 1 && chance(0.18)) newsSide = gpick([0, 1]);
     let draftEnd = -1;
-    if (mechanicOn("draft") && layout === "wall" && chance(0.25)) draftEnd = gpick([0, n - 1]);
+    if (mechanicOn("draft") && layout === "wall" && idx > 1 && chance(0.25)) draftEnd = gpick([0, n - 1]);
 
     round = { idx, theme, themeKey: plan.theme, plan, n, spots, dividers, layout, luggageAt, time: plan.time,
       hasBag, constructionAt, flickerAt, wetAt, iceAt, dogAt, pipeAt, fogged, fogLifted: false, newsSide, draftEnd,
@@ -2782,7 +2792,13 @@ function showLesson(title, text, pts) {
   $("scene").classList.add("scoring"); // soften the room — we're reviewing now
   const r = G.cur;
   if (!r.isWaitRound) {
-    r.bestSpots.forEach(i => { const el = slotEl(i); if (el) el.classList.add("best-mark"); });
+    r.bestSpots.forEach(i => {
+      const el = slotEl(i);
+      if (el) {
+        el.classList.add("best-mark");
+        if (!el.querySelector(".spotbeam")) { const b = document.createElement("div"); b.className = "spotbeam"; el.appendChild(b); }
+      }
+    });
     if ($("scene").classList.contains("mode3d")) t3Best(r.bestSpots);
   }
 }
@@ -3058,6 +3074,8 @@ function resolveChoice(i) {
     markSlot(i, "chosen-good"); postPickBonuses(r, i);
     showLesson("Fine. Technically fine.",
       `No splash zone, but the pros would take ${describeBest(r)}. Streak reset.` +
+      (i === r.draftEnd ? ` Your end sits in the <b>propped-door draft</b> 🚪💨 — corner privilege void. That's the whole gap.` : "") +
+      (sc.onAir ? ` Also: you did that <b>ON AIR</b> 🎥. The segment runs at 6.` : "") +
       (sc.flicker ? ` Also: you chose the spot under the <b>dying fluorescent light</b>. On purpose. Bold.` : ""), pts);
     if (r.attendant) showAttendant(); else showDrinkOffer();
   } else {
@@ -3954,6 +3972,46 @@ function build3D(round) {
   sideL.rotation.y = Math.PI / 2; sideL.position.set(-roomW / 2, 1.6, 5);
   const sideR = sideL.clone(); sideR.rotation.y = -Math.PI / 2; sideR.position.x = roomW / 2;
   T3.group.add(backWall, floor, base, ceil, sideL, sideR);
+  // --- 8K dressing: two-tone wainscot, crown line, chrome supply run, floor drain ---
+  const band = new THREE.Mesh(new THREE.BoxGeometry(roomW, 0.06, 0.02),
+    smat(wallC.clone().multiplyScalar(0.62).getHex(), 0.5));
+  band.position.set(0, 1.42, 0.012);
+  const crown = new THREE.Mesh(new THREE.BoxGeometry(roomW, 0.05, 0.03), smat(0xc9ced6, 0.45));
+  crown.position.set(0, 2.96, 0.016);
+  const supply = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, roomW - 0.6, 14),
+    smat(0xdde4ea, 0.18, 1));
+  supply.rotation.z = Math.PI / 2; supply.position.set(0, 1.68, 0.055);
+  supply.castShadow = true;
+  const drainT = tex((x, w, h) => {
+    x.fillStyle = "#57606a"; x.beginPath(); x.arc(w / 2, h / 2, w / 2, 0, 7); x.fill();
+    x.strokeStyle = "#3a4149"; x.lineWidth = 6;
+    for (let k = 1; k < 5; k++) { x.beginPath(); x.moveTo(w * k / 5, 8); x.lineTo(w * k / 5, h - 8); x.stroke(); }
+  }, 128, 128);
+  const drain2 = new THREE.Mesh(new THREE.CircleGeometry(0.22, 22),
+    new THREE.MeshStandardMaterial({ map: drainT, roughness: 0.35, metalness: 0.8, transparent: true }));
+  drain2.rotation.x = -Math.PI / 2; drain2.position.set(0, 0.013, 2.2);
+  T3.group.add(band, crown, supply, drain2);
+  // recessed ceiling fixtures with emissive lenses, matched to the point lights
+  const shadowT = tex((x, w, h) => {
+    const g = x.createRadialGradient(w / 2, h / 2, 4, w / 2, h / 2, w / 2);
+    g.addColorStop(0, "rgba(0,0,0,.42)"); g.addColorStop(1, "rgba(0,0,0,0)");
+    x.fillStyle = g; x.fillRect(0, 0, w, h);
+  }, 128, 128);
+  T3.blobT = shadowT;
+  for (const lx of [-roomW / 4, roomW / 4]) {
+    const hous = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.09, 0.5), smat(0x39404c, 0.5, 0.3));
+    hous.position.set(lx, 2.985, 2.4);
+    const lens = new THREE.Mesh(new THREE.PlaneGeometry(1.36, 0.4),
+      new THREE.MeshBasicMaterial({ color: 0xfff8e6, toneMapped: false }));
+    lens.rotation.x = Math.PI / 2; lens.position.set(lx, 2.93, 2.4);
+    T3.group.add(hous, lens);
+  }
+  const blob = (x, z, r) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(r * 2, r * 2),
+      new THREE.MeshBasicMaterial({ map: T3.blobT, transparent: true, depthWrite: false }));
+    m.rotation.x = -Math.PI / 2; m.position.set(x, 0.011, z);
+    T3.group.add(m);
+  };
   T3.scene.fog = new THREE.Fog(wallC.clone().multiplyScalar(0.5), 10, 26);
   // shadow camera fitted to the room
   T3.dir.position.set(roomW / 5, 5.5, 5);
@@ -4000,6 +4058,7 @@ function build3D(round) {
     const s = round.spots[i], x = X(i);
     const u = t3Urinal(); u.position.x = x;
     T3.group.add(u); T3.slots.push(u);
+    blob(x, 0.35, 0.34);
     if (round.dividers && i < n - 1) {
       const d = new THREE.Mesh(new THREE.BoxGeometry(0.05, 1.15, 0.5), smat(0xc9ced6, 0.35)); d.castShadow = true;
       d.position.set(x + S / 2, 1.05, 0.25);
@@ -4008,6 +4067,7 @@ function build3D(round) {
     if (s.occupant) {
       const person = t3Person(s.persona, s.persona === "boss" ? 0x23293a : parseInt(pick(SHIRTS).slice(1), 16));
       person.position.set(x, 0, 0.55);
+      blob(x, 0.6, 0.3);
       if (s.persona === "lurker") person.rotation.y = Math.PI; // facing the room. unsettling.
       if (s.persona === "boss") {
         const bc = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.16, 0.08), smat(0x4a3423, 0.7));
@@ -4344,7 +4404,21 @@ function t3Mark(i, cls) {
 function t3Best(indices) {
   indices.forEach(i => {
     const ring = T3.rings[i];
-    if (ring && !ring.userData.lockedColor) { ring.material.color.setHex(0x2fb46b); ring.material.opacity = 0.9; }
+    if (!ring) return;
+    if (!ring.userData.lockedColor) { ring.material.color.setHex(0x2fb46b); ring.material.opacity = 0.9; }
+    // museum spotlight: a light cone drops from the ceiling onto the pros' pick
+    const x = ring.position.x;
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.55, 2.55, 24, 1, true),
+      new THREE.MeshBasicMaterial({ color: 0xc9f7dc, transparent: true, opacity: 0.14, depthWrite: false,
+        side: THREE.DoubleSide, toneMapped: false }));
+    cone.position.set(x, 1.7, 0.6);
+    const pool = new THREE.Mesh(new THREE.CircleGeometry(0.52, 26),
+      new THREE.MeshBasicMaterial({ color: 0xd9ffe9, transparent: true, opacity: 0.22, depthWrite: false, toneMapped: false }));
+    pool.rotation.x = -Math.PI / 2; pool.position.set(x, 0.015, 0.6);
+    const sp = new THREE.SpotLight(0xd4ffe6, 10, 9, 0.42, 0.5, 1.1);
+    sp.position.set(x, 3.0, 1.0);
+    sp.target.position.set(x, 0, 0.55);
+    T3.group.add(cone, pool, sp, sp.target);
   });
 }
 /* ---------- wire up ---------- */
