@@ -146,9 +146,15 @@ walk-in from the door, corridor POV down the row, capsule people with
 personas (the REC guy's LED blinks in 3D), hazards as real meshes, the
 flickering-light hazard as an actually flickering point light,
 time-of-day-graded lighting, drag-to-look, tap-to-pick via raycasting, and
-the stall door standing at the end of the corridor. Trough and shame-tub
-rounds automatically fall back to the classic 2D view. All scoring, HUD,
-FX and game logic are shared with 2D.
+the stall door standing at the end of the corridor. **Every layout is 3D**:
+the old-school trough renders as one long porcelain river with animated
+running water, and the shame tub is a proper clawfoot centerpiece — water
+drifting, brass feet, patrons all the way around it (the far side faces
+the camera, regulation ballpark frank at waist level), viewed from a
+raised diorama angle with floor rings on the near side and bobbing pick-
+pins over the far side. The classic 2D view remains only as the fallback
+for devices without WebGL. All scoring, HUD, FX and game logic are shared
+with 2D.
 
 Open `urinal-test.html` in any browser — best on a phone, where wrong picks
 trigger real haptic feedback.

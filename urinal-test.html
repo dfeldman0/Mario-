@@ -468,6 +468,7 @@
     color: #9fb0c3; font-size: 11px; padding: 4px 9px; pointer-events: none; }
   
   #scene.mode3d #stalldoor, #scene.mode3d #attendantbox, #scene.mode3d #trough,
+  #scene.mode3d #tub, #scene.mode3d #rowfar,
   #scene.mode3d #troughfront, #scene.mode3d #setdress, #scene.mode3d #citydeco,
   #scene.mode3d #parkdeco, #scene.mode3d #backdrop, #scene.mode3d #lights,
   #scene.mode3d .floor, #scene.mode3d .floorline, #scene.mode3d .ceiling, #scene.mode3d #tod { display: none; }
@@ -568,6 +569,9 @@
   #tub { position: absolute; left: 12%; right: 12%; top: 47%; height: 20%; display: none; z-index: 3; pointer-events: none;
     filter: drop-shadow(0 10px 10px rgba(0,0,0,.35)); }
   #scene.tub #tub { display: block; }
+  /* in 3D mode the canvas IS the room — no 2D fixture may bleed through */
+  #scene.mode3d #trough, #scene.mode3d #troughfront, #scene.mode3d #tub,
+  #scene.mode3d #row, #scene.mode3d #rowfar { display: none !important; }
   #scene.tub .fixture { display: none; }
   .tub-basin { position: absolute; inset: 0; border-radius: 50%;
     background:
@@ -2416,7 +2420,7 @@ function renderRound(round) {
   $("newsbadge").className = round.newsSide >= 0 ? ("show side" + round.newsSide) : "";
   $("newsbadge").innerHTML = round.newsSide >= 0 ? `🎥 <b>LIVE</b> — ON AIR` : "";
   // 3D mode: wall rooms render in three.js; other layouts fall back to 2D
-  const use3d = threeOn() && window.THREE && T3.ready && round.layout === "wall";
+  const use3d = threeOn() && window.THREE && T3.ready; // every layout renders 3D now
   $("scene").classList.toggle("mode3d", use3d);
   if (use3d) build3D(round);
   $("themebar").innerHTML = `${round.theme.icon} <b>${round.theme.name}</b>` +
@@ -3867,7 +3871,7 @@ function boardMesh(title, rows, w, h) {
   }, 1024, 512);
   return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t, toneMapped: false }));
 }
-function t3Person(persona, shirtHex) {
+function t3Person(persona, shirtHex, front) {
   const g = new THREE.Group();
   const skin = pick([0xe8b48a, 0xc68b5e, 0x8d5a3b, 0xf0c9a5, 0x6b4429]);
   const pants = pick([0x3a4553, 0x54606e, 0x2e3a49, 0x5b4a3a]);
@@ -3902,7 +3906,26 @@ function t3Person(persona, shirtHex) {
   const hair = new THREE.Mesh(new THREE.SphereGeometry(0.153, 22, 14, 0, Math.PI * 2, 0, Math.PI * 0.55), smat(pick([0x2b2119, 0x111111, 0x6e6e6e, 0xa5763a]), 0.9));
   hair.position.y = 1.16;
   hd.add(head, hair);
+  if (front) {
+    // eye contact is the whole point of the shame tub
+    for (const ex of [-0.055, 0.055]) {
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 8), smat(0x1d2430, 0.4));
+      eye.position.set(ex, 1.16, -0.125);
+      hd.add(eye);
+    }
+  }
   g.add(torso, hd);
+  if (front) {
+    // the regulation ballpark frank, held at waist level with both hands. Rated E.
+    const bun = new THREE.Mesh(new THREE.CapsuleGeometry(0.05, 0.2, 6, 10), smat(0xe0a952, 0.8));
+    bun.rotation.z = Math.PI / 2; bun.position.set(0, 0.5, -0.22);
+    const frank = new THREE.Mesh(new THREE.CapsuleGeometry(0.03, 0.24, 6, 10), smat(0xb35b2e, 0.55));
+    frank.rotation.z = Math.PI / 2; frank.position.set(0, 0.545, -0.235);
+    const hL = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 8), smat(skin, 0.6));
+    hL.position.set(-0.15, 0.5, -0.22);
+    const hR = hL.clone(); hR.position.x = 0.15;
+    g.add(bun, frank, hL, hR);
+  }
   g.userData.head = hd;
   if (persona === "shifty") g.userData.swivel = hd; // the neck that will not quit
   if (persona === "glasses") {
@@ -3961,9 +3984,10 @@ function build3D(round) {
   T3.slots = []; T3.rings = []; T3.hits = []; T3.people = []; T3.anims = []; T3.flicker = null; T3.door = null;
   const n = round.n, S = 0.85;
   const X = i => (i - (n - 1) / 2) * S;
-  const roomW = n * S + 4;
+  const nFar = Math.ceil(n / 2);
+  const roomW = (round.layout === "tub" ? Math.max(nFar + 2, 6) : n) * S + 4;
   T3.X = X; T3.roomW = roomW;
-  const halfW0 = (n - 1) / 2 * S + 0.8;
+  const halfW0 = (round.layout === "tub" ? (nFar - 1) / 2 * S + 0.25 * S + 0.9 : (n - 1) / 2 * S + 0.8);
   const hHalf0 = Math.atan(Math.tan(58 * Math.PI / 360) * (T3.cam.aspect || 0.5));
   const camDist = Math.max(4.2, halfW0 / Math.tan(hHalf0) + 0.7);
   const sgn = Math.min(2.3, Math.max(1, camDist / 6.2)); // signage scale: constant apparent size
@@ -4189,6 +4213,149 @@ function build3D(round) {
     poster.rotation.z = rnd(-0.05, 0.05);
     T3.group.add(poster);
   }
+  T3.waterMats = [];
+  const wetSign3 = (x2, z2) => {
+    const wet = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.36), new THREE.MeshBasicMaterial({
+      toneMapped: false, side: THREE.DoubleSide, map: tex((c2, w, h) => {
+        c2.fillStyle = "#ffe14e"; c2.beginPath(); c2.moveTo(w * 0.2, 0); c2.lineTo(w * 0.8, 0);
+        c2.lineTo(w, h); c2.lineTo(0, h); c2.fill();
+        c2.fillStyle = "#7a1f1f"; c2.textAlign = "center"; c2.font = "bold 54px Trebuchet MS";
+        c2.fillText("⚠", w / 2, 64); c2.font = "bold 34px Trebuchet MS";
+        c2.fillText("WET", w / 2, 100); c2.fillText("FLOOR", w / 2, 128);
+      }, 160, 160) }));
+    wet.position.set(x2 + 0.2, 0.18, z2); wet.rotation.x = -0.22;
+    T3.group.add(wet);
+  };
+  const mkRing = (i, x2, z2, halo) => {
+    const onAir = round.newsSide >= 0 && (round.newsSide === 0 ? i < n / 2 : i >= n / 2);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(halo ? 0.24 : 0.28, 0.045, 12, 36),
+      new THREE.MeshBasicMaterial({ color: onAir ? 0xff8a6f : 0x57b8ff, transparent: true, opacity: 0.85 }));
+    if (!halo) ring.rotation.x = -Math.PI / 2; // halos stay upright, facing the camera
+    ring.position.set(x2, halo ? 1.5 : 0.02, z2);
+    ring.userData.gx = x2; ring.userData.gz = z2;
+    T3.group.add(ring);
+    T3.rings[i] = ring;
+  };
+  const mkCol = (i, x2, z2, w2) => {
+    const col = new THREE.Mesh(new THREE.BoxGeometry(w2, 2.2, 1.2), new THREE.MeshBasicMaterial({ visible: false }));
+    col.position.set(x2, 1.1, z2); col.userData.slot = i;
+    T3.group.add(col); T3.hits.push(col);
+  };
+  if (round.layout === "trough") {
+    // ---- the old-school trough: one long porcelain river ----
+    const L = (n - 1) * S + 0.95;
+    const por = pmat(0xeef2f5, 0.3, 0.7, { envMapIntensity: 0.65 });
+    const backP = new THREE.Mesh(new THREE.BoxGeometry(L, 1.05, 0.06), por);
+    backP.position.set(0, 0.9, 0.05); backP.castShadow = true;
+    const basin = new THREE.Mesh(new THREE.BoxGeometry(L, 0.44, 0.36), por);
+    basin.position.set(0, 0.42, 0.22); basin.castShadow = true;
+    const lip = new THREE.Mesh(new THREE.BoxGeometry(L + 0.06, 0.05, 0.42), por);
+    lip.position.set(0, 0.66, 0.22);
+    const wT = tex((x2, w, h) => {
+      x2.fillStyle = "#9fc4d8"; x2.fillRect(0, 0, w, h);
+      for (let k = 0; k < 40; k++) { x2.strokeStyle = `rgba(255,255,255,${0.15 + Math.random() * 0.3})`;
+        x2.lineWidth = 2 + Math.random() * 3; x2.beginPath();
+        const y2 = Math.random() * h; x2.moveTo(0, y2); x2.bezierCurveTo(w / 3, y2 + 8, w * 2 / 3, y2 - 8, w, y2); x2.stroke(); }
+    }, 512, 128);
+    wT.wrapS = wT.wrapT = THREE.RepeatWrapping; wT.repeat.set(L / 1.2, 1);
+    const water = new THREE.Mesh(new THREE.PlaneGeometry(L - 0.1, 0.26),
+      new THREE.MeshStandardMaterial({ map: wT, transparent: true, opacity: 0.85, roughness: 0.15, metalness: 0.1 }));
+    water.rotation.x = -Math.PI / 2; water.position.set(0, 0.645, 0.22);
+    T3.waterMats.push(wT);
+    // sprayer bar: the trickle source
+    const bar2 = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, L, 12), smat(0xdde4ea, 0.18, 1));
+    bar2.rotation.z = Math.PI / 2; bar2.position.set(0, 1.42, 0.09);
+    T3.group.add(backP, basin, lip, water, bar2);
+    blob(0, 0.4, L / 2);
+    for (let i = 0; i < n; i++) {
+      const s = round.spots[i], x = X(i);
+      if (s.occupant) {
+        const person = t3Person(s.persona, parseInt(pick(SHIRTS).slice(1), 16));
+        person.position.set(x, 0, 0.72);
+        blob(x, 0.78, 0.3);
+        T3.group.add(person); T3.people.push(person);
+      } else if (s.blocked) {
+        if (s.blockType === "construction") {
+          const cone = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.34, 18), smat(0xf07818, 0.55)); cone.castShadow = true;
+          cone.position.set(x, 0.17, 0.95);
+          T3.group.add(cone);
+        } else {
+          const bagcase = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.5, 0.2), smat(0xc0392b, 0.5)); bagcase.castShadow = true;
+          bagcase.position.set(x, 0.25, 0.9);
+          T3.group.add(bagcase);
+        }
+      } else {
+        mkRing(i, x, 1.0, false);
+      }
+      if (round.wetAt === i) wetSign3(x, 1.15);
+      mkCol(i, x, 0.9, S * 0.94);
+    }
+  } else if (round.layout === "tub") {
+    // ---- the shame tub: clawfoot, center room, eye contact across the water ----
+    const sideLen = nFar;
+    const xT = p => (p - (sideLen - 1) / 2) * S;
+    const zTub = 1.55, L = Math.max(1.4, (sideLen - 1) * S + 0.5);
+    const por = pmat(0xf4f7f9, 0.25, 0.85, { envMapIntensity: 0.7 });
+    const tubG = new THREE.Group();
+    const mid = new THREE.Mesh(new THREE.BoxGeometry(L * 0.72, 0.62, 0.8), por);
+    mid.position.y = 0.44;
+    const endA = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.62, 26), por);
+    endA.position.set(-L * 0.36, 0.44, 0);
+    const endB = endA.clone(); endB.position.x = L * 0.36;
+    const rim = new THREE.Mesh(new THREE.BoxGeometry(L * 0.72, 0.07, 0.9), por);
+    rim.position.y = 0.76;
+    const rimA = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.07, 26), por);
+    rimA.position.set(-L * 0.36, 0.76, 0);
+    const rimB = rimA.clone(); rimB.position.x = L * 0.36;
+    const wT2 = tex((x2, w, h) => {
+      x2.fillStyle = "#8fbcd6"; x2.fillRect(0, 0, w, h);
+      for (let k = 0; k < 14; k++) { x2.strokeStyle = `rgba(255,255,255,${0.12 + Math.random() * 0.25})`;
+        x2.lineWidth = 3; x2.beginPath();
+        x2.ellipse(w / 2, h / 2, 20 + k * 18, 8 + k * 7, 0, 0, 7); x2.stroke(); }
+    }, 512, 256);
+    wT2.wrapS = wT2.wrapT = THREE.RepeatWrapping;
+    const water2 = new THREE.Mesh(new THREE.CircleGeometry(0.4, 30),
+      new THREE.MeshStandardMaterial({ map: wT2, transparent: true, opacity: 0.9, roughness: 0.1, metalness: 0.1 }));
+    water2.rotation.x = -Math.PI / 2; water2.position.y = 0.82; water2.scale.x = (L * 0.72 + 0.72) / 0.8; water2.scale.y = 1.02;
+    T3.waterMats.push(wT2);
+    tubG.add(mid, endA, endB, rim, rimA, rimB, water2);
+    for (const fx of [-L * 0.34, L * 0.34]) for (const fz of [-0.3, 0.3]) {
+      const foot = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 10), smat(0xb08d3e, 0.35, 0.8));
+      foot.position.set(fx, 0.09, fz); foot.castShadow = true;
+      tubG.add(foot);
+    }
+    tubG.position.set(0, 0, zTub);
+    tubG.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    T3.group.add(tubG);
+    blob(0, zTub, L / 2 + 0.3);
+    for (let i = 0; i < n; i++) {
+      const s = round.spots[i];
+      const far = s.side === 0;
+      const x = xT(s.pos) + (far ? -0.25 : 0.25) * S; // staggered around the oval
+      const z = zTub + (far ? -0.72 : 0.72);
+      if (s.occupant) {
+        const person = t3Person(s.persona, parseInt(pick(SHIRTS).slice(1), 16), far);
+        person.position.set(x, 0, z);
+        if (far) person.rotation.y = Math.PI; // facing the room — hot dog visible, orientation unmistakable
+        blob(x, z, 0.3);
+        T3.group.add(person); T3.people.push(person);
+      } else if (far) {
+        // far-side spots hide behind the tub — a glowing pin floats over each one
+        const onAir2 = round.newsSide >= 0 && (round.newsSide === 0 ? i < n / 2 : i >= n / 2);
+        const pin = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.34, 16),
+          new THREE.MeshBasicMaterial({ color: onAir2 ? 0xff8a6f : 0x7fd4ff, transparent: true, opacity: 0.9, toneMapped: false }));
+        pin.rotation.x = Math.PI; // point down at the spot
+        pin.position.set(x, 1.66, z);
+        pin.userData.baseY = 1.66; // bobs in the frame loop so it never camouflages
+        pin.userData.gx = x; pin.userData.gz = z;
+        T3.group.add(pin);
+        T3.rings[i] = pin;
+      } else {
+        mkRing(i, x, z + 0.28, false); // near side: floor rings in plain view
+      }
+      mkCol(i, x, z, S * 0.62);
+    }
+  } else {
   // slots
   for (let i = 0; i < n; i++) {
     const s = round.spots[i], x = X(i);
@@ -4295,6 +4462,7 @@ function build3D(round) {
       const ring = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.045, 12, 36),
         new THREE.MeshBasicMaterial({ color: onAir ? 0xff8a6f : 0x57b8ff, transparent: true, opacity: 0.85 }));
       ring.rotation.x = -Math.PI / 2; ring.position.set(x, 0.02, 0.8);
+      ring.userData.gx = x; ring.userData.gz = 0.8;
       T3.group.add(ring);
       T3.rings[i] = ring;
     }
@@ -4304,6 +4472,7 @@ function build3D(round) {
     const col = new THREE.Mesh(new THREE.BoxGeometry(S * 0.94, 2.2, 1.7), new THREE.MeshBasicMaterial({ visible: false }));
     col.position.set(x, 1.1, 0.65); col.userData.slot = i;
     T3.group.add(col); T3.hits.push(col);
+  }
   }
   // the stall door
   const doorG = new THREE.Group();
@@ -4462,10 +4631,10 @@ function build3D(round) {
   // camera: STRAIGHT-ON — the whole row visible instantly, zero navigation.
   // Distance auto-fits the row width to the viewport, walk-in dollies straight through the door.
   T3.cam.fov = 58; T3.cam.updateProjectionMatrix();
-  const dist = camDist;
-  T3.camFrom = new THREE.Vector3(0, 1.82, dist + 2.4);
-  T3.camTo = new THREE.Vector3(0, 1.5, dist);
-  T3.look = new THREE.Vector3(0, 1.08, 0.2);
+  const dist = camDist + (round.layout === "tub" ? 1.3 : 0);
+  T3.camFrom = new THREE.Vector3(0, round.layout === "tub" ? 2.9 : 1.82, dist + 2.4);
+  T3.camTo = new THREE.Vector3(0, round.layout === "tub" ? 2.5 : 1.5, dist);
+  T3.look = new THREE.Vector3(0, round.layout === "tub" ? 0.35 : 1.08, round.layout === "tub" ? 1.35 : 0.2);
   T3.camT = 0;
   T3.cam.position.copy(T3.camFrom);
   if (!T3.raf) T3.raf = requestAnimationFrame(t3Frame);
@@ -4617,6 +4786,9 @@ function t3Frame(now) {
   });
   // rings pulse
   T3.rings.forEach(r => { if (r && !r.userData.lockedColor) { r.material.opacity = 0.55 + Math.sin(t * 5) * 0.3; } });
+  // the trough's river runs; the tub's surface drifts; pick-pins bob
+  (T3.waterMats || []).forEach(m => { m.offset.x += 0.0018; });
+  T3.rings.forEach((r, i) => { if (r && r.userData.baseY) r.position.y = r.userData.baseY + Math.sin(t * 3 + i) * 0.07; });
   // flicker hazard
   if (T3.flicker) T3.flicker.intensity = Math.random() < 0.12 ? rnd(0, 2) : rnd(6, 9);
   // scoring: dim the room, keep verdicts readable
@@ -4691,17 +4863,18 @@ function t3Best(indices) {
     if (!ring) return;
     if (!ring.userData.lockedColor) { ring.material.color.setHex(0x2fb46b); ring.material.opacity = 0.9; }
     // museum spotlight: a light cone drops from the ceiling onto the pros' pick
-    const x = ring.position.x;
+    const x = ring.userData.gx != null ? ring.userData.gx : ring.position.x;
+    const z = ring.userData.gz != null ? ring.userData.gz : 0.6;
     const cone = new THREE.Mesh(new THREE.ConeGeometry(0.55, 2.55, 24, 1, true),
       new THREE.MeshBasicMaterial({ color: 0xc9f7dc, transparent: true, opacity: 0.14, depthWrite: false,
         side: THREE.DoubleSide, toneMapped: false }));
-    cone.position.set(x, 1.7, 0.6);
+    cone.position.set(x, 1.7, z);
     const pool = new THREE.Mesh(new THREE.CircleGeometry(0.52, 26),
       new THREE.MeshBasicMaterial({ color: 0xd9ffe9, transparent: true, opacity: 0.22, depthWrite: false, toneMapped: false }));
-    pool.rotation.x = -Math.PI / 2; pool.position.set(x, 0.015, 0.6);
+    pool.rotation.x = -Math.PI / 2; pool.position.set(x, 0.015, z);
     const sp = new THREE.SpotLight(0xd4ffe6, 10, 9, 0.42, 0.5, 1.1);
-    sp.position.set(x, 3.0, 1.0);
-    sp.target.position.set(x, 0, 0.55);
+    sp.position.set(x, 3.0, z + 0.4);
+    sp.target.position.set(x, 0, z);
     T3.group.add(cone, pool, sp, sp.target);
   });
 }
