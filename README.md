@@ -90,10 +90,32 @@ and **Endless Rush** (procedurally generated rounds until the rush claims you).
   Grand Central, 30th Street…), and stamps a "CHICAGO EDITION" banner on the
   title screen.
 
-### 🧪 3D Mode (beta)
+### 🏅 Career progression
 
-Toggle on the start screen. Wall-urinal rounds render as a low-poly 3D room
-(three.js, lazy-loaded from `vendor/` only when enabled): first-person
+Every **10 successful pees** (lifetime, saved on-device) levels you up and
+adds a new mechanic to the rotation, so the game keeps evolving instead of
+repeating:
+
+| Level | Unlock |
+|---|---|
+| 2 | ⚠️ **Wet floors** — a caution sign at a random spot; picking it costs a 2-second slip |
+| 3 | 👀 **The side-glancer** — one guy keeps looking sideways; dividers can't stop a wandering neck |
+| 4 | 🎲 **The send-it gamble** — on no-good-option boards, going anyway is a coin flip, not an automatic splash |
+| 5 | 🫧 **Soap jackpot** — a tappable dispenser worth +8 |
+| 6 | 📱 **The phone zombie** — mid-round, a guy drifts one urinal over without looking up; the board re-scores |
+| 7 | 🧍 **The lurker** — standing at a urinal, facing the room, not going, not leaving |
+| 8 | 🎤 **The crooner** — mid-ballad; his radius is bigger than his talent |
+| 9 | 🚪 **Rush-hour walk-ins** — dawdle and someone takes the best spot |
+| 10 | 🌪️ **Full chaos** — every hazard rolls hotter and stacks |
+
+Level-ups are announced before the next round; the start screen tracks your
+career. The Daily Challenge always runs the full rotation so it stays
+identical worldwide.
+
+### 🧪 3D Mode
+
+Always on — wall-urinal rounds render as a low-poly 3D room
+(three.js, lazy-loaded from `vendor/`): first-person
 walk-in from the door, corridor POV down the row, capsule people with
 personas (the REC guy's LED blinks in 3D), hazards as real meshes, the
 flickering-light hazard as an actually flickering point light,

@@ -148,6 +148,26 @@
   .subnote { margin-top: 12px; color: #66788d; font-size: 12px; }
   #bestline { color: #57b8ff; font-size: 13px; margin-top: 10px; min-height: 16px; }
 
+  /* ---------- career mechanics ---------- */
+  .wetsign { position: absolute; left: 50%; transform: translateX(-50%); bottom: -4px; z-index: 4;
+    background: linear-gradient(#ffe14e, #e8c018); color: #7a1f1f; border-radius: 4px 4px 2px 2px;
+    font-size: 13px; padding: 2px 5px 3px; text-align: center; line-height: 1;
+    box-shadow: 0 2px 4px rgba(0,0,0,.35); border: 1px solid #b89210;
+    clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%); }
+  .wetsign span { display: block; font-size: 7px; font-weight: 900; letter-spacing: .5px; margin-top: 1px; }
+  #scenewrap.slipping { animation: slipwob .65s ease; }
+  @keyframes slipwob { 0% { transform: rotate(0); } 22% { transform: rotate(-5deg) translateY(4px); }
+    48% { transform: rotate(4deg) translateY(-2px); } 72% { transform: rotate(-2deg); } 100% { transform: rotate(0); } }
+  .person.shifty svg { animation: shiftylook 1.7s ease-in-out infinite; transform-origin: 50% 22%; }
+  @keyframes shiftylook { 0%, 26% { transform: rotate(0); } 34%, 46% { transform: rotate(-7deg); }
+    54%, 60% { transform: rotate(0); } 68%, 84% { transform: rotate(7deg); } 92%, 100% { transform: rotate(0); } }
+  .person.crooner svg { animation: croon 1.1s ease-in-out infinite; transform-origin: 50% 90%; }
+  @keyframes croon { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+  .soapjack { position: absolute; z-index: 26; font-size: 30px; cursor: pointer; user-select: none;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,.5)); animation: soapbob 1s ease-in-out infinite; }
+  @keyframes soapbob { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-5px) rotate(4deg); } }
+  #careerline { color: #e6b93d; font-size: 13px; margin-top: 6px; min-height: 16px; }
+
   /* ---------- score feedback ---------- */
   #scorechip { border-color: #8a6a1d; color: #ffd76a; font-weight: bold; }
   #scorechip.bump { animation: scorebump .6s ease; }
@@ -223,8 +243,9 @@
   #start #startbtn { animation: menuin .45s ease backwards .07s, ctapulse 2.4s ease-in-out 1.4s infinite; }
   @keyframes ctapulse { 0%, 100% { box-shadow: 0 4px 0 #176b3e; }
     50% { box-shadow: 0 4px 0 #176b3e, 0 0 24px rgba(55,201,122,.6); } }
-  #ticker { position: absolute; left: 0; right: 0; bottom: 0; overflow: hidden; padding: 8px 0 10px;
-    border-top: 1px solid #222b3b; background: rgba(10,14,20,.72); }
+  #ticker { position: fixed; left: 50%; transform: translateX(-50%); width: 100%; max-width: 900px;
+    bottom: 0; overflow: hidden; padding: 8px 0 10px; z-index: 51;
+    border-top: 1px solid #222b3b; background: rgba(10,14,20,.88); }
   #tickertrack { display: inline-block; white-space: nowrap; color: #8fa2b8; font-size: 12px;
     letter-spacing: 1.2px; animation: tickermove 75s linear infinite; will-change: transform; }
   @keyframes tickermove { to { transform: translateX(-50%); } }
@@ -772,12 +793,12 @@
     <button class="bigbtn daily" id="dailybtn">📅 DAILY CHALLENGE</button>
     <button class="bigbtn alt" id="endlessbtn">♾️ ENDLESS RUSH<small>survive as long as you can · beat your best</small></button>
     <button class="bigbtn loc" id="locbtn">📍 PLAY YOUR HOME BALLPARK<small>your park · your airport · your inside jokes</small></button>
-    <button class="bigbtn beta3d" id="btn3d">🧪 3D MODE: OFF <span style="font-weight:normal">(beta — urinal rooms)</span></button>
     <button class="bigbtn roadtrip hiddenrow" id="roadtripbtn">🗺️ ROAD TRIP<small>choose any of the 30 ballpark cities</small></button>
     <div id="locline"></div>
     <div id="roadtripline"></div>
     <div id="towelline"></div>
     <div id="bestline"></div>
+    <div id="careerline"></div>
     <div class="subnote">📱 Best on a phone — wrong picks trigger haptic splash feedback.</div>
     <div id="ticker"><div id="tickertrack"></div></div>
   </div>
@@ -1035,6 +1056,9 @@ const PERSONAS = {
   phone:    { chip: "“yeah… yeah…”", desc: "a guy on a speakerphone call" },
   headphones: { chip: "♪ ♫",         desc: "a guy vibing in headphones" },
   traveler: { chip: "✈️ gate B12",   desc: "a traveler with rolling luggage" },
+  shifty:   { chip: "👀 …what?",     desc: "the side-glancer — he WILL look" },
+  lurker:   { chip: "🧍 (not going)", desc: "the lurker — not going, not leaving" },
+  crooner:  { chip: "🎤 SWEET CAROLIIINE", desc: "the crooner mid-ballad" },
 };
 
 /* Detailed guy: varied build, hair, outfit, stance. facing: 'back' | 'front' */
@@ -1099,6 +1123,13 @@ function personSVG(persona, facing) {
              <rect x="${35+headR-3}" y="14" width="7" height="11" rx="3" fill="#222"/>`;
   } else if (persona === "traveler") {
     extra = `<path d="M${x0+2} 33 Q35 44 ${x0+torsoW-2} 33 L${x0+torsoW-2} 39 Q35 50 ${x0+2} 39 Z" fill="#9aa8b8"/>`;
+  } else if (persona === "shifty" && !front) {
+    // head caught mid-turn: profile nose + one judging eye
+    extra = `<path d="M${35+headR-1} 20 l4 2.2 l-4 2.2 Z" fill="${skin}"/>
+             <circle cx="${35+headR*0.62}" cy="20.5" r="1.7" fill="#1d2430"/>`;
+  } else if (persona === "crooner" && !front) {
+    extra = `<text x="${35+headR+4}" y="16" font-size="9" fill="#ffd76a">♪</text>
+             <text x="${35-headR-10}" y="10" font-size="7" fill="#ffd76a">♫</text>`;
   }
 
   /* Front-facing guys hold a ballpark frank at waist level with both hands.
@@ -1383,6 +1414,7 @@ function buildRulesDeck() {
     { e: "🚨", t: `<span class="hl">DESPERATION</span>`, x: `At 🍺×3 you're desperate. The clock <b>flies</b>. Run out of time and you will <b>piss yourself</b> in front of everyone. Going relieves 2 drinks. Plan accordingly.`, art: null },
     { e: "🚻", t: `THE <span class="hl">STALL</span> GAMBLE`, x: `No decent spot? Knock on the stall — <b>3 waits per run</b>, each burns ~2.5 seconds, and sometimes… <i>"someone's IN here!"</i>`, art: null },
     { e: "🧖", t: `TIP THE <span class="hl">ATTENDANT</span>`, x: `Towel? Cologne? Gum? <b>$2 buys a towel blessing</b> that saves your pants from one splash. Walk past at your own risk. He's seen things.`, art: artAtt },
+    { e: "🏅", t: `YOUR <span class="hl">CAREER</span>`, x: `Every <b>10 successful pees</b> unlocks a new mechanic — wet floors, the side-glancer, phone zombies, walk-ins… The rooms evolve as you do. The Daily always runs the full rotation.`, art: null },
   ];
   $("ruletrack").innerHTML = CARDS.map(c =>
     `<div class="rulecard"><div class="rc-emoji">${c.e}</div><div class="rc-title">${c.t}</div>` +
@@ -1533,6 +1565,35 @@ const G = {
   cur: null, timer: null, timeLeft: 0, timerTotal: 10, introT: null, locked: false,
 };
 function desperate() { return G.drinks >= 3; }
+
+/* ---------- career ladder: every 10 successful pees adds a mechanic ---------- */
+function careerPees() { try { return Number(localStorage.getItem("ut_pees") || 0); } catch (e) { return 0; } }
+function careerLevel() { return Math.floor(careerPees() / 10) + 1; }
+const CAREER_LADDER = [
+  null, // level 1: the base game
+  { key: "wet",     icon: "⚠️", name: "WET FLOORS",          tease: "Caution signs appear at random spots. Slipping costs 2 seconds." },
+  { key: "glancer", icon: "👀", name: "THE SIDE-GLANCER",    tease: "One guy can't keep his eyes to himself. Dividers don't stop a wandering neck." },
+  { key: "gamble",  icon: "🎲", name: "THE SEND-IT GAMBLE",  tease: "No good option? Going anyway is now a coin flip instead of a guaranteed splash." },
+  { key: "soap",    icon: "🫧", name: "SOAP JACKPOT",        tease: "A soap dispenser worth tapping appears sometimes. Free hygiene points." },
+  { key: "drift",   icon: "📱", name: "THE PHONE ZOMBIE",    tease: "Mid-round, a guy glued to his phone drifts one urinal over. The board changes under you." },
+  { key: "lurker",  icon: "🧍", name: "THE LURKER",          tease: "A guy standing at a urinal. Facing out. Not going. Not leaving." },
+  { key: "crooner", icon: "🎤", name: "THE CROONER",         tease: "One patron is mid-ballad. His radius is bigger than his talent." },
+  { key: "sniper",  icon: "🚪", name: "RUSH-HOUR WALK-INS",  tease: "Dawdle too long and someone walks in and TAKES the best spot." },
+  { key: "chaos",   icon: "🌪️", name: "FULL CHAOS",          tease: "Every hazard can now stack in one room. You asked for this, legend." },
+];
+function mechanicOn(key) {
+  // the Daily is the shared arena: everyone worldwide plays with the full rotation
+  const lvl = G.mode === "daily" ? CAREER_LADDER.length : careerLevel();
+  const at = CAREER_LADDER.findIndex(m => m && m.key === key);
+  return at >= 0 && lvl > at;
+}
+function addPee() {
+  const before = careerLevel();
+  try { localStorage.setItem("ut_pees", careerPees() + 1); } catch (e) {}
+  const after = careerLevel();
+  const m = CAREER_LADDER[after - 1];
+  if (after > before && m) G.pendingUnlock = m; // announced before the next round starts
+}
 
 /* ---------- towels (free respawns), earned by sharing ---------- */
 function getTowels() {
@@ -1687,6 +1748,12 @@ function updateStartLines() {
     const bestScore = Number(localStorage.getItem("ut_bestEndlessScore") || 0);
     $("bestline").textContent = best ? `♾️ Endless best: round ${best} · ${bestScore} pts` : "";
   } catch (e) {}
+  const pees = careerPees(), lvl = careerLevel();
+  const next = CAREER_LADDER[lvl];
+  $("careerline").textContent = pees > 0
+    ? `🏅 Career: ${pees} pee${pees === 1 ? "" : "s"} · Level ${lvl}` +
+      (next ? ` — ${10 - (pees % 10)} more to unlock “${next.name}”` : " — the full rotation. Legend.")
+    : "";
   buildAttract(); buildTicker();
 }
 
@@ -1757,9 +1824,22 @@ function makeRound(idx) {
         const cand = occupiedIdx.filter(i => !spots[i].persona);
         if (cand.length) spots[gpick(cand)].persona = "traveler";
       }
+      if (mechanicOn("glancer") && idx > 0 && chance(0.32)) {
+        const cand = occupiedIdx.filter(i => !spots[i].persona);
+        if (cand.length) spots[gpick(cand)].persona = "shifty";
+      }
+      if (mechanicOn("crooner") && idx > 0 && chance(["divebar", "festival", "stadium"].includes(plan.theme) ? 0.35 : 0.12)) {
+        const cand = occupiedIdx.filter(i => !spots[i].persona);
+        if (cand.length) spots[gpick(cand)].persona = "crooner";
+      }
       occupiedIdx.forEach(i => {
         if (!spots[i].persona) spots[i].persona = grnd() < 0.3 ? gpick(["phone", "headphones"]) : "regular";
       });
+    }
+    // the lurker claims a free spot and simply... exists there
+    if (mechanicOn("lurker") && layout === "wall" && !plan.waitRound && idx > 1 && chance(0.22)) {
+      const cand = spots.map((s, i) => (!s.occupant && !s.blocked) ? i : -1).filter(i => i >= 0);
+      if (cand.length > 3) { const k = gpick(cand); spots[k].occupant = "regular"; spots[k].persona = "lurker"; }
     }
 
     // traveler luggage blocks an adjacent free spot (linear layouts only)
@@ -1798,14 +1878,26 @@ function makeRound(idx) {
     }
 
     // flickering light: one usable-but-cursed spot (comfort penalty, no splash risk)
+    const chaosB = mechanicOn("chaos") ? 1.5 : 1; // full chaos: every hazard rolls hotter
     let flickerAt = -1;
-    if (layout === "wall" && !plan.waitRound && chance(plan.flicker) && freeIdx().length > 2) {
+    if (layout === "wall" && !plan.waitRound && chance(Math.min(0.8, (plan.flicker || 0) * chaosB)) && freeIdx().length > 2) {
       flickerAt = gpick(freeIdx());
     }
 
+    // wet floor: one free spot hides a slip that costs 2 seconds
+    let wetAt = -1;
+    if (layout !== "tub" && mechanicOn("wet") && idx > 0 && chance(Math.min(0.6, 0.3 * chaosB)) && freeIdx().length > 1) {
+      wetAt = gpick(freeIdx());
+    }
+
     round = { idx, theme, themeKey: plan.theme, plan, n, spots, dividers, layout, luggageAt, time: plan.time,
-      hasBag, constructionAt, flickerAt,
+      hasBag, constructionAt, flickerAt, wetAt,
       attendant: layout === "wall" && chance(plan.attendant) };
+    // mid-round events: a phone zombie drifting, or a walk-in taking the best spot
+    round.driftAt = (mechanicOn("drift") && layout === "wall" && !plan.waitRound && idx > 0 && chance(0.28)) ? 0.55 : 0;
+    round.sniperAt = (!round.driftAt && mechanicOn("sniper") && layout === "wall" && !plan.waitRound && idx > 0 && chance(0.24)) ? 0.5 : 0;
+    round.driftPending = round.driftAt > 0;
+    round.sniperPending = round.sniperAt > 0;
     analyze(round);
 
     const isWait = round.bestRaw <= 1.0 && occupiedIdx.length > 0;
@@ -1828,7 +1920,7 @@ function distBetween(r, i, j) {
 
 function comfortOf(round, i) {
   const { spots, n, dividers } = round;
-  let minRaw = 99, adjGlasses = false, hasAdjacent = false;
+  let minRaw = 99, adjGlasses = false, adjShifty = false, hasAdjacent = false;
   for (let j = 0; j < n; j++) {
     if (!spots[j].occupant) continue;
     let d = distBetween(round, i, j);
@@ -1836,11 +1928,18 @@ function comfortOf(round, i) {
       ? (spots[i].side === spots[j].side && Math.abs(spots[i].pos - spots[j].pos) === 1)
       : Math.abs(i - j) === 1;
     if (spots[j].persona === "glasses") d -= 0.5; // his presence is... larger
-    if (sideBySide) { hasAdjacent = true; if (spots[j].persona === "glasses") adjGlasses = true; }
+    if (spots[j].persona === "shifty") d -= 0.4;  // those eyes travel
+    if (spots[j].persona === "crooner") d -= 0.35; // the ballad carries
+    if (sideBySide) {
+      hasAdjacent = true;
+      if (spots[j].persona === "glasses") adjGlasses = true;
+      if (spots[j].persona === "shifty") adjShifty = true;
+    }
     if (d < minRaw) minRaw = d;
   }
   let eff = minRaw;
   if (adjGlasses) eff = Math.min(eff, 0.5);
+  else if (adjShifty) eff = Math.min(eff, 0.6); // a divider can't block a wandering neck
   else if (minRaw === 1 && hasAdjacent && dividers) eff = 1.5; // divider softens a direct neighbor
   let isEnd;
   if (round.layout === "tub") {
@@ -2196,7 +2295,8 @@ function renderRound(round) {
     if (s.occupant) {
       slot.classList.add("occupied");
       const chip = PERSONAS[s.persona].chip;
-      inner += `<div class="person">${personSVG(s.persona, facing)}` +
+      const pface = s.persona === "lurker" ? "front" : facing; // the lurker faces the ROOM
+      inner += `<div class="person${s.persona === "shifty" ? " shifty" : ""}${s.persona === "crooner" ? " crooner" : ""}">${personSVG(s.persona, pface)}` +
         (chip ? `<div class="chip">${chip}</div>` : "") + `</div>`;
     } else if (s.blocked) {
       slot.classList.add("blocked");
@@ -2212,6 +2312,7 @@ function renderRound(round) {
       slot.classList.add("free");
     }
     if (round.flickerAt === i) inner += `<div class="flick"></div>`;
+    if (round.wetAt === i) inner += `<div class="wetsign">⚠️<span>WET<br>FLOOR</span></div>`;
     slot.innerHTML = inner;
     slot.addEventListener("click", () => onSlot(i));
     (far ? rowfar : row).appendChild(slot);
@@ -2269,6 +2370,25 @@ function gainScore(pts, kind) {
   setTimeout(() => el.remove(), 1200);
 }
 
+/* Soap jackpot: a wall dispenser worth tapping. Hygiene pays. */
+function spawnSoap() {
+  const old = $("scene").querySelector(".soapjack");
+  if (old) old.remove();
+  const s = document.createElement("div");
+  s.className = "soapjack"; s.textContent = "🧼";
+  s.style.left = rnd(8, 84) + "%";
+  s.style.top = rnd(16, 34) + "%";
+  s.addEventListener("click", e => {
+    e.stopPropagation();
+    gainScore(8, "mid");
+    toast("🫧 HYGIENE BONUS +8. Gleaming.");
+    tone(880, .08, "sine", .07); tone(1320, .1, "sine", .06, .07);
+    s.remove();
+  });
+  $("scene").appendChild(s);
+  setTimeout(() => { if (s.isConnected) s.remove(); }, 4500);
+}
+
 function toast(msg) {
   const t = document.createElement("div");
   t.className = "toast"; t.textContent = msg;
@@ -2304,6 +2424,12 @@ function runTimer() {
   wrap.classList.remove("low");
   G.timer = setInterval(() => {
     G.timeLeft -= 0.1;
+    const r0 = G.cur;
+    if (r0 && !G.locked) {
+      const frac = G.timeLeft / G.timerTotal;
+      if (r0.driftPending && frac <= r0.driftAt) { r0.driftPending = false; doDrift(r0); }
+      if (r0.sniperPending && frac <= r0.sniperAt) { r0.sniperPending = false; doSniper(r0); }
+    }
     const p = Math.max(0, G.timeLeft / G.timerTotal * 100);
     bar.style.width = p + "%";
     if (p < 30) wrap.classList.add("low");
@@ -2312,6 +2438,42 @@ function runTimer() {
     if (G.timeLeft <= 0) { stopTimer(); onTimeout(); }
   }, 100);
 }
+/* The phone zombie: an occupant drifts one spot over without looking up. */
+function doDrift(r) {
+  const cands = [];
+  r.spots.forEach((s, i) => {
+    if (!s.occupant || s.persona === "lurker") return;
+    [i - 1, i + 1].forEach(j => {
+      if (j >= 0 && j < r.n && !r.spots[j].occupant && !r.spots[j].blocked && j !== r.wetAt)
+        cands.push([i, j, s.persona === "phone" ? 3 : 1]); // phone guys drift the most
+    });
+  });
+  if (!cands.length) return;
+  const bag = cands.flatMap(c => Array(c[2]).fill(c));
+  const [from, to] = bag[Math.floor(Math.random() * bag.length)];
+  r.spots[to].occupant = r.spots[from].occupant;
+  r.spots[to].persona = r.spots[from].persona === "regular" ? "phone" : r.spots[from].persona;
+  r.spots[from].occupant = null; r.spots[from].persona = undefined;
+  analyze(r);
+  renderRound(r);
+  buzz([25, 15, 25]); tone(420, .1, "sine", .06);
+  toast("📱 He drifted a spot over without looking up. The board changed.");
+}
+
+/* Rush hour: a walk-in beelines for the best open spot. Shouldn't have dawdled. */
+function doSniper(r) {
+  const free = r.selectable;
+  if (free.length < 3) return; // never strand the player
+  const target = r.bestSpots[Math.floor(Math.random() * r.bestSpots.length)];
+  if (target == null || r.spots[target].occupant || r.spots[target].blocked) return;
+  r.spots[target].occupant = "regular";
+  r.spots[target].persona = Math.random() < 0.4 ? "phone" : "regular";
+  analyze(r);
+  renderRound(r);
+  buzz([40, 20, 40]); tone(300, .16, "square", .07);
+  toast("🚪 WALK-IN! He took the good spot. Adapt.");
+}
+
 function stopTimer() {
   if (G.timer) { clearInterval(G.timer); G.timer = null; }
   if (G.introT) { clearTimeout(G.introT); G.introT = null; }
@@ -2627,7 +2789,7 @@ function resolveChoice(i) {
       G.streak++; G.trail.push("😬");
       const pts = Math.round(80 * buzzMult());
       gainScore(pts, "ok"); G.perfects++;
-      relieve();
+      relieve(); addPee();
       buzz([30, 20, 30]); sfx.ok();
       verdict("GRITTED TEETH 😬", "ok");
       markSlot(i, "chosen-good");
@@ -2638,6 +2800,29 @@ function resolveChoice(i) {
         `stared straight ahead, and said nothing. Respect.`, pts);
       if (r.attendant) showAttendant(); else showDrinkOffer();
       updateHUD();
+      return;
+    }
+    // the send-it gamble: on a no-good-option board, going anyway is a coin flip
+    if (mechanicOn("gamble") && sc.comfort >= r.bestComfort - 0.01) {
+      relieve();
+      if (Math.random() < 0.55) {
+        G.trail.push("🎲");
+        const pts = Math.round(60 * buzzMult());
+        gainScore(pts, "ok");
+        addPee();
+        buzz([25, 15, 25]); sfx.ok();
+        verdict("SENT IT 🎲", "ok");
+        markSlot(i, "chosen-good");
+        showLesson("Fortune favors the desperate.",
+          `No good option existed — the stall was the percentage play — but you sent it next to ` +
+          `${neighborDesc(r, i)} and somehow… nothing happened. Nobody spoke. Nobody looked. ` +
+          `Streak survives. <b>This time.</b>`, pts);
+        if (r.attendant) showAttendant(); else showDrinkOffer();
+        updateHUD();
+        return;
+      }
+      fail(i, "GAMBLE LOST 💦", `You sent it next to ${neighborDesc(r, i)} — a coin flip, and it landed wrong. ` +
+        `<b>The stall</b> 🚻 was the percentage play.`);
       return;
     }
     relieve(); // you went — messily
@@ -2652,7 +2837,7 @@ function resolveChoice(i) {
     const pts = Math.round((100 + speedBonus) * mult * buzzMult());
     const buzzNote = G.held.length ? ` ${heldIcons()} +${buzzPct()}% buzz bonus!` : "";
     gainScore(pts, "big"); G.perfects++;
-    relieve();
+    relieve(); addPee();
     buzz(30); sfx.good();
     verdict("PERFECT!", "good");
     markSlot(i, "chosen-good");
@@ -2665,7 +2850,7 @@ function resolveChoice(i) {
     G.streak = 0; G.trail.push("🟨");
     const pts = Math.round(40 * buzzMult());
     gainScore(pts, "mid");
-    relieve();
+    relieve(); addPee();
     buzz([15, 30, 15]); sfx.ok();
     verdict("ACCEPTABLE", "ok");
     markSlot(i, "chosen-good");
@@ -2737,6 +2922,17 @@ function onSlot(i) {
   }
   G.locked = true;
   stopTimer();
+  if (!s.blocked && i === r.wetAt) {
+    // the sign was RIGHT THERE: 2 seconds of cartoon skating, then your pick resolves
+    G.timeLeft = Math.max(0, G.timeLeft - 2);
+    const sw = $("scenewrap");
+    sw.classList.remove("slipping"); void sw.offsetWidth; sw.classList.add("slipping");
+    buzz([50, 30, 80]); tone(700, .12, "square", .07); tone(220, .25, "sawtooth", .07, .1);
+    toast("🛼 WET FLOOR — you skated. −2s off your speed bonus.");
+    const r0 = r; // if anything replaces the round mid-slide, the pick dies with it
+    setTimeout(() => { sw.classList.remove("slipping"); if (G.cur === r0) resolveChoice(i); }, 650);
+    return;
+  }
   if (s.blocked) {
     if (s.blockType === "bag") {
       fail(i, "IT'S BAGGED!", `That urinal has been out of order since the previous administration. ` +
@@ -2790,7 +2986,7 @@ function stallSuccess() {
   door.classList.add("spent");
   sfx.flush();
   buzz([30, 60, 30]);
-  G.drinks = 0; G.held = []; // a stall is a proper visit — full relief
+  G.drinks = 0; G.held = []; addPee(); // a stall is a proper visit — full relief
   if (r.isWaitRound) {
     G.streak++; G.trail.push("🚻");
     const pts = Math.round(150 * buzzMult());
@@ -2847,6 +3043,7 @@ function startRound() {
   const sc = $("scene");
   sc.classList.remove("dollying"); void sc.offsetWidth; sc.classList.add("dollying");
   setTimeout(() => sc.classList.remove("dollying"), 1600);
+  if (mechanicOn("soap") && G.cur.layout === "wall" && Math.random() < 0.3) spawnSoap();
   let factor = Math.max(0.5, 1 - clockPct() / 100); // every drink makes the clock meaner
   let muskNote = "";
   if (G.musk) { factor *= 0.88; G.musk = false; muskNote = " · 🧴 cologne cloud: −12% time"; }
@@ -2861,6 +3058,10 @@ function startRound() {
   if (G.cur.hasBag) hazards.push("🛍️ one's out of order");
   if (G.cur.constructionAt >= 0) hazards.push("🚧 construction zone");
   if (G.cur.flickerAt >= 0) hazards.push("💡 flickering light");
+  if (G.cur.wetAt >= 0) hazards.push("⚠️ wet floor");
+  if (G.cur.spots.some(s => s.persona === "shifty")) hazards.push("👀 wandering eyes");
+  if (G.cur.spots.some(s => s.persona === "lurker")) hazards.push("🧍 a lurker");
+  if (G.cur.spots.some(s => s.persona === "crooner")) hazards.push("🎤 live vocals");
   const hazardNote = hazards.length ? ` · ${hazards.join(" · ")}` : "";
   const pkIntro = THEMES.stadium.parkRef;
   const chantNote = (pkIntro && G.cur.themeKey === "stadium") ? ` · ${pkIntro.chant}!` : "";
@@ -2894,6 +3095,12 @@ function startRound() {
   } else {
     stages.push({ ms: hazards.length ? 1900 : 1500, run: () =>
       announce(G.cur.theme.icon, G.cur.theme.name, infoLine, hazards.length ? 1850 : 1450),
+      end: () => {} });
+  }
+  if (G.pendingUnlock) {
+    const m = G.pendingUnlock; G.pendingUnlock = null;
+    stages.push({ ms: 2600, run: () =>
+      announce(m.icon, `LEVEL UP — ${m.name}`, `${m.tease} Now in the rotation.`, 2550, "warn"),
       end: () => {} });
   }
   if (desperate()) stages.push({ ms: 1800, run: () =>
@@ -3140,9 +3347,9 @@ updateStartLines();
    Wall-urinal rounds only; trough/tub fall back to 2D.
    All game logic, HUD, FX and scoring stay in the DOM above.
    ========================================================= */
-const T3 = { ready: false, raf: null, slots: [], rings: [], hits: [], door: null,
+const T3 = { ready: false, failed: false, raf: null, slots: [], rings: [], hits: [], door: null,
   people: [], flicker: null, camT: 0, dim: 0 };
-function threeOn() { try { return localStorage.getItem("ut_3d") === "1"; } catch (e) { return false; } }
+function threeOn() { return !T3.failed; } // 3D is the game now; falls back to 2D only if WebGL can't start
 function loadThree() {
   if (window.THREE) return Promise.resolve(true);
   return new Promise(res => {
@@ -3156,7 +3363,7 @@ function loadThree() {
 function t3Init() {
   if (T3.ready) return;
   const cv = $("three3d");
-  T3.renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+  T3.renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); // throws without WebGL — caller catches
   T3.renderer.setPixelRatio(Math.min(3, window.devicePixelRatio || 1));
   T3.renderer.outputColorSpace = THREE.SRGBColorSpace;
   T3.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -3263,11 +3470,14 @@ function t3Person(persona, shirtHex) {
     arm.rotation.x = -0.35; arm.rotation.z = ax > 0 ? -0.12 : 0.12;
     g.add(arm);
   }
+  const hd = new THREE.Group();
   const head = new THREE.Mesh(new THREE.SphereGeometry(0.15, 22, 18), smat(skin, 0.6));
   head.position.y = 1.14;
   const hair = new THREE.Mesh(new THREE.SphereGeometry(0.153, 22, 14, 0, Math.PI * 2, 0, Math.PI * 0.55), smat(pick([0x2b2119, 0x111111, 0x6e6e6e, 0xa5763a]), 0.9));
   hair.position.y = 1.16;
-  g.add(torso, head, hair);
+  hd.add(head, hair);
+  g.add(torso, hd);
+  if (persona === "shifty") g.userData.swivel = hd; // the neck that will not quit
   if (persona === "glasses") {
     const band = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.022, 8, 24), smat(0x111111, 0.35, 0.4));
     band.position.y = 1.15; band.rotation.x = Math.PI / 2;
@@ -3427,6 +3637,7 @@ function build3D(round) {
     if (s.occupant) {
       const person = t3Person(s.persona, parseInt(pick(SHIRTS).slice(1), 16));
       person.position.set(x, 0, 0.55);
+      if (s.persona === "lurker") person.rotation.y = Math.PI; // facing the room. unsettling.
       T3.group.add(person); T3.people.push(person);
     } else if (s.blocked) {
       if (s.blockType === "bag") {
@@ -3458,6 +3669,18 @@ function build3D(round) {
         handle.position.set(x, 0.62, 0.7);
         T3.group.add(bagcase, handle);
       }
+    }
+    if (round.wetAt === i) {
+      const wet = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.36), new THREE.MeshBasicMaterial({
+        toneMapped: false, side: THREE.DoubleSide, map: tex((c2, w, h) => {
+          c2.fillStyle = "#ffe14e"; c2.beginPath(); c2.moveTo(w * 0.2, 0); c2.lineTo(w * 0.8, 0);
+          c2.lineTo(w, h); c2.lineTo(0, h); c2.fill();
+          c2.fillStyle = "#7a1f1f"; c2.textAlign = "center"; c2.font = "bold 54px Trebuchet MS";
+          c2.fillText("⚠", w / 2, 64); c2.font = "bold 34px Trebuchet MS";
+          c2.fillText("WET", w / 2, 100); c2.fillText("FLOOR", w / 2, 128);
+        }, 160, 160) }));
+      wet.position.set(x + 0.2, 0.18, 1.0); wet.rotation.x = -0.22;
+      T3.group.add(wet);
     }
     // pick-ring for selectable spots
     if (!s.occupant && !s.blocked) {
@@ -3659,6 +3882,7 @@ function t3Frame(now) {
   T3.people.forEach((p, i) => {
     p.rotation.z = Math.sin(t * 1.3 + i * 2) * 0.03;
     if (p.userData.led) p.userData.led.visible = Math.floor(t * 2) % 2 === 0;
+    if (p.userData.swivel) p.userData.swivel.rotation.y = Math.sin(t * 1.4 + i) * 0.9;
   });
   // rings pulse
   T3.rings.forEach(r => { if (r && !r.userData.lockedColor) { r.material.opacity = 0.55 + Math.sin(t * 5) * 0.3; } });
@@ -3698,14 +3922,6 @@ function t3Best(indices) {
     if (ring && !ring.userData.lockedColor) { ring.material.color.setHex(0x2fb46b); ring.material.opacity = 0.9; }
   });
 }
-function update3DButton() {
-  const b = $("btn3d");
-  b.classList.toggle("on", threeOn());
-  b.innerHTML = threeOn()
-    ? `🧪 3D MODE: ON <span style="font-weight:normal">(beta — urinal rooms)</span>`
-    : `🧪 3D MODE: OFF <span style="font-weight:normal">(beta — urinal rooms)</span>`;
-}
-
 /* ---------- wire up ---------- */
 $("startbtn").addEventListener("click", () => maybeStart("gauntlet"));
 $("dailybtn").addEventListener("click", () => maybeStart("daily"));
@@ -3720,21 +3936,10 @@ $("rulenext").addEventListener("click", () => {
 $("ruletrack").addEventListener("scroll", () => updateRuleUI(), { passive: true });
 $("scene").addEventListener("click", () => skipIntro());
 $("parkphoto").addEventListener("click", e => { e.stopPropagation(); enterThroughDoors(); });
-$("btn3d").addEventListener("click", async () => {
-  const turningOn = !threeOn();
-  try { localStorage.setItem("ut_3d", turningOn ? "1" : "0"); } catch (e) {}
-  update3DButton();
-  if (turningOn) {
-    const ok = await loadThree();
-    if (!ok) {
-      try { localStorage.setItem("ut_3d", "0"); } catch (e) {}
-      update3DButton();
-      toast("Couldn't load the 3D engine — staying classic.");
-    } else { t3Init(); toast("🧪 3D rooms on. Trough & tub stay classic for now."); }
-  }
+loadThree().then(ok => {
+  if (!ok) { T3.failed = true; return; }
+  try { t3Init(); } catch (e) { T3.failed = true; } // no WebGL → classic 2D, no drama
 });
-if (threeOn()) loadThree().then(ok => { if (ok) t3Init(); else { try { localStorage.setItem("ut_3d", "0"); } catch (e) {} update3DButton(); } });
-update3DButton();
 window.addEventListener("resize", () => { if (T3.ready && $("scene").classList.contains("mode3d")) t3Resize(); });
 $("againbtn").addEventListener("click", () => { buzz(20); resetGame(undefined, undefined); });
 $("menubtn").addEventListener("click", () => { $("end").classList.add("hidden"); $("start").classList.remove("hidden"); updateStartLines(); });
