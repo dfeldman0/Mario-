@@ -112,6 +112,7 @@
   #dim { position: absolute; inset: 0; background: rgba(6,9,14,.55); backdrop-filter: blur(1.5px);
     opacity: 0; transition: opacity .35s; pointer-events: none; z-index: 10; }
   #scene.scoring #dim { opacity: 1; }
+  #scene.scoring.review #dim { opacity: 0; }
   #scene.scoring #rowfar { z-index: 11; }
   #scene.scoring #tub { z-index: 12; }
   #scene.scoring #row { z-index: 13; }
@@ -1601,6 +1602,20 @@ function localizeStadium() {
   }, { timeout: 9000, maximumAge: 600000 });
 }
 /* ---------- gauntlet round scripts (difficulty curve) ---------- */
+/* Every venue is a different BUILDING: its own row size, surfaces and light.
+   A hipster roastery has four urinals and warm brick; an airport has ten and terrazzo. */
+const VENUE_STYLE = {
+  office:   { nMax: 6,  wall: "paint",    floor: "square",   lightC: 0xf2f6ff, pt: 1.0 },
+  coffee:   { nMax: 4,  wall: "brick",    floor: "hex",      lightC: 0xffd9a8, pt: 0.8 },
+  mall:     { nMax: 8,  wall: "bigtile",  floor: "terrazzo", lightC: 0xffffff, pt: 1.05 },
+  tech:     { nMax: 5,  wall: "concrete", floor: "poured",   lightC: 0xe8f2ff, pt: 0.95 },
+  divebar:  { nMax: 5,  wall: "wood",     floor: "checker",  lightC: 0xffc890, pt: 0.68 },
+  airport:  { nMax: 10, wall: "bigtile",  floor: "terrazzo", lightC: 0xffffff, pt: 1.1 },
+  station:  { nMax: 9,  wall: "subway",   floor: "worn",     lightC: 0xfff4da, pt: 0.95 },
+  stadium:  { nMax: 10, wall: "block",    floor: "poured",   lightC: 0xf8fbff, pt: 1.05 },
+  festival: { nMax: 8,  wall: "plastic",  floor: "plank",    lightC: 0xffc8e8, pt: 0.85, party: true },
+};
+
 const ROUND_PLAN = [
   { theme: "office",  n: [5, 5],  occ: [0, 0], div: 0,   time: 10 },                              // 1: empty tutorial
   { theme: "coffee",  n: [4, 5],  occ: [1, 1], div: 0,   time: 9 },                               // 2
@@ -1888,7 +1903,7 @@ function makeRound(idx) {
   const theme = THEMES[plan.theme];
   let round = null;
   for (let attempt = 0; attempt < 120; attempt++) {
-    const n = grand(plan.n[0], plan.n[1]);
+    const n = Math.min(grand(plan.n[0], plan.n[1]), (VENUE_STYLE[plan.theme] || {}).nMax || 10);
     const occCount = Math.max(0, Math.min(grand(plan.occ[0], plan.occ[1]), n - 2));
     const tub = chance(plan.tub);
     const trough = !tub && chance(plan.trough);
@@ -1923,11 +1938,13 @@ function makeRound(idx) {
         const cand = occupiedIdx.filter(i => !spots[i].persona);
         if (cand.length) spots[gpick(cand)].persona = "shifty";
       }
-      if (mechanicOn("crooner") && idx > 0 && chance(["divebar", "festival", "stadium"].includes(plan.theme) ? 0.35 : 0.12)) {
+      const croonV = { divebar: 0.35, festival: 0.35, stadium: 0.3, station: 0.2 }[plan.theme] || 0; // buskers busk where buskers busk
+      if (mechanicOn("crooner") && idx > 0 && chance(croonV)) {
         const cand = occupiedIdx.filter(i => !spots[i].persona);
         if (cand.length) spots[gpick(cand)].persona = "crooner";
       }
-      if (mechanicOn("boss") && idx > 1 && chance(["office", "tech"].includes(plan.theme) ? 0.35 : 0.1)) {
+      const bossV = { office: 0.35, tech: 0.35, airport: 0.15 }[plan.theme] || 0; // the boss doesn't do dive bars
+      if (mechanicOn("boss") && idx > 1 && chance(bossV)) {
         const cand = occupiedIdx.filter(i => !spots[i].persona);
         if (cand.length) spots[gpick(cand)].persona = "boss";
       }
@@ -2003,9 +2020,12 @@ function makeRound(idx) {
       const cand = freeIdx().filter(j => !taken(j) && j !== iceAt && j !== dogAt);
       if (cand.length > 2) pipeAt = gpick(cand); // never rig a room the burst could strand
     }
-    const fogged = mechanicOn("fog") && idx > 0 && chance(plan.theme === "festival" ? 0.5 : 0.1);
+    const fogV = { festival: 0.5, divebar: 0.25, stadium: 0.15 }[plan.theme] || 0; // steam needs a steam source
+    const fogged = mechanicOn("fog") && idx > 0 && chance(fogV);
     let newsSide = -1;
-    if (mechanicOn("news") && layout === "wall" && !plan.waitRound && n >= 5 && idx > 1 && chance(0.18)) newsSide = gpick([0, 1]);
+    // a film crew shoots where the public is — never in a four-stall roastery
+    if (mechanicOn("news") && ["stadium", "airport", "station", "mall", "festival"].includes(plan.theme) &&
+        layout === "wall" && !plan.waitRound && n >= 5 && idx > 1 && chance(0.18)) newsSide = gpick([0, 1]);
     let draftEnd = -1;
     if (mechanicOn("draft") && layout === "wall" && idx > 1 && chance(0.25)) draftEnd = gpick([0, n - 1]);
 
@@ -2788,7 +2808,11 @@ function showLesson(title, text, pts) {
   $("ltext").innerHTML = text;
   $("lpts").textContent = pts > 0 ? `+${pts}` : (pts < 0 ? `${pts}` : "");
   $("lesson").classList.add("show");
-  $("scene").classList.add("scoring"); // soften the room — we're reviewing now
+  const sc2 = $("scene");
+  sc2.classList.add("scoring"); // soften the room — the verdict needs the stage
+  sc2.classList.remove("review");
+  clearTimeout(G.reviewT);
+  G.reviewT = setTimeout(() => sc2.classList.add("review"), 1250); // …then the lights come back up: enjoy the signs, the clock is dead
   const r = G.cur;
   if (!r.isWaitRound) {
     r.bestSpots.forEach(i => {
@@ -3273,7 +3297,8 @@ function onTimeout() {
 /* ---------- flow ---------- */
 function startRound() {
   G.locked = false;
-  $("scene").classList.remove("scoring");
+  clearTimeout(G.reviewT);
+  $("scene").classList.remove("scoring", "review");
   $("lesson").classList.remove("show");
   $("attrow").classList.remove("show");
   $("drinkrow").classList.remove("show");
@@ -3860,11 +3885,16 @@ function t3Person(persona, shirtHex) {
   }
   const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.17, 0.36, 6, 14), shirtM);
   torso.position.y = 0.74;
+  g.userData.arms = [];
   for (const ax of [-0.22, 0.22]) {
+    const shoulder = new THREE.Group();
+    shoulder.position.set(ax, 0.92, 0);
     const arm = new THREE.Mesh(new THREE.CapsuleGeometry(0.05, 0.3, 4, 10), shirtM);
-    arm.position.set(ax, 0.74, 0.05);
+    arm.position.set(0, -0.18, 0.05);
     arm.rotation.x = -0.35; arm.rotation.z = ax > 0 ? -0.12 : 0.12;
-    g.add(arm);
+    shoulder.add(arm);
+    g.add(shoulder);
+    g.userData.arms.push(shoulder);
   }
   const hd = new THREE.Group();
   const head = new THREE.Mesh(new THREE.SphereGeometry(0.15, 22, 18), smat(skin, 0.6));
@@ -3873,6 +3903,7 @@ function t3Person(persona, shirtHex) {
   hair.position.y = 1.16;
   hd.add(head, hair);
   g.add(torso, hd);
+  g.userData.head = hd;
   if (persona === "shifty") g.userData.swivel = hd; // the neck that will not quit
   if (persona === "glasses") {
     const band = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.022, 8, 24), smat(0x111111, 0.35, 0.4));
@@ -3941,14 +3972,62 @@ function build3D(round) {
   // room shell — 4K treatment: hi-res tiled walls, glossy floor, baseboard, depth fog
   const wallHexA = "#" + wallC.getHexString();
   const wallHexB = "#" + wallC.clone().multiplyScalar(0.88).getHexString();
+  const VS = VENUE_STYLE[round.themeKey] || VENUE_STYLE.office;
   const wallT = tex((x, w, h) => {
-    // subway tile with grout + subtle per-tile tone variation
     x.fillStyle = wallHexB; x.fillRect(0, 0, w, h);
-    const tw = w / 8, th = h / 12;
-    for (let r = 0; r < 12; r++) for (let c = 0; c < 9; c++) {
-      const off = (r % 2) * tw / 2;
-      x.fillStyle = `rgba(255,255,255,${0.06 + Math.random() * 0.08})`;
-      x.fillRect(c * tw - off + 2, r * th + 2, tw - 4, th - 4);
+    if (VS.wall === "subway" || VS.wall === "bigtile" || VS.wall === "block") {
+      const cols = VS.wall === "bigtile" ? 4 : VS.wall === "block" ? 5 : 8;
+      const rows = VS.wall === "bigtile" ? 6 : VS.wall === "block" ? 8 : 12;
+      const tw = w / cols, th = h / rows, g = VS.wall === "block" ? 6 : 3;
+      for (let r = 0; r < rows; r++) for (let c = 0; c < cols + 1; c++) {
+        const off = (r % 2) * tw / 2;
+        x.fillStyle = `rgba(255,255,255,${0.06 + Math.random() * 0.08})`;
+        x.fillRect(c * tw - off + g, r * th + g, tw - g * 2, th - g * 2);
+      }
+    } else if (VS.wall === "brick") {
+      const tw = w / 6, th = h / 16;
+      for (let r = 0; r < 16; r++) for (let c = 0; c < 7; c++) {
+        const off = (r % 2) * tw / 2;
+        x.fillStyle = Math.random() < 0.18 ? "rgba(70,40,30,.28)" : `rgba(255,240,225,${0.05 + Math.random() * 0.1})`;
+        x.fillRect(c * tw - off + 3, r * th + 3, tw - 6, th - 6);
+      }
+    } else if (VS.wall === "wood") {
+      for (let c = 0; c < 10; c++) {
+        x.fillStyle = `rgba(${60 + Math.random() * 30 | 0},${34 + Math.random() * 18 | 0},${16 + Math.random() * 10 | 0},.35)`;
+        x.fillRect(c * w / 10 + 2, 0, w / 10 - 4, h);
+        x.strokeStyle = "rgba(0,0,0,.25)"; x.lineWidth = 2;
+        for (let k = 0; k < 4; k++) { x.beginPath(); const gx = c * w / 10 + Math.random() * w / 10;
+          x.moveTo(gx, Math.random() * h); x.bezierCurveTo(gx + 6, h * 0.4, gx - 6, h * 0.7, gx + 3, h); x.stroke(); }
+      }
+      for (let k = 0; k < 7; k++) { // sticker bombing
+        x.fillStyle = `hsl(${Math.random() * 360 | 0},70%,55%)`;
+        x.save(); x.translate(Math.random() * w, Math.random() * h); x.rotate(Math.random() - 0.5);
+        Math.random() < 0.5 ? x.fillRect(-26, -14, 52, 28) : (x.beginPath(), x.arc(0, 0, 20, 0, 7), x.fill());
+        x.restore();
+      }
+    } else if (VS.wall === "concrete") {
+      for (let k = 0; k < 240; k++) { x.fillStyle = `rgba(255,255,255,${Math.random() * 0.05})`;
+        x.fillRect(Math.random() * w, Math.random() * h, 2 + Math.random() * 4, 2 + Math.random() * 4); }
+      x.strokeStyle = "rgba(0,0,0,.16)"; x.lineWidth = 3;
+      for (let c = 1; c < 3; c++) { x.beginPath(); x.moveTo(c * w / 3, 0); x.lineTo(c * w / 3, h); x.stroke(); }
+      x.fillStyle = "rgba(20,25,35,.55)";
+      for (let r = 1; r < 4; r++) for (let c = 0; c < 3; c++)
+        for (const dx of [30, w / 3 - 30]) { x.beginPath(); x.arc(c * w / 3 + dx, r * h / 4, 6, 0, 7); x.fill(); }
+      const gr = x.createLinearGradient(0, h * 0.46, 0, h * 0.5);
+      gr.addColorStop(0, "rgba(87,184,255,0)"); gr.addColorStop(0.5, "rgba(87,184,255,.5)"); gr.addColorStop(1, "rgba(87,184,255,0)");
+      x.fillStyle = gr; x.fillRect(0, h * 0.46, w, h * 0.04);
+    } else if (VS.wall === "plastic") {
+      x.strokeStyle = "rgba(0,0,0,.2)"; x.lineWidth = 4;
+      for (let c = 1; c < 5; c++) { x.beginPath(); x.moveTo(c * w / 5, 0); x.lineTo(c * w / 5, h); x.stroke(); }
+      x.fillStyle = "rgba(0,0,0,.3)";
+      for (let c = 0; c < 5; c++) for (const ry of [0.06, 0.94])
+        { x.beginPath(); x.arc(c * w / 5 + w / 10, h * ry, 7, 0, 7); x.fill(); }
+      for (let k = 0; k < 60; k++) { x.fillStyle = `rgba(255,255,255,${Math.random() * 0.06})`;
+        x.fillRect(Math.random() * w, Math.random() * h, 30, 5); }
+    } else { // paint: flat with roller texture + painted wainscot line
+      for (let k = 0; k < 120; k++) { x.fillStyle = `rgba(255,255,255,${Math.random() * 0.04})`;
+        x.fillRect(Math.random() * w, Math.random() * h, 60, 8); }
+      x.fillStyle = "rgba(0,0,0,.12)"; x.fillRect(0, h * 0.55, w, h * 0.45);
     }
   }, 1024, 1024);
   wallT.wrapS = wallT.wrapT = THREE.RepeatWrapping;
@@ -3958,14 +4037,63 @@ function build3D(round) {
   backWall.receiveShadow = true;
   const floorT = tex((x, w, h) => {
     x.fillStyle = round.theme.floor1; x.fillRect(0, 0, w, h);
-    const tn = 8, ts = w / tn;
-    for (let r = 0; r < tn; r++) for (let c = 0; c < tn; c++) {
-      x.fillStyle = `rgba(${Math.random() < .5 ? "255,255,255" : "0,0,0"},${0.02 + Math.random() * 0.045})`;
-      x.fillRect(c * ts, r * ts, ts, ts);
+    if (VS.floor === "hex") {
+      const R = w / 14;
+      for (let r = 0; r < 18; r++) for (let c = 0; c < 16; c++) {
+        const cx = c * R * 1.74 + (r % 2) * R * 0.87, cy = r * R * 1.5;
+        x.beginPath();
+        for (let k = 0; k < 6; k++) x[k ? "lineTo" : "moveTo"](cx + R * Math.sin(k * 1.047), cy + R * Math.cos(k * 1.047));
+        x.closePath();
+        x.fillStyle = `rgba(255,255,255,${0.05 + Math.random() * 0.1})`; x.fill();
+        x.strokeStyle = "rgba(0,0,0,.4)"; x.lineWidth = 4; x.stroke();
+      }
+    } else if (VS.floor === "terrazzo") {
+      for (let k = 0; k < 900; k++) {
+        x.fillStyle = `rgba(${Math.random() < 0.5 ? "255,255,255" : Math.random() < 0.5 ? "40,50,70" : "180,140,90"},${0.14 + Math.random() * 0.2})`;
+        x.beginPath(); x.arc(Math.random() * w, Math.random() * h, 1.5 + Math.random() * 4.5, 0, 7); x.fill();
+      }
+      x.strokeStyle = "rgba(0,0,0,.2)"; x.lineWidth = 4;
+      for (let c = 1; c < 3; c++) { x.beginPath(); x.moveTo(c * w / 3, 0); x.lineTo(c * w / 3, h); x.stroke(); }
+    } else if (VS.floor === "checker") {
+      const tn = 8, ts = w / tn;
+      for (let r = 0; r < tn; r++) for (let c = 0; c < tn; c++) {
+        x.fillStyle = (r + c) % 2 ? "rgba(15,15,18,.55)" : "rgba(240,236,225,.5)";
+        x.fillRect(c * ts, r * ts, ts, ts);
+      }
+      for (let k = 0; k < 40; k++) { x.fillStyle = "rgba(0,0,0,.1)"; // decades of spills
+        x.beginPath(); x.arc(Math.random() * w, Math.random() * h, 4 + Math.random() * 16, 0, 7); x.fill(); }
+    } else if (VS.floor === "plank") {
+      for (let r = 0; r < 10; r++) {
+        x.fillStyle = `rgba(${95 + Math.random() * 40 | 0},${70 + Math.random() * 25 | 0},${40 + Math.random() * 15 | 0},.6)`;
+        x.fillRect(0, r * h / 10 + 2, w, h / 10 - 4);
+        x.strokeStyle = "rgba(0,0,0,.35)"; x.lineWidth = 3;
+        x.strokeRect(-2, r * h / 10 + 2, w + 4, h / 10 - 4);
+      }
+      for (let k = 0; k < 30; k++) { x.fillStyle = "rgba(40,28,12,.4)"; // mud
+        x.beginPath(); x.arc(Math.random() * w, Math.random() * h, 3 + Math.random() * 10, 0, 7); x.fill(); }
+    } else if (VS.floor === "poured") {
+      for (let k = 0; k < 160; k++) { x.fillStyle = `rgba(${Math.random() < .5 ? "255,255,255" : "0,0,0"},${Math.random() * 0.05})`;
+        x.beginPath(); x.arc(Math.random() * w, Math.random() * h, 8 + Math.random() * 30, 0, 7); x.fill(); }
+      x.strokeStyle = "rgba(0,0,0,.3)"; x.lineWidth = 5;
+      x.beginPath(); x.moveTo(w / 2, 0); x.lineTo(w / 2, h); x.stroke();
+      x.beginPath(); x.moveTo(0, h / 2); x.lineTo(w, h / 2); x.stroke();
+      x.strokeStyle = "rgba(0,0,0,.18)"; x.lineWidth = 2;
+      for (let k = 0; k < 4; k++) { x.beginPath(); let px = Math.random() * w, py = Math.random() * h; x.moveTo(px, py);
+        for (let s = 0; s < 5; s++) { px += (Math.random() - 0.5) * 120; py += Math.random() * 60; x.lineTo(px, py); } x.stroke(); }
+    } else { // square (office) and worn (station)
+      const tn = 8, ts = w / tn;
+      for (let r = 0; r < tn; r++) for (let c = 0; c < tn; c++) {
+        x.fillStyle = `rgba(${Math.random() < .5 ? "255,255,255" : "0,0,0"},${0.02 + Math.random() * 0.045})`;
+        x.fillRect(c * ts, r * ts, ts, ts);
+      }
+      x.strokeStyle = "rgba(0,0,0,.32)"; x.lineWidth = 5;
+      for (let i = 0; i <= tn; i++) { x.beginPath(); x.moveTo(i * ts, 0); x.lineTo(i * ts, h); x.stroke();
+        x.beginPath(); x.moveTo(0, i * ts); x.lineTo(w, i * ts); x.stroke(); }
+      if (VS.floor === "worn") {
+        for (let k = 0; k < 26; k++) { x.fillStyle = "rgba(0,0,0,.12)"; // a century of foot traffic
+          x.beginPath(); x.arc(Math.random() * w, h * (0.3 + Math.random() * 0.4), 10 + Math.random() * 30, 0, 7); x.fill(); }
+      }
     }
-    x.strokeStyle = "rgba(0,0,0,.32)"; x.lineWidth = 5;
-    for (let i = 0; i <= tn; i++) { x.beginPath(); x.moveTo(i * ts, 0); x.lineTo(i * ts, h); x.stroke();
-      x.beginPath(); x.moveTo(0, i * ts); x.lineTo(w, i * ts); x.stroke(); }
   }, 1024, 1024);
   floorT.wrapS = floorT.wrapT = THREE.RepeatWrapping; floorT.repeat.set(roomW / 1.6, 6);
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(roomW, 12),
@@ -4010,7 +4138,7 @@ function build3D(round) {
     const hous = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.09, 0.5), smat(0x39404c, 0.5, 0.3));
     hous.position.set(lx, 2.985, 2.4);
     const lens = new THREE.Mesh(new THREE.PlaneGeometry(1.36, 0.4),
-      new THREE.MeshBasicMaterial({ color: 0xfff8e6, toneMapped: false }));
+      new THREE.MeshBasicMaterial({ color: VS.lightC || 0xfff8e6, toneMapped: false }));
     lens.rotation.x = Math.PI / 2; lens.position.set(lx, 2.93, 2.4);
     T3.group.add(hous, lens);
   }
@@ -4317,11 +4445,14 @@ function build3D(round) {
     evening: { amb: 0.75, col: 0xffd7b0, pt: 8 }, night: { amb: 0.42, col: 0xbfd0ff, pt: 10 },
   };
   const g2 = grades[tod];
+  const VSl = VENUE_STYLE[round.themeKey] || {};
   T3.amb.intensity = g2.amb; T3.amb.color.setHex(g2.col);
   T3.dir.intensity = tod === "night" ? 0.22 : 0.55;
+  T3.p1.color.setHex(VSl.party ? 0xff9ad0 : (VSl.lightC || 0xfff6dd));
+  T3.p2.color.setHex(VSl.party ? 0x9ac8ff : (VSl.lightC || 0xfff6dd));
   const roomW2 = roomW;
   T3.p1.position.set(-roomW2 / 4, 2.6, 2.4); T3.p2.position.set(roomW2 / 4, 2.6, 2.4);
-  T3.p1.intensity = T3.p2.intensity = g2.pt;
+  T3.p1.intensity = T3.p2.intensity = g2.pt * (VSl.pt || 1);
   // the flicker hazard is a genuinely flickering light
   if (round.flickerAt >= 0) {
     T3.flicker = new THREE.PointLight(0xfff2c0, 8, 5);
@@ -4356,10 +4487,22 @@ function t3InitPost() {
         gl_FragColor = vec4(c, 1.0);
       }`;
     const compFrag = `
-      uniform sampler2D tSharp; uniform sampler2D tBlur; uniform float uDim; varying vec2 vUv;
+      uniform sampler2D tSharp; uniform sampler2D tBlur; uniform sampler2D tDepth;
+      uniform vec2 uRes; uniform float uDim; varying vec2 vUv;
+      float lin(float d) { float z = d * 2.0 - 1.0; return (2.0 * 0.1 * 60.0) / (60.1 - z * 59.9); }
       void main() {
         vec3 sharp = texture2D(tSharp, vUv).rgb;
         vec3 blur = texture2D(tBlur, vUv).rgb;
+        // crease AO: neighbors sitting in front of you cast a soft contact shadow
+        float d0 = lin(texture2D(tDepth, vUv).x);
+        float ao = 0.0;
+        vec2 px = 3.0 / uRes;
+        for (int k = 0; k < 8; k++) {
+          float a = float(k) * 0.7854;
+          float dn = lin(texture2D(tDepth, vUv + vec2(cos(a), sin(a)) * px).x);
+          ao += clamp((d0 - dn - 0.02) * 1.6, 0.0, 0.22);
+        }
+        float aoK = 1.0 - min(ao, 0.85) * 0.42;
         // tilt-shift: crisp band around the fixtures, milky top and bottom — diorama energy
         float dof = smoothstep(0.10, 0.42, abs(vUv.y - 0.52)) * 0.75;
         vec3 c = mix(sharp, blur, dof);
@@ -4369,9 +4512,9 @@ function t3InitPost() {
         float l = dot(c, vec3(0.299, 0.587, 0.114));
         c = mix(vec3(l), c, 1.16);
         c = (c - 0.5) * 1.06 + 0.5 + vec3(0.012, 0.006, 0.0) * (1.0 - l);
-        // vignette
+        // vignette + AO
         float v = smoothstep(0.92, 0.34, distance(vUv, vec2(0.5, 0.44)));
-        c *= mix(0.72, 1.0, v);
+        c *= mix(0.72, 1.0, v) * aoK;
         gl_FragColor = vec4(c, 1.0);
       }`;
     const vert = `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
@@ -4380,9 +4523,11 @@ function t3InitPost() {
       blurMat: new THREE.ShaderMaterial({ vertexShader: vert, fragmentShader: blurFrag,
         uniforms: { tD: { value: null }, dir: { value: new THREE.Vector2(1, 0) }, res: { value: new THREE.Vector2(1, 1) } }, depthTest: false }),
       compMat: new THREE.ShaderMaterial({ vertexShader: vert, fragmentShader: compFrag,
-        uniforms: { tSharp: { value: null }, tBlur: { value: null }, uDim: { value: 0 } }, depthTest: false }),
+        uniforms: { tSharp: { value: null }, tBlur: { value: null }, tDepth: { value: null },
+          uRes: { value: new THREE.Vector2(2, 2) }, uDim: { value: 0 } }, depthTest: false }),
       rtScene: mkRT(2, 2), rtA: mkRT(2, 2), rtB: mkRT(2, 2),
     };
+    post.rtScene.depthTexture = new THREE.DepthTexture();
     post.quad = new THREE.Mesh(quadGeo, post.compMat);
     post.quad.frustumCulled = false;
     post.scene.add(post.quad);
@@ -4394,6 +4539,7 @@ function t3PostSize() {
   const s = new THREE.Vector2();
   T3.renderer.getDrawingBufferSize(s);
   T3.post.rtScene.setSize(s.x, s.y);
+  T3.post.compMat.uniforms.uRes.value.set(s.x, s.y);
   T3.post.rtA.setSize(Math.max(1, s.x >> 1), Math.max(1, s.y >> 1));
   T3.post.rtB.setSize(Math.max(1, s.x >> 1), Math.max(1, s.y >> 1));
   T3.post.blurMat.uniforms.res.value.set(Math.max(1, s.x >> 1), Math.max(1, s.y >> 1));
@@ -4412,6 +4558,7 @@ function t3RenderPost() {
   p.quad.material = p.compMat;
   p.compMat.uniforms.tSharp.value = p.rtScene.texture;
   p.compMat.uniforms.tBlur.value = p.rtB.texture;
+  p.compMat.uniforms.tDepth.value = p.rtScene.depthTexture;
   r.setRenderTarget(null);
   r.render(p.scene, p.cam);
 }
@@ -4435,12 +4582,20 @@ function t3Frame(now) {
     T3.cam.position.x = T3.camTo.x + Math.sin(t * 0.7) * 0.02;
   }
   T3.cam.lookAt(T3.look || new THREE.Vector3(0, 1.05, 0));
-  // people sway and breathe; REC LED blinks
+  // people sway and breathe; REC LED blinks; heads acknowledge newcomers
+  const looking = T3.lookUntil && now < T3.lookUntil;
   T3.people.forEach((p, i) => {
     p.rotation.z = Math.sin(t * 1.3 + i * 2) * 0.03;
     p.scale.y = 1 + Math.sin(t * 1.9 + i * 1.4) * 0.006;
     if (p.userData.led) p.userData.led.visible = Math.floor(t * 2) % 2 === 0;
     if (p.userData.swivel) p.userData.swivel.rotation.y = Math.sin(t * 1.4 + i) * 0.9;
+    else if (p.userData.head) {
+      // idle micro-glances; everyone clocks a walk-in for a beat, then eyes front
+      let want = Math.sin(t * 0.31 + i * 2.1) * 0.06;
+      if (looking && Math.abs(T3.lookAtX - p.position.x) > 0.2)
+        want = (T3.lookAtX > p.position.x ? 1 : -1) * 0.55;
+      p.userData.head.rotation.y += (want - p.userData.head.rotation.y) * 0.09;
+    }
   });
   // entrances in progress: position lerp + leg swing + step bob
   T3.anims = T3.anims.filter(a => {
@@ -4451,9 +4606,11 @@ function t3Frame(now) {
     a.p.position.y = Math.abs(Math.sin(q * Math.PI * (a.kind === "walk" ? 4 : 2.5))) * 0.035;
     const swing = Math.sin(q * Math.PI * (a.kind === "walk" ? 8 : 5)) * (a.kind === "walk" ? 0.55 : 0.3);
     (a.p.userData.legs || []).forEach((hip, k) => { hip.rotation.x = swing * (k ? -1 : 1); });
+    (a.p.userData.arms || []).forEach((sh, k) => { sh.rotation.x = -swing * 0.6 * (k ? -1 : 1); });
     if (q >= 1) {
       a.p.position.y = 0;
       (a.p.userData.legs || []).forEach(h => { h.rotation.x = 0; });
+      (a.p.userData.arms || []).forEach(s2 => { s2.rotation.x = 0; });
       return false;
     }
     return true;
@@ -4463,7 +4620,8 @@ function t3Frame(now) {
   // flicker hazard
   if (T3.flicker) T3.flicker.intensity = Math.random() < 0.12 ? rnd(0, 2) : rnd(6, 9);
   // scoring: dim the room, keep verdicts readable
-  const target = $("scene").classList.contains("scoring") ? 1 : 0;
+  const sc3 = $("scene");
+  const target = (sc3.classList.contains("scoring") && !sc3.classList.contains("review")) ? 1 : 0;
   T3.dim += (target - T3.dim) * 0.12;
   T3.renderer.toneMappingExposure = 1 - T3.dim * 0.55;
   try {
@@ -4514,6 +4672,7 @@ function t3WalkIn(slot) {
   const from = { x: T3.roomW / 2 + 0.6, z: 2.8 };
   p.position.set(from.x, 0, from.z);
   T3.anims.push({ p, from, to: { x, z: 0.55 }, t0: performance.now(), dur: 1000, kind: "walk" });
+  T3.lookAtX = x; T3.lookUntil = performance.now() + 1600; // the room notices
 }
 /* The phone zombie side-steps one urinal over, eyes never leaving the screen. */
 function t3Shuffle(fromSlot, toSlot) {
