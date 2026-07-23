@@ -52,6 +52,14 @@ and **Endless Rush** (procedurally generated rounds until the rush claims you).
   variants per park (106 images) rotate randomly per visit — all in `parks/`
   (sources & licenses in `parks/CREDITS.md`); drop in your own JPG named
   `<park-slug>-<n>.jpg` to replace any of them.
+- **🏙 City-edition venues**: with a home park set, every entrance card is a
+  "special edition Monopoly" version of your city — dive bars named from
+  real neighborhoods and the local pour ("THE OLD STYLE BENCH — Wicker
+  Park, est. 1971"), roasteries with localized menus ("deep dish scone",
+  "chicago fog"), festivals with rotating punny lineups, and airport /
+  station boards listing real departures to the other 29 league cities.
+  All cards float over a blurred photo of your ballpark, names and copy
+  draw from no-repeat decks, and a gold "CHICAGO EDITION" chip seals it.
 - **🗺️ Road Trip**: score 650+ in any mode to permanently unlock the park
   picker — play *any* of the 30 ballparks, with its photos, team colors,
   airport, station and city banner. Your home turf is earned; the league is
@@ -59,7 +67,9 @@ and **Endless Rush** (procedurally generated rounds until the rush claims you).
   boarding-pass **layover card** appears between rounds — the 7th-inning
   stretch in the Gauntlet, every 5th round in Endless (never in the Daily) —
   with the clock stopped. Change cities or stay; score and streak carry
-  either way.
+  either way. Finish a run on your feet and the end screen offers to take
+  your points on the road — **the score only resets when you actually
+  lose**; survivors keep compounding city after city.
 - **Orientation is obvious**: guys facing you at the shame tub hold a
   ballpark frank at waist level with both hands. That's what the hands are
   doing. It's a hot dog. Rated E for Everyone.

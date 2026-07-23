@@ -24,6 +24,8 @@
     -webkit-user-select: none;
   }
   #app { height: 100%; display: flex; flex-direction: column; max-width: 900px; margin: 0 auto; position: relative; }
+  /* off-screen but NOT display:none — a hidden switch won't tick */
+  #haptwrap { position: fixed; left: -100px; top: 0; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
 
   /* ---------- screens ---------- */
   .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
@@ -646,7 +648,17 @@
   .pp-custom { position: absolute; inset: 0; display: none; }
   #parkphoto.custom .pp-custom { display: block; }
   #parkphoto.custom .pp-img, #parkphoto.custom .pp-photo { display: none; }
+  #parkphoto.custom.haspic .pp-img { display: block; filter: blur(18px) brightness(.34) saturate(1.25); }
+  .ev-city { display: inline-block; margin: 0 auto 10px; padding: 3px 12px; border: 1.5px solid #ffd76a;
+    border-radius: 999px; color: #ffd76a; font-size: clamp(10px, 2.8vw, 12px); font-weight: 900;
+    letter-spacing: 2.5px; background: rgba(20,16,6,.55); }
   .ea-wrap { position: absolute; inset: 0; background: #05080a; padding-top: 13%; text-align: center; }
+  /* with a city photo behind, the venue card glass goes translucent */
+  #parkphoto.haspic .ea-wrap { background: rgba(5,8,10,.66); }
+  #parkphoto.haspic .es-wrap { background: rgba(14,24,48,.6); }
+  #parkphoto.haspic .ec-wrap { background: rgba(34,53,40,.62); }
+  #parkphoto.haspic .eb-wrap, #parkphoto.haspic .ef-wrap { background: rgba(8,10,14,.45); }
+
   .ea-wrap::after { content: ""; position: absolute; inset: 0;
     background: repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 2px, transparent 2px 4px); }
   .ea-big { font-size: clamp(19px, 6vw, 28px); color: #fff; letter-spacing: 3px; margin-bottom: 16px; font-weight: 900; }
@@ -818,6 +830,7 @@
 </svg>
 
 <div id="app">
+<label id="haptwrap" aria-hidden="true"><input type="checkbox" switch id="hapt" tabindex="-1"></label>
 
   <!-- START SCREEN -->
   <div id="start" class="screen">
@@ -851,7 +864,7 @@
     <div id="chalresult"></div>
     <div id="unlockline"></div>
     <div id="endroadtriprow" class="hiddenrow" style="margin-bottom:14px">
-      <button class="bigbtn roadtrip" id="endroadtripbtn">🗺️ ROAD TRIP — CHOOSE YOUR NEXT CITY</button>
+      <button class="bigbtn roadtrip" id="endroadtripbtn">🗺️ ROAD TRIP</button>
     </div>
     <div id="respawnrow" class="hiddenrow">
       <button class="bigbtn respawn" id="respawnbtn"></button>
@@ -1054,7 +1067,18 @@ function dailyKey() {
 }
 
 /* ---------- haptics ---------- */
-function buzz(pattern) { if (navigator.vibrate) { try { navigator.vibrate(pattern); } catch (e) {} } }
+function buzz(pattern) {
+  if (navigator.vibrate) { try { navigator.vibrate(pattern); return; } catch (e) {} }
+  // iOS Safari has no Vibration API — but toggling a switch control (iOS 17.4+)
+  // during a user gesture fires the real Taptic tick. Longer patterns = more ticks.
+  try {
+    const h = document.getElementById("hapt");
+    if (h) {
+      const n = Array.isArray(pattern) ? Math.min(4, pattern.length) : 1;
+      for (let i = 0; i < n; i++) h.click();
+    }
+  } catch (e) {}
+}
 
 /* ---------- tiny synth ---------- */
 let actx = null;
@@ -1527,9 +1551,14 @@ function openParkPicker(ctx) {
       closeParkPicker();
       updateStartLines();
       if (pickerCtx === "end") {
-        // wheels up: straight into the next run, no menu detour
-        resetGame(G.mode);
-        setTimeout(() => announce("🛫", "ROAD TRIP", `Next stop: ${p.park}. Hold it on the flight.`, 1600, "good"), 300);
+        if (G.lives > 0 && !G.pissed) {
+          // you finished on your feet — the run RIDES ALONG. Score, streak, pants: all carry.
+          continueRunInCity(p);
+        } else {
+          // you lost. The new city deserves a fresh you.
+          resetGame(G.mode === "daily" ? "gauntlet" : G.mode);
+          setTimeout(() => announce("🛫", "ROAD TRIP", `Next stop: ${p.park}. Hold it on the flight.`, 1600, "good"), 300);
+        }
       } else if (pickerCtx === "layover") {
         resumeFromLayover(); // wheels down — the next round's entrance IS the arrival
       } else {
@@ -1625,7 +1654,7 @@ const CAREER_LADDER = [
   { key: "gamble",  icon: "🎲", name: "THE SEND-IT GAMBLE",  tease: "No good option? Going anyway is now a coin flip instead of a guaranteed splash." },
   { key: "soap",    icon: "🫧", name: "SOAP JACKPOT",        tease: "A soap dispenser worth tapping appears sometimes. Free hygiene points." },
   { key: "drift",   icon: "📱", name: "THE PHONE ZOMBIE",    tease: "Mid-round, a guy glued to his phone drifts one urinal over. The board changes under you." },
-  { key: "lurker",  icon: "🧍", name: "THE LURKER",          tease: "A guy standing at a urinal. Facing out. Not going. Not leaving." },
+  { key: "lurker",  icon: "🧍", name: "THE LURKER",          tease: "A guy standing at a urinal. Facing out. Not going. Not leaving. Needs the same wide berth as the glancer." },
   { key: "crooner", icon: "🎤", name: "THE CROONER",         tease: "One patron is mid-ballad. His radius is bigger than his talent." },
   { key: "sniper",  icon: "🚪", name: "RUSH-HOUR WALK-INS",  tease: "Dawdle too long and someone walks in and TAKES the best spot." },
   { key: "chaos",   icon: "🌪️", name: "FULL CHAOS",          tease: "Every hazard can now stack in one room. You asked for this, legend." },
@@ -2015,17 +2044,18 @@ function comfortOf(round, i) {
       : Math.abs(i - j) === 1;
     if (spots[j].persona === "glasses") d -= 0.5; // his presence is... larger
     if (spots[j].persona === "shifty") d -= 0.4;  // those eyes travel
+    if (spots[j].persona === "lurker") d -= 0.4;  // he's facing the ROOM. watching.
     if (spots[j].persona === "crooner") d -= 0.35; // the ballad carries
     if (sideBySide) {
       hasAdjacent = true;
       if (spots[j].persona === "glasses") adjGlasses = true;
-      if (spots[j].persona === "shifty") adjShifty = true;
+      if (spots[j].persona === "shifty" || spots[j].persona === "lurker") adjShifty = true;
     }
     if (d < minRaw) minRaw = d;
   }
   let eff = minRaw;
   if (adjGlasses) eff = Math.min(eff, 0.5);
-  else if (adjShifty) eff = Math.min(eff, 0.6); // a divider can't block a wandering neck
+  else if (adjShifty) eff = Math.min(eff, 0.6); // a divider can't block a wandering neck (or a man facing the room)
   else if (minRaw === 1 && hasAdjacent && dividers) eff = 1.5; // divider softens a direct neighbor
   let isEnd;
   if (round.layout === "tub") {
@@ -3284,10 +3314,14 @@ function startRound() {
       if (announceT) clearTimeout(announceT);
       $("announce").classList.remove("show");
       const pp = $("parkphoto");
-      pp.className = (ent.cls ? "custom " + ent.cls : "");
+      pp.className = (ent.cls ? "custom " + ent.cls : "") + (ent.bg ? " haspic" : "");
       if (ent.photo) {
         pp.querySelector(".pp-img").style.backgroundImage = `url('${ent.photo}')`;
         pp.querySelector(".pp-photo").style.backgroundImage = `url('${ent.photo}')`;
+      } else {
+        // venue cards float over a blurred glimpse of the city's own ballpark
+        pp.querySelector(".pp-img").style.backgroundImage = ent.bg ? `url('${ent.bg}')` : "none";
+        pp.querySelector(".pp-photo").style.backgroundImage = "none";
       }
       pp.querySelector(".pp-custom").innerHTML = ent.html || "";
       pp.querySelector(".pp-name").textContent = ent.name;
@@ -3325,42 +3359,160 @@ function startRound() {
 
 
 /* entrance cards: which venues earn the tap-to-enter ritual, and what they show */
+/* ---------- city venue DNA: the "special edition Monopoly" layer ----------
+   Three real neighborhoods, the local pour, and the local plate per city —
+   every bar, roastery and festival gets named from these. */
+const CITY_VENUES = {
+  "Angel Stadium":            { hoods: ["Old Towne Orange", "Anaheim Hills", "Garden Grove"], brew: "Noble Ale", dish: "animal-style fries" },
+  "Daikin Park":              { hoods: ["Montrose", "The Heights", "EaDo"], brew: "Saint Arnold", dish: "brisket kolache" },
+  "Sutter Health Park":       { hoods: ["Midtown", "Land Park", "East Sac"], brew: "Track 7", dish: "farm-to-fork grilled cheese" },
+  "Tropicana Field":          { hoods: ["Ybor City", "Gulfport", "Seminole Heights"], brew: "Cigar City", dish: "Cuban sandwich" },
+  "Yankee Stadium":           { hoods: ["The Bronx", "Harlem", "Mott Haven"], brew: "$19 tallboy", dish: "chopped cheese" },
+  "Progressive Field":        { hoods: ["Ohio City", "Tremont", "The Flats"], brew: "Great Lakes", dish: "pierogi platter" },
+  "Comerica Park":            { hoods: ["Corktown", "Midtown", "Hamtramck"], brew: "Stroh's", dish: "coney dog" },
+  "Kauffman Stadium":         { hoods: ["Westport", "Crossroads", "River Market"], brew: "Boulevard", dish: "burnt ends" },
+  "Target Field":             { hoods: ["Northeast", "Uptown", "Dinkytown"], brew: "Grain Belt", dish: "Juicy Lucy" },
+  "Rate Field":               { hoods: ["Bridgeport", "Pilsen", "Hyde Park"], brew: "Old Style", dish: "elote" },
+  "Wrigley Field":            { hoods: ["Wrigleyville", "Logan Square", "Wicker Park"], brew: "Old Style", dish: "deep dish" },
+  "Great American Ball Park": { hoods: ["Over-the-Rhine", "The Banks", "Northside"], brew: "Rhinegeist", dish: "Skyline 4-way" },
+  "American Family Field":    { hoods: ["Bay View", "Walker's Point", "Third Ward"], brew: "brandy old fashioned", dish: "cheese curds" },
+  "PNC Park":                 { hoods: ["Lawrenceville", "The Strip District", "South Side"], brew: "Iron City", dish: "Primanti's stack" },
+  "Busch Stadium":            { hoods: ["The Hill", "Soulard", "The Grove"], brew: "ice-cold Busch", dish: "toasted ravioli" },
+  "Coors Field":              { hoods: ["LoDo", "RiNo", "Capitol Hill"], brew: "fresh-hopped IPA", dish: "green chile fries" },
+  "Dodger Stadium":           { hoods: ["Echo Park", "Silver Lake", "Los Feliz"], brew: "michelada", dish: "Dodger Dog" },
+  "Petco Park":               { hoods: ["Gaslamp", "North Park", "Ocean Beach"], brew: "Ballast Point", dish: "California burrito" },
+  "Oracle Park":              { hoods: ["The Mission", "SoMa", "North Beach"], brew: "Anchor Steam", dish: "garlic fries" },
+  "Chase Field":              { hoods: ["Roosevelt Row", "Tempe", "Old Town Scottsdale"], brew: "Four Peaks", dish: "Sonoran dog" },
+  "T-Mobile Park":            { hoods: ["SoDo", "Ballard", "Capitol Hill"], brew: "Rainier", dish: "fish-market catch" },
+  "Globe Life Field":         { hoods: ["Deep Ellum", "Bishop Arts", "The Stockyards"], brew: "Shiner Bock", dish: "brisket plate" },
+  "Fenway Park":              { hoods: ["Southie", "Back Bay", "Somerville"], brew: "Sam Summer", dish: "lobstah roll" },
+  "Camden Yards":             { hoods: ["Fells Point", "Federal Hill", "Hampden"], brew: "Natty Boh", dish: "crab cake" },
+  "Rogers Centre":            { hoods: ["Kensington Market", "Queen West", "The Annex"], brew: "two-four of Canadian", dish: "poutine" },
+  "Truist Park":              { hoods: ["Ponce City", "East Atlanta", "Decatur"], brew: "SweetWater", dish: "lemon pepper wings" },
+  "loanDepot park":           { hoods: ["Wynwood", "Little Havana", "Coconut Grove"], brew: "mojito", dish: "croquetas" },
+  "Citi Field":               { hoods: ["Astoria", "Flushing", "Jackson Heights"], brew: "bodega tallboy", dish: "halal cart platter" },
+  "Citizens Bank Park":       { hoods: ["Fishtown", "South Philly", "Passyunk"], brew: "Citywide Special", dish: "whiz-wit cheesesteak" },
+  "Nationals Park":           { hoods: ["Navy Yard", "Adams Morgan", "Shaw"], brew: "DC Brau", dish: "half-smoke" },
+};
+
+/* Cosmetic no-repeat decks: every option plays once before any option repeats. */
+const VDECKS = {};
+function cshuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function vdraw(key, arr) {
+  let d = VDECKS[key];
+  if (!d || !d.length || d.n !== arr.length) { d = VDECKS[key] = cshuffle([...arr.keys()]); d.n = arr.length; }
+  return arr[d.pop()];
+}
+function vdrawN(key, arr, n) {
+  const out = [];
+  while (out.length < Math.min(n, arr.length)) { const v = vdraw(key, arr); if (!out.includes(v)) out.push(v); }
+  return out;
+}
+function cityChip(pk) { return pk ? `<div class="ev-city">🏙 ${pk.city.toUpperCase()} EDITION</div>` : ""; }
+
 function buildEntrance(r) {
   const pk = THEMES.stadium.parkRef;
+  const v = pk && CITY_VENUES[pk.park];
   const t = r.themeKey;
-  if (t === "stadium" && pk) return { photo: parkPhotoURL(pk), name: pk.park.toUpperCase(), sub: `\u26be ${pk.flavor}` };
+  const bg = pk ? parkPhotoURL(pk) : null;
+  if (t === "stadium" && pk) return { photo: parkPhotoURL(pk), name: pk.park.toUpperCase(), sub: `⚾ ${pk.flavor}` };
   if (t === "airport") {
     const ap = (pk ? pk.ap : "Terminal C").toUpperCase();
-    return { cls: "ent-air", name: ap, sub: "\u2708 boarding group C is boarding", html:
-      `<div class="ea-wrap"><div class="ea-big">\u2708 ${ap}</div>` +
-      `<div class="ea-row">B12&nbsp;&nbsp;BOARDING</div>` +
-      `<div class="ea-row bad">C07&nbsp;&nbsp;DELAYED</div>` +
-      `<div class="ea-row">A03&nbsp;&nbsp;FINAL CALL \u2014 RUN</div>` +
-      `<div class="ea-row dim">RESTROOM&nbsp;&nbsp;\u2192&nbsp;&nbsp;RIGHT HERE</div></div>` };
+    // the departures board flies to the rest of the league
+    const dests = vdrawN("apdest", MLB_PARKS.filter(p => !pk || p.park !== pk.park).map(p => p.city.toUpperCase()), 2);
+    const gates = vdrawN("apgate", ["A03", "B12", "C07", "D22", "E09", "F14"], 3);
+    return { cls: "ent-air", bg, name: ap, sub: "✈ boarding group C is boarding", html:
+      `<div class="ea-wrap">${cityChip(pk)}<div class="ea-big">✈ ${ap}</div>` +
+      `<div class="ea-row">${gates[0]}&nbsp;&nbsp;${dests[0]}&nbsp;·&nbsp;BOARDING</div>` +
+      `<div class="ea-row bad">${gates[1]}&nbsp;&nbsp;${dests[1]}&nbsp;·&nbsp;DELAYED</div>` +
+      `<div class="ea-row">${gates[2]}&nbsp;&nbsp;FINAL CALL — RUN</div>` +
+      `<div class="ea-row dim">RESTROOM&nbsp;&nbsp;→&nbsp;&nbsp;RIGHT HERE</div></div>` };
   }
   if (t === "station") {
     const st = (pk ? pk.st : "Central Station").toUpperCase();
-    return { cls: "ent-sta", name: st, sub: "\ud83d\ude86 the 5:15 waits for no bladder", html:
-      `<div class="es-wrap"><div class="es-h">\ud83d\ude86 ${st}</div>` +
-      `<div><span class="flap">5:15</span><span class="flap">ON TIME</span></div>` +
-      `<div><span class="flap">5:45</span><span class="flap bad">DELAYED</span></div>` +
-      `<div><span class="flap">6:10</span><span class="flap bad">CANCELED</span></div></div>` };
+    const dests = vdrawN("stdest", MLB_PARKS.filter(p => !pk || p.park !== pk.park).map(p => p.city.toUpperCase()), 2);
+    const times = vdrawN("sttime", ["5:15", "5:45", "6:10", "6:40", "7:05", "7:30"], 3).sort();
+    return { cls: "ent-sta", bg, name: st, sub: `🚆 the ${times[0]} waits for no bladder`, html:
+      `<div class="es-wrap">${cityChip(pk)}<div class="es-h">🚆 ${st}</div>` +
+      `<div><span class="flap">${times[0]}</span><span class="flap">${dests[0]}</span><span class="flap">ON TIME</span></div>` +
+      `<div><span class="flap">${times[1]}</span><span class="flap">${dests[1]}</span><span class="flap bad">DELAYED</span></div>` +
+      `<div><span class="flap">${times[2]}</span><span class="flap bad">CANCELED</span></div></div>` };
   }
-  if (t === "divebar") return { cls: "ent-bar", name: "THE DIVE", sub: "\ud83c\udf7a est. 1972 \u00b7 cash only", html:
-    `<div class="eb-wrap"><div class="eb-neon">DIVE BAR</div>` +
-    `<div class="eb-neon2">OPEN LATE \u00b7 COLD BEER</div>` +
-    `<div class="eb-neon3">\ud83c\udfaf DARTS TUESDAYS</div></div>` };
-  if (t === "coffee") return { cls: "ent-cof", name: "THE ROASTERY", sub: "\u2615 it WILL go right through you", html:
-    `<div class="ec-wrap"><div class="ec-h">\u2615 TODAY'S MENU</div>` +
-    `<div class="ec-m">cortado ..... $7</div>` +
-    `<div class="ec-m">oat milk ..... +$2</div>` +
-    `<div class="ec-m">cold brew ..... regret</div>` +
-    `<div class="ec-m">wifi ..... ask nicely</div></div>` };
-  if (t === "festival") return { cls: "ent-fes", name: "MAIN STAGE", sub: "\ud83c\udfb8 set times are a suggestion", html:
-    `<div class="ef-wrap"><div class="ef-h">\u2014 TONIGHT \u2014</div>` +
-    `<div class="ef-a1">THE REC GUYS</div>` +
-    `<div class="ef-a2">SHAME TUB COLLECTIVE</div>` +
-    `<div class="ef-a3">DJ FLICKER & THE DIVIDERS</div></div>` };
+  if (t === "divebar") {
+    const hood = v ? vdraw("hood:" + pk.park, v.hoods) : null;
+    const name = v
+      ? vdraw("bar:" + pk.park, [
+          `THE ${hood.toUpperCase()} TAP`,
+          `${hood.toUpperCase()} SOCIAL CLUB`,
+          `THE ${v.brew.toUpperCase()} BENCH`,
+          `THE DUGOUT · ${hood.toUpperCase()}`,
+          `LAST CALL ${pk.city.toUpperCase()}`,
+          `${pk.chant ? pk.chant.toUpperCase() : pk.city.toUpperCase()}'S PLACE`,
+        ])
+      : vdraw("bar:x", ["THE DIVE", "THE RUSTY TAP", "THE BROKEN STOOL", "SUDS & DUDS", "THE LAST STALL SALOON"]);
+    const line2 = v
+      ? vdraw("barl2:" + pk.park, [
+          `OPEN LATE · COLD ${v.brew.toUpperCase()}`,
+          `${v.dish.toUpperCase()} TILL 2AM`,
+          `$4 ${v.brew.toUpperCase()} DURING THE 7TH`,
+          `NO COVER · NO MERCY`,
+          `POOL TABLE (ONE POCKET MISSING)`,
+          `${pk.team.toUpperCase()} GAME ALWAYS ON`,
+        ])
+      : vdraw("barl2:x", ["OPEN LATE · COLD BEER", "CASH ONLY · NO REGRETS", "POOL TABLE (ONE POCKET MISSING)"]);
+    const line3 = vdraw("barl3", ["🎯 DARTS TUESDAYS", "🎤 KARAOKE THURSDAYS (CRIMES ONLY)", "🧠 TRIVIA WEDNESDAYS", "🩩 DISCO SUNDAYS", "🃏 EUCHRE NIGHT · BYO PARTNER", "🎶 JUKEBOX STUCK ON ONE SONG"]);
+    const est = vdraw("barest", ["est. 1958", "est. 1962", "est. 1971", "est. 1972", "est. 1977", "est. 1983"]);
+    return { cls: "ent-bar", bg, name,
+      sub: `🍺 ${hood || "downtown"} · ${est} · cash only`, html:
+      `<div class="eb-wrap">${cityChip(pk)}<div class="eb-neon">${name}</div>` +
+      `<div class="eb-neon2">${line2}</div>` +
+      `<div class="eb-neon3">${line3}</div></div>` };
+  }
+  if (t === "coffee") {
+    const hood = v ? vdraw("hood:" + pk.park, v.hoods) : null;
+    const name = v
+      ? vdraw("cof:" + pk.park, [
+          `${hood.toUpperCase()} ROASTERS`,
+          `${hood.toUpperCase()} COFFEE LAB`,
+          `THE ${pk.city.toUpperCase()} GRIND`,
+          `FOURTH WAVE ${hood.toUpperCase()}`,
+          `${hood.toUpperCase()} BEANERY`,
+        ])
+      : vdraw("cof:x", ["THE ROASTERY", "BEAN THERE", "GRIND CULTURE", "THE DAILY DRIP"]);
+    const items = vdrawN("cofm" + (pk ? ":" + pk.park : ""), [
+      "cortado ..... $7", "oat milk ..... +$2", "cold brew ..... regret", "wifi ..... ask nicely",
+      "batch brew ..... honor system", "espresso ..... +18% pts", "matcha ..... judged silently",
+      "pour over ..... 11 min wait", "decaf ..... why", "drip ..... like that pipe",
+      ...(v ? [`${v.dish.toLowerCase()} scone ..... $9`, `${pk.city.toLowerCase()} fog ..... $6`, `${v.brew.toLowerCase()} affogato ..... bold`] : []),
+    ], 4);
+    return { cls: "ent-cof", bg, name,
+      sub: `☕ ${hood || "downtown"} · it WILL go right through you`, html:
+      `<div class="ec-wrap">${cityChip(pk)}<div class="ec-h">☕ ${name} — MENU</div>` +
+      items.map(m => `<div class="ec-m">${m}</div>`).join("") + `</div>` };
+  }
+  if (t === "festival") {
+    const hood = v ? vdraw("hood:" + pk.park, v.hoods) : null;
+    const name = v
+      ? vdraw("fes:" + pk.park, [
+          `${hood.toUpperCase()} BLOCK PARTY`,
+          `${pk.city.toUpperCase()}FEST`,
+          `${hood.toUpperCase()} SOUND & SUDS`,
+          `${pk.city.toUpperCase()} PORTA-PALOOZA`,
+        ])
+      : vdraw("fes:x", ["MAIN STAGE", "MUD & AMPS", "FIELD DAY"]);
+    const acts = vdrawN("acts" + (pk ? ":" + pk.park : ""), [
+      "THE REC GUYS", "SHAME TUB COLLECTIVE", "DJ FLICKER & THE DIVIDERS", "THE SIDE-GLANCERS",
+      "WET FLOOR (EMO SET)", "THE STALL DOORS", "BUFFER ZONE", "THE LURKERS",
+      "HOT DOG ORIENTATION", "ONE URINAL SHORT",
+      ...(v ? [`THE ${v.dish.toUpperCase()} BOYS`, `${v.brew.toUpperCase()} TRIBUTE ACT`, ...(pk.chant ? [`DJ ${pk.chant.toUpperCase()}`] : [])] : []),
+    ], 3);
+    return { cls: "ent-fes", bg, name,
+      sub: `🎸 ${hood || "the fairgrounds"} · set times are a suggestion`, html:
+      `<div class="ef-wrap">${cityChip(pk)}<div class="ef-h">— ${name} · TONIGHT —</div>` +
+      `<div class="ef-a1">${acts[0]}</div>` +
+      `<div class="ef-a2">${acts[1]}</div>` +
+      `<div class="ef-a3">${acts[2]}</div></div>` };
+  }
   return null;
 }
 
@@ -3390,6 +3542,18 @@ function skipIntro() {
   if (announceT) clearTimeout(announceT);
   $("announce").classList.remove("show");
   startTimer(G.pendingSecs || G.cur.time);
+}
+
+/* Wheels up with the scoreboard intact: a survived run continues in the new city
+   as an endless rush. The longer you last, the more baller you get. */
+function continueRunInCity(p) {
+  $("end").classList.add("hidden");
+  G.mode = "endless";       // the road trip is one long night from here on
+  G.stalls = 3;             // new building, three fresh stall knocks
+  G.round++;                // difficulty keeps climbing from where you left off
+  updateHUD();
+  setTimeout(() => announce("🛫", "ROAD TRIP — RUN CONTINUES", `${G.score} pts ride along to ${p.park}. Lose and THEN we talk resets.`, 2000, "good"), 250);
+  setTimeout(() => startRound(), 400);
 }
 
 function nextRound() {
@@ -3501,6 +3665,9 @@ function endGame(survived) {
     $("unlockline").textContent = roadtripUnlocked() ? "" : `🔒 Score ${ROADTRIP_SCORE}+ to unlock Road Trip (play any ballpark)`;
   }
   $("endroadtriprow").classList.toggle("hiddenrow", !roadtripUnlocked());
+  $("endroadtripbtn").innerHTML = (G.lives > 0 && !G.pissed)
+    ? `🗺️ ROAD TRIP — TAKE ${G.score} PTS ON THE ROAD<small>run continues · score resets only when you lose</small>`
+    : `🗺️ ROAD TRIP — FRESH START, NEW CITY<small>choose any of 30 ballparks</small>`;
   $("end").classList.remove("hidden");
   if (survived && G.mode !== "endless") sfx.flush();
 }
