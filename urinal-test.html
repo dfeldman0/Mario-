@@ -460,10 +460,7 @@
 
   /* ---------- 3D mode (beta) ---------- */
   #three3d { position: absolute; inset: 0; width: 100%; height: 100%; display: none; z-index: 3; }
-  #scene.mode3d #three3d { display: block; filter: saturate(1.14) contrast(1.06) brightness(1.02); }
-  /* filmic vignette over the 3D view — post-processing on a budget */
-  #scene.mode3d::after { content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none;
-    background: radial-gradient(ellipse at 50% 42%, transparent 52%, rgba(6,8,12,.34) 100%); }
+  #scene.mode3d #three3d { display: block; }
   #scene.mode3d #row { visibility: hidden; }
   #hint3d { display: none; position: absolute; left: 10px; bottom: 10px; z-index: 6;
     background: rgba(16,20,27,.85); border: 1px solid #3a4a63; border-radius: 8px;
@@ -2617,6 +2614,7 @@ function doDrift(r) {
   r.spots[from].occupant = null; r.spots[from].persona = undefined;
   analyze(r);
   renderRound(r);
+  if ($("scene").classList.contains("mode3d")) t3Shuffle(from, to);
   buzz([25, 15, 25]); tone(420, .1, "sine", .06);
   toast("📱 He drifted a spot over without looking up. The board changed.");
 }
@@ -2631,6 +2629,7 @@ function doSniper(r) {
   r.spots[target].persona = Math.random() < 0.4 ? "phone" : "regular";
   analyze(r);
   renderRound(r);
+  if ($("scene").classList.contains("mode3d")) t3WalkIn(target);
   buzz([40, 20, 40]); tone(300, .16, "square", .07);
   toast("🚪 WALK-IN! He took the good spot. Adapt.");
 }
@@ -3737,7 +3736,7 @@ updateStartLines();
    All game logic, HUD, FX and scoring stay in the DOM above.
    ========================================================= */
 const T3 = { ready: false, failed: false, raf: null, slots: [], rings: [], hits: [], door: null,
-  people: [], flicker: null, camT: 0, dim: 0 };
+  people: [], anims: [], flicker: null, camT: 0, dim: 0 };
 function threeOn() { return !T3.failed; } // 3D is the game now; falls back to 2D only if WebGL can't start
 function loadThree() {
   if (window.THREE) return Promise.resolve(true);
@@ -3787,6 +3786,8 @@ function t3Init() {
     pm.dispose();
   } catch (e) {}
   cv.addEventListener("click", t3Click);
+  t3InitPost();
+  t3PostSize();
   T3.ready = true;
 }
 function mat(c, opts) { return new THREE.MeshLambertMaterial(Object.assign({ color: c, flatShading: true }, opts || {})); }
@@ -3846,10 +3847,16 @@ function t3Person(persona, shirtHex) {
   const skin = pick([0xe8b48a, 0xc68b5e, 0x8d5a3b, 0xf0c9a5, 0x6b4429]);
   const pants = pick([0x3a4553, 0x54606e, 0x2e3a49, 0x5b4a3a]);
   const shirtM = smat(shirtHex, 0.75);
+  g.userData.legs = [];
   for (const lx of [-0.07, 0.07]) {
+    // hip-pivoted so a walk cycle can swing them
+    const hip = new THREE.Group();
+    hip.position.set(lx, 0.46, 0);
     const leg = new THREE.Mesh(new THREE.CapsuleGeometry(0.062, 0.34, 4, 10), smat(pants, 0.8));
-    leg.position.set(lx, 0.26, 0);
-    g.add(leg);
+    leg.position.set(0, -0.2, 0);
+    hip.add(leg);
+    g.add(hip);
+    g.userData.legs.push(hip);
   }
   const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.17, 0.36, 6, 14), shirtM);
   torso.position.y = 0.74;
@@ -3920,10 +3927,11 @@ function t3Dispose(obj) {
 function build3D(round) {
   t3Resize();
   while (T3.group.children.length) { const c = T3.group.children[0]; T3.group.remove(c); t3Dispose(c); }
-  T3.slots = []; T3.rings = []; T3.hits = []; T3.people = []; T3.flicker = null; T3.door = null;
+  T3.slots = []; T3.rings = []; T3.hits = []; T3.people = []; T3.anims = []; T3.flicker = null; T3.door = null;
   const n = round.n, S = 0.85;
   const X = i => (i - (n - 1) / 2) * S;
   const roomW = n * S + 4;
+  T3.X = X; T3.roomW = roomW;
   const halfW0 = (n - 1) / 2 * S + 0.8;
   const hHalf0 = Math.atan(Math.tan(58 * Math.PI / 360) * (T3.cam.aspect || 0.5));
   const camDist = Math.max(4.2, halfW0 / Math.tan(hHalf0) + 0.7);
@@ -4331,11 +4339,88 @@ function build3D(round) {
   T3.cam.position.copy(T3.camFrom);
   if (!T3.raf) T3.raf = requestAnimationFrame(t3Frame);
 }
+/* ---- post stack: scene -> blur chain -> composite (bloom, tilt-shift, grade) ---- */
+function t3InitPost() {
+  try {
+    const quadGeo = new THREE.PlaneGeometry(2, 2);
+    const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const mkRT = (w, h) => new THREE.WebGLRenderTarget(w, h, {
+      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: true });
+    const blurFrag = `
+      uniform sampler2D tD; uniform vec2 dir; uniform vec2 res; varying vec2 vUv;
+      void main() {
+        vec2 px = dir / res;
+        vec3 c = texture2D(tD, vUv).rgb * 0.227;
+        c += (texture2D(tD, vUv + px * 1.384).rgb + texture2D(tD, vUv - px * 1.384).rgb) * 0.316;
+        c += (texture2D(tD, vUv + px * 3.230).rgb + texture2D(tD, vUv - px * 3.230).rgb) * 0.070;
+        gl_FragColor = vec4(c, 1.0);
+      }`;
+    const compFrag = `
+      uniform sampler2D tSharp; uniform sampler2D tBlur; uniform float uDim; varying vec2 vUv;
+      void main() {
+        vec3 sharp = texture2D(tSharp, vUv).rgb;
+        vec3 blur = texture2D(tBlur, vUv).rgb;
+        // tilt-shift: crisp band around the fixtures, milky top and bottom — diorama energy
+        float dof = smoothstep(0.10, 0.42, abs(vUv.y - 0.52)) * 0.75;
+        vec3 c = mix(sharp, blur, dof);
+        // bloom: the blurred image's hot spots glow over everything
+        c += max(blur - vec3(0.55), vec3(0.0)) * 0.85;
+        // grade: gentle saturation + contrast, warmed shadows
+        float l = dot(c, vec3(0.299, 0.587, 0.114));
+        c = mix(vec3(l), c, 1.16);
+        c = (c - 0.5) * 1.06 + 0.5 + vec3(0.012, 0.006, 0.0) * (1.0 - l);
+        // vignette
+        float v = smoothstep(0.92, 0.34, distance(vUv, vec2(0.5, 0.44)));
+        c *= mix(0.72, 1.0, v);
+        gl_FragColor = vec4(c, 1.0);
+      }`;
+    const vert = `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
+    const post = {
+      cam, scene: new THREE.Scene(),
+      blurMat: new THREE.ShaderMaterial({ vertexShader: vert, fragmentShader: blurFrag,
+        uniforms: { tD: { value: null }, dir: { value: new THREE.Vector2(1, 0) }, res: { value: new THREE.Vector2(1, 1) } }, depthTest: false }),
+      compMat: new THREE.ShaderMaterial({ vertexShader: vert, fragmentShader: compFrag,
+        uniforms: { tSharp: { value: null }, tBlur: { value: null }, uDim: { value: 0 } }, depthTest: false }),
+      rtScene: mkRT(2, 2), rtA: mkRT(2, 2), rtB: mkRT(2, 2),
+    };
+    post.quad = new THREE.Mesh(quadGeo, post.compMat);
+    post.quad.frustumCulled = false;
+    post.scene.add(post.quad);
+    T3.post = post;
+  } catch (e) { T3.post = null; }
+}
+function t3PostSize() {
+  if (!T3.post) return;
+  const s = new THREE.Vector2();
+  T3.renderer.getDrawingBufferSize(s);
+  T3.post.rtScene.setSize(s.x, s.y);
+  T3.post.rtA.setSize(Math.max(1, s.x >> 1), Math.max(1, s.y >> 1));
+  T3.post.rtB.setSize(Math.max(1, s.x >> 1), Math.max(1, s.y >> 1));
+  T3.post.blurMat.uniforms.res.value.set(Math.max(1, s.x >> 1), Math.max(1, s.y >> 1));
+}
+function t3RenderPost() {
+  const p = T3.post, r = T3.renderer;
+  r.setRenderTarget(p.rtScene);
+  r.render(T3.scene, T3.cam);
+  p.quad.material = p.blurMat;
+  p.blurMat.uniforms.tD.value = p.rtScene.texture;
+  p.blurMat.uniforms.dir.value.set(1, 0);
+  r.setRenderTarget(p.rtA); r.render(p.scene, p.cam);
+  p.blurMat.uniforms.tD.value = p.rtA.texture;
+  p.blurMat.uniforms.dir.value.set(0, 1);
+  r.setRenderTarget(p.rtB); r.render(p.scene, p.cam);
+  p.quad.material = p.compMat;
+  p.compMat.uniforms.tSharp.value = p.rtScene.texture;
+  p.compMat.uniforms.tBlur.value = p.rtB.texture;
+  r.setRenderTarget(null);
+  r.render(p.scene, p.cam);
+}
 function t3Resize() {
   const r = $("scene").getBoundingClientRect();
   T3.renderer.setSize(r.width, r.height, false);
   T3.cam.aspect = r.width / r.height;
   T3.cam.updateProjectionMatrix();
+  t3PostSize();
 }
 function t3Frame(now) {
   if (!$("scene").classList.contains("mode3d")) { T3.raf = null; return; }
@@ -4350,11 +4435,28 @@ function t3Frame(now) {
     T3.cam.position.x = T3.camTo.x + Math.sin(t * 0.7) * 0.02;
   }
   T3.cam.lookAt(T3.look || new THREE.Vector3(0, 1.05, 0));
-  // people sway; REC LED blinks
+  // people sway and breathe; REC LED blinks
   T3.people.forEach((p, i) => {
     p.rotation.z = Math.sin(t * 1.3 + i * 2) * 0.03;
+    p.scale.y = 1 + Math.sin(t * 1.9 + i * 1.4) * 0.006;
     if (p.userData.led) p.userData.led.visible = Math.floor(t * 2) % 2 === 0;
     if (p.userData.swivel) p.userData.swivel.rotation.y = Math.sin(t * 1.4 + i) * 0.9;
+  });
+  // entrances in progress: position lerp + leg swing + step bob
+  T3.anims = T3.anims.filter(a => {
+    const q = Math.min(1, (now - a.t0) / a.dur);
+    const e = 1 - Math.pow(1 - q, 2);
+    a.p.position.x = a.from.x + (a.to.x - a.from.x) * e;
+    a.p.position.z = a.from.z + (a.to.z - a.from.z) * e;
+    a.p.position.y = Math.abs(Math.sin(q * Math.PI * (a.kind === "walk" ? 4 : 2.5))) * 0.035;
+    const swing = Math.sin(q * Math.PI * (a.kind === "walk" ? 8 : 5)) * (a.kind === "walk" ? 0.55 : 0.3);
+    (a.p.userData.legs || []).forEach((hip, k) => { hip.rotation.x = swing * (k ? -1 : 1); });
+    if (q >= 1) {
+      a.p.position.y = 0;
+      (a.p.userData.legs || []).forEach(h => { h.rotation.x = 0; });
+      return false;
+    }
+    return true;
   });
   // rings pulse
   T3.rings.forEach(r => { if (r && !r.userData.lockedColor) { r.material.opacity = 0.55 + Math.sin(t * 5) * 0.3; } });
@@ -4365,9 +4467,11 @@ function t3Frame(now) {
   T3.dim += (target - T3.dim) * 0.12;
   T3.renderer.toneMappingExposure = 1 - T3.dim * 0.55;
   try {
-    T3.renderer.render(T3.scene, T3.cam);
+    if (T3.post) t3RenderPost();
+    else T3.renderer.render(T3.scene, T3.cam);
     T3.renderErrs = 0;
   } catch (e) {
+    T3.post = null; // a failed pass drops us to the direct path before it drops us to 2D
     // a struggling GPU gets three strikes, then the classic 2D view takes over
     T3.renderErrs = (T3.renderErrs || 0) + 1;
     if (T3.renderErrs >= 3) {
@@ -4401,6 +4505,27 @@ function t3Mark(i, cls) {
   ring.material.color.setHex(cls === "chosen-good" ? 0x2fb46b : 0xe6483d);
   ring.material.opacity = 1;
 }
+/* A newcomer enters from the door and WALKS to his spot — legs and all. */
+function t3WalkIn(slot) {
+  if (!T3.X) return;
+  const x = T3.X(slot);
+  const p = T3.people.find(m => Math.abs(m.position.x - x) < 0.01);
+  if (!p) return;
+  const from = { x: T3.roomW / 2 + 0.6, z: 2.8 };
+  p.position.set(from.x, 0, from.z);
+  T3.anims.push({ p, from, to: { x, z: 0.55 }, t0: performance.now(), dur: 1000, kind: "walk" });
+}
+/* The phone zombie side-steps one urinal over, eyes never leaving the screen. */
+function t3Shuffle(fromSlot, toSlot) {
+  if (!T3.X) return;
+  const x = T3.X(toSlot);
+  const p = T3.people.find(m => Math.abs(m.position.x - x) < 0.01);
+  if (!p) return;
+  const from = { x: T3.X(fromSlot), z: 0.55 };
+  p.position.x = from.x;
+  T3.anims.push({ p, from, to: { x, z: 0.55 }, t0: performance.now(), dur: 650, kind: "shuffle" });
+}
+
 function t3Best(indices) {
   indices.forEach(i => {
     const ring = T3.rings[i];

@@ -135,7 +135,13 @@ identical worldwide.
 ### 🧪 3D Mode
 
 Always on — wall-urinal rounds render as a low-poly 3D room
-(three.js, lazy-loaded from `vendor/`): first-person
+(three.js, lazy-loaded from `vendor/`) with a **custom post-processing
+pipeline built on core render targets** (no extra libs): bloom pulled from
+the blurred frame, tilt-shift depth-of-field for a diorama look, in-shader
+color grade and vignette — plus **animated patrons**: rush-hour walk-ins
+enter through the door with a full leg-swinging walk cycle, phone zombies
+side-step one urinal over without looking up, and everyone idles, sways
+and breathes. The room itself gets first-person
 walk-in from the door, corridor POV down the row, capsule people with
 personas (the REC guy's LED blinks in 3D), hazards as real meshes, the
 flickering-light hazard as an actually flickering point light,
