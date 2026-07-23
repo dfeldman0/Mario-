@@ -167,6 +167,42 @@
     filter: drop-shadow(0 2px 4px rgba(0,0,0,.5)); animation: soapbob 1s ease-in-out infinite; }
   @keyframes soapbob { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-5px) rotate(4deg); } }
   #careerline { color: #e6b93d; font-size: 13px; margin-top: 6px; min-height: 16px; }
+  .icecube { position: absolute; left: 50%; transform: translateX(-50%); top: 34%; z-index: 3; font-size: 15px;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,.4)); }
+  .dogspot { position: absolute; right: -12px; bottom: -2px; z-index: 4; font-size: 21px;
+    animation: dogwag 1.4s ease-in-out infinite; transform-origin: 50% 90%; }
+  @keyframes dogwag { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+  .draftdoor { position: absolute; left: 50%; transform: translateX(-50%); top: -14px; z-index: 4; font-size: 14px;
+    animation: draftsway 1.8s ease-in-out infinite; }
+  @keyframes draftsway { 0%, 100% { transform: translateX(-58%); } 50% { transform: translateX(-42%); } }
+  .slot.rattle .fixture { animation: pipettl .35s linear infinite; }
+  @keyframes pipettl { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-1.3px); } 75% { transform: translateX(1.3px); } }
+  .burstspray { position: absolute; left: 50%; transform: translateX(-50%); top: 22%; z-index: 4; font-size: 26px;
+    animation: soapbob 0.7s ease-in-out infinite; }
+  .slot.oncam::before { content: "ON AIR"; position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: #b03030; color: #ffe9e6; font-size: 6.5px; font-weight: 900; letter-spacing: 1px;
+    padding: 1px 4px; border-radius: 3px; z-index: 5; animation: onairblink 1.6s steps(2) infinite; }
+  @keyframes onairblink { 50% { opacity: 0.45; } }
+  #newsbadge { display: none; position: absolute; top: 15%; z-index: 6; background: rgba(20,10,10,.85);
+    border: 1.5px solid #b03030; color: #ffd7d0; font-size: 12px; letter-spacing: 1px;
+    padding: 5px 10px; border-radius: 8px; }
+  #newsbadge.show { display: block; }
+  #newsbadge.side0 { left: 3%; } #newsbadge.side1 { right: 3%; }
+  #newsbadge b { color: #ff6a5f; animation: onairblink 1.2s steps(2) infinite; }
+  #fogsteam { position: absolute; left: -4%; right: -4%; top: 12%; height: 58%; z-index: 28; pointer-events: none;
+    opacity: 0; transition: opacity 1.1s ease; filter: blur(13px);
+    background:
+      radial-gradient(circle at 12% 60%, rgba(235,240,244,.95) 0 22%, transparent 45%),
+      radial-gradient(circle at 38% 40%, rgba(228,236,242,.92) 0 26%, transparent 50%),
+      radial-gradient(circle at 64% 62%, rgba(238,242,246,.95) 0 24%, transparent 48%),
+      radial-gradient(circle at 88% 44%, rgba(230,238,244,.92) 0 22%, transparent 46%),
+      radial-gradient(ellipse at 50% 80%, rgba(225,233,240,.85) 0 40%, transparent 70%); }
+  #scene.fogbank #fogsteam { opacity: .97; animation: fogdrift 5s ease-in-out infinite; }
+  @keyframes fogdrift { 0%, 100% { transform: translateX(-1.5%); } 50% { transform: translateX(1.5%); } }
+  #blackout { position: absolute; inset: 0; background: #030507; opacity: 0; pointer-events: none;
+    transition: opacity .12s; z-index: 34; }
+  #blackout.on { opacity: .96; }
+  #lesson .attbtns .hag { background: linear-gradient(#3aa9a0, #26766f); }
 
   /* ---------- score feedback ---------- */
   #scorechip { border-color: #8a6a1d; color: #ffd76a; font-weight: bold; }
@@ -738,6 +774,8 @@
   #attrow.show, #drinkrow.show { display: block; }
   .attq { font-weight: bold; color: #ffd76a; margin-bottom: 8px; }
   .attbtns { display: flex; gap: 6px; }
+  .attbtns:has(> :nth-child(4)) { flex-wrap: wrap; }
+  .attbtns:has(> :nth-child(4)) button { flex: 1 1 45%; }
   .attbtns button { flex: 1; font-family: inherit; font-weight: bold; font-size: clamp(11px, 3vw, 13px);
     padding: 9px 4px; border: none; border-radius: 10px; color: #fff; cursor: pointer; line-height: 1.25; }
   .attbtns .tip { background: linear-gradient(#37c97a, #229458); }
@@ -917,6 +955,9 @@
       <div id="tod"></div>
       <div id="dim"></div>
       <div id="flash"></div>
+      <div id="fogsteam"></div>
+      <div id="blackout"></div>
+      <div id="newsbadge"></div>
       <div id="fx"></div>
       <canvas id="fxc"></canvas>
       <div id="attendantbox"></div>
@@ -952,6 +993,7 @@
             <button class="tip" id="att-tip">💵 Tip $2<br><small>−20 pts, towel blessing</small></button>
             <button class="col" id="att-col">🧴 Free cologne<br><small>+25 pts, strong musk</small></button>
             <button class="walk" id="att-walk">🚶 Walk past<br><small>risky…</small></button>
+            <button class="hag" id="att-hag">🤝 Haggle<br><small>stakes escalate</small></button>
           </div>
         </div>
         <div id="attnote"></div>
@@ -1059,6 +1101,7 @@ const PERSONAS = {
   shifty:   { chip: "👀 …what?",     desc: "the side-glancer — he WILL look" },
   lurker:   { chip: "🧍 (not going)", desc: "the lurker — not going, not leaving" },
   crooner:  { chip: "🎤 SWEET CAROLIIINE", desc: "the crooner mid-ballad" },
+  boss:     { chip: "👔 got a minute?",    desc: "your boss. yes, here." },
 };
 
 /* Detailed guy: varied build, hair, outfit, stance. facing: 'back' | 'front' */
@@ -1130,6 +1173,12 @@ function personSVG(persona, facing) {
   } else if (persona === "crooner" && !front) {
     extra = `<text x="${35+headR+4}" y="16" font-size="9" fill="#ffd76a">♪</text>
              <text x="${35-headR-10}" y="10" font-size="7" fill="#ffd76a">♫</text>`;
+  } else if (persona === "boss") {
+    // blazer over the shirt + a briefcase parked at his heel
+    extra = `<path d="M${x0} 33 L${x0+6} 33 L${x0+6} 66 L${x0} 64 Z" fill="#23293a"/>
+             <path d="M${x0+torsoW} 33 L${x0+torsoW-6} 33 L${x0+torsoW-6} 66 L${x0+torsoW} 64 Z" fill="#23293a"/>
+             <rect x="${x0+torsoW+3}" y="78" width="14" height="11" rx="2" fill="#4a3423"/>
+             <rect x="${x0+torsoW+8}" y="75" width="4" height="4" fill="#4a3423"/>`;
   }
 
   /* Front-facing guys hold a ballpark frank at waist level with both hands.
@@ -1560,7 +1609,7 @@ function endlessPlan(r) {
 /* ---------- game state ---------- */
 const G = {
   mode: "gauntlet",
-  round: 0, score: 0, streak: 0, lives: 3, drinks: 0, held: [], pissed: false,
+  round: 0, score: 0, streak: 0, lives: 3, drinks: 0, held: [], pissed: false, haggles: 0,
   splashes: 0, perfects: 0, trail: [], seed: null, city: null, stalls: 3,
   cur: null, timer: null, timeLeft: 0, timerTotal: 10, introT: null, locked: false,
 };
@@ -1580,6 +1629,16 @@ const CAREER_LADDER = [
   { key: "crooner", icon: "🎤", name: "THE CROONER",         tease: "One patron is mid-ballad. His radius is bigger than his talent." },
   { key: "sniper",  icon: "🚪", name: "RUSH-HOUR WALK-INS",  tease: "Dawdle too long and someone walks in and TAKES the best spot." },
   { key: "chaos",   icon: "🌪️", name: "FULL CHAOS",          tease: "Every hazard can now stack in one room. You asked for this, legend." },
+  { key: "fog",     icon: "🌫️", name: "FESTIVAL STEAM",      tease: "Some rooms open in a wall of steam — you can't see who's where until it lifts." },
+  { key: "ice",     icon: "🧊", name: "THE ICED URINAL",     tease: "A stadium urinal full of ice. Picking it is tradition. Tradition pays +15." },
+  { key: "boss",    icon: "👔", name: "THE BOSS",            tease: "Your boss goes here too. Stand next to him and you WILL discuss Q3. −25." },
+  { key: "news",    icon: "🎥", name: "THE NEWS CREW",       tease: "A local crew is filming a segment. Half the room is ON AIR. Choose accordingly." },
+  { key: "nopaper", icon: "🧻", name: "NO PAPER",            tease: "New stall heartbreak: the door opens… and there's no paper. Abort. Abort." },
+  { key: "pipe",    icon: "🔧", name: "THE RATTLING PIPE",   tease: "One fixture rattles ominously. Mid-round, it blows. Don't be nearby." },
+  { key: "dog",     icon: "🐕", name: "THE SERVICE DOG",     tease: "A very good boy sits beside one spot. Petting urge: −1 second, +5 cuteness." },
+  { key: "power",   icon: "🔌", name: "POWER DIPS",          tease: "The lights cut out for a full second mid-round. The clock does not care." },
+  { key: "draft",   icon: "🚪", name: "THE PROPPED DOOR",    tease: "Someone propped the door open. The end spot near it loses its corner privilege." },
+  { key: "haggle",  icon: "🤝", name: "ATTENDANT HAGGLING",  tease: "You can now negotiate with the attendant. Stakes escalate every time." },
 ];
 function mechanicOn(key) {
   // the Daily is the shared arena: everyone worldwide plays with the full rotation
@@ -1832,6 +1891,10 @@ function makeRound(idx) {
         const cand = occupiedIdx.filter(i => !spots[i].persona);
         if (cand.length) spots[gpick(cand)].persona = "crooner";
       }
+      if (mechanicOn("boss") && idx > 1 && chance(["office", "tech"].includes(plan.theme) ? 0.35 : 0.1)) {
+        const cand = occupiedIdx.filter(i => !spots[i].persona);
+        if (cand.length) spots[gpick(cand)].persona = "boss";
+      }
       occupiedIdx.forEach(i => {
         if (!spots[i].persona) spots[i].persona = grnd() < 0.3 ? gpick(["phone", "headphones"]) : "regular";
       });
@@ -1889,15 +1952,38 @@ function makeRound(idx) {
     if (layout !== "tub" && mechanicOn("wet") && idx > 0 && chance(Math.min(0.6, 0.3 * chaosB)) && freeIdx().length > 1) {
       wetAt = gpick(freeIdx());
     }
+    // levels 11-20: the room keeps learning new tricks
+    const taken = j => j === wetAt;
+    let iceAt = -1, dogAt = -1, pipeAt = -1;
+    if (mechanicOn("ice") && plan.theme === "stadium" && layout === "wall" && chance(0.4)) {
+      const cand = freeIdx().filter(j => !taken(j));
+      if (cand.length) iceAt = gpick(cand);
+    }
+    if (mechanicOn("dog") && layout === "wall" && idx > 0 && chance(0.2)) {
+      const cand = freeIdx().filter(j => !taken(j) && j !== iceAt);
+      if (cand.length) dogAt = gpick(cand);
+    }
+    if (mechanicOn("pipe") && layout === "wall" && !plan.waitRound && idx > 1 && chance(0.22)) {
+      const cand = freeIdx().filter(j => !taken(j) && j !== iceAt && j !== dogAt);
+      if (cand.length > 2) pipeAt = gpick(cand); // never rig a room the burst could strand
+    }
+    const fogged = mechanicOn("fog") && idx > 0 && chance(plan.theme === "festival" ? 0.5 : 0.1);
+    let newsSide = -1;
+    if (mechanicOn("news") && layout === "wall" && !plan.waitRound && n >= 5 && chance(0.18)) newsSide = gpick([0, 1]);
+    let draftEnd = -1;
+    if (mechanicOn("draft") && layout === "wall" && chance(0.25)) draftEnd = gpick([0, n - 1]);
 
     round = { idx, theme, themeKey: plan.theme, plan, n, spots, dividers, layout, luggageAt, time: plan.time,
-      hasBag, constructionAt, flickerAt, wetAt,
+      hasBag, constructionAt, flickerAt, wetAt, iceAt, dogAt, pipeAt, fogged, fogLifted: false, newsSide, draftEnd,
       attendant: layout === "wall" && chance(plan.attendant) };
     // mid-round events: a phone zombie drifting, or a walk-in taking the best spot
     round.driftAt = (mechanicOn("drift") && layout === "wall" && !plan.waitRound && idx > 0 && chance(0.28)) ? 0.55 : 0;
     round.sniperAt = (!round.driftAt && mechanicOn("sniper") && layout === "wall" && !plan.waitRound && idx > 0 && chance(0.24)) ? 0.5 : 0;
     round.driftPending = round.driftAt > 0;
     round.sniperPending = round.sniperAt > 0;
+    round.pipePending = pipeAt >= 0;
+    round.powerAt = (mechanicOn("power") && idx > 1 && chance(0.2)) ? 0.45 : 0;
+    round.powerPending = round.powerAt > 0;
     analyze(round);
 
     const isWait = round.bestRaw <= 1.0 && occupiedIdx.length > 0;
@@ -1951,7 +2037,11 @@ function comfortOf(round, i) {
   }
   // the flickering-light spot is usable, but nobody in their right mind prefers it
   const flickerPenalty = (round.flickerAt === i) ? 0.45 : 0;
-  return { raw: minRaw, eff, comfort: eff + (isEnd ? 0.25 : 0) - flickerPenalty, isEnd, flicker: round.flickerAt === i };
+  // the news crew's half of the room is ON AIR; the propped door voids one corner
+  const onAir = round.newsSide >= 0 && (round.newsSide === 0 ? i < n / 2 : i >= n / 2);
+  const endBonus = (isEnd && i !== round.draftEnd) ? 0.25 : 0;
+  return { raw: minRaw, eff, comfort: eff + endBonus - flickerPenalty - (onAir ? 0.3 : 0),
+    isEnd, onAir, flicker: round.flickerAt === i };
 }
 
 function analyze(round) {
@@ -2266,6 +2356,8 @@ function renderRound(round) {
     $("backdrop").textContent = "";
   }
   dressScene(round);
+  $("newsbadge").className = round.newsSide >= 0 ? ("show side" + round.newsSide) : "";
+  $("newsbadge").innerHTML = round.newsSide >= 0 ? `🎥 <b>LIVE</b> — ON AIR` : "";
   // 3D mode: wall rooms render in three.js; other layouts fall back to 2D
   const use3d = threeOn() && window.THREE && T3.ready && round.layout === "wall";
   $("scene").classList.toggle("mode3d", use3d);
@@ -2305,6 +2397,8 @@ function renderRound(round) {
       } else if (s.blockType === "construction") {
         inner += `<div class="tape"></div><div class="tape tape2"></div>` +
           (s.coneHere ? `<div class="cone">${coneSVG()}</div>` : "");
+      } else if (s.blockType === "burst") {
+        inner += `<div class="burstspray">⛲</div>`;
       } else {
         inner += `<div class="person">${suitcaseSVG()}</div>`;
       }
@@ -2313,6 +2407,11 @@ function renderRound(round) {
     }
     if (round.flickerAt === i) inner += `<div class="flick"></div>`;
     if (round.wetAt === i) inner += `<div class="wetsign">⚠️<span>WET<br>FLOOR</span></div>`;
+    if (round.iceAt === i) inner += `<div class="icecube">🧊</div>`;
+    if (round.dogAt === i) inner += `<div class="dogspot">🐕</div>`;
+    if (round.pipeAt === i && !s.blocked) slot.classList.add("rattle");
+    if (round.draftEnd === i) inner += `<div class="draftdoor">🚪💨</div>`;
+    if (round.newsSide >= 0 && (round.newsSide === 0 ? i < round.n / 2 : i >= round.n / 2)) slot.classList.add("oncam");
     slot.innerHTML = inner;
     slot.addEventListener("click", () => onSlot(i));
     (far ? rowfar : row).appendChild(slot);
@@ -2370,6 +2469,19 @@ function gainScore(pts, kind) {
   setTimeout(() => el.remove(), 1200);
 }
 
+/* Rewards and taxes that ride along with a successful pick. */
+function postPickBonuses(r, i) {
+  if (i === r.iceAt) {
+    gainScore(15, "mid");
+    setTimeout(() => toast("🧊 ICED IT — stadium tradition upheld. +15."), 500);
+  }
+  const bossAdj = r.spots.some((s, j) => s.occupant && s.persona === "boss" && Math.abs(j - i) === 1);
+  if (bossAdj) {
+    gainScore(-25);
+    setTimeout(() => toast("👔 “Got a minute?” You discussed Q3. At the urinal. −25."), 900);
+  }
+}
+
 /* Soap jackpot: a wall dispenser worth tapping. Hygiene pays. */
 function spawnSoap() {
   const old = $("scene").querySelector(".soapjack");
@@ -2415,6 +2527,13 @@ function startTimer(sec) {
   stopTimer();
   G.timeLeft = sec;
   G.timerTotal = sec;
+  const r = G.cur;
+  if (r && r.fogged && !r.fogLifted) {
+    $("scene").classList.add("fogbank");
+    setTimeout(() => {
+      if (G.cur === r) { r.fogLifted = true; $("scene").classList.remove("fogbank"); }
+    }, 2200);
+  }
   runTimer();
 }
 function resumeTimer() { stopTimer(); runTimer(); }
@@ -2429,6 +2548,8 @@ function runTimer() {
       const frac = G.timeLeft / G.timerTotal;
       if (r0.driftPending && frac <= r0.driftAt) { r0.driftPending = false; doDrift(r0); }
       if (r0.sniperPending && frac <= r0.sniperAt) { r0.sniperPending = false; doSniper(r0); }
+      if (r0.pipePending && frac <= 0.5) { r0.pipePending = false; doPipeBurst(r0); }
+      if (r0.powerPending && frac <= r0.powerAt) { r0.powerPending = false; doPower(); }
     }
     const p = Math.max(0, G.timeLeft / G.timerTotal * 100);
     bar.style.width = p + "%";
@@ -2472,6 +2593,28 @@ function doSniper(r) {
   renderRound(r);
   buzz([40, 20, 40]); tone(300, .16, "square", .07);
   toast("🚪 WALK-IN! He took the good spot. Adapt.");
+}
+
+/* The rattling pipe makes good on its threats. */
+function doPipeBurst(r) {
+  const p = r.pipeAt;
+  if (p == null || p < 0 || r.spots[p].occupant || r.spots[p].blocked) return;
+  if (r.selectable.length < 3) return; // never strand the player
+  r.spots[p].blocked = true; r.spots[p].blockType = "burst";
+  analyze(r);
+  renderRound(r);
+  splashFX(false);
+  buzz([70, 40, 70]); noiseBurst(.7, 1200, .25);
+  toast("⛲ THE PIPE BLEW! That spot is a geyser now.");
+}
+
+/* Lights out. Clock on. */
+function doPower() {
+  const b = $("blackout");
+  b.classList.add("on");
+  buzz(30); tone(120, .5, "sawtooth", .06);
+  toast("🔌 POWER DIP — hold your position…");
+  setTimeout(() => b.classList.remove("on"), 1000);
 }
 
 function stopTimer() {
@@ -2616,6 +2759,7 @@ function showLesson(title, text, pts) {
 
 /* ---------- the attendant intercept ---------- */
 function showAttendant() {
+  $("att-hag").style.display = mechanicOn("haggle") ? "" : "none";
   $("attrow").classList.add("show");
   $("attnote").classList.remove("show");
   $("nextbtn").style.display = "none";
@@ -2641,6 +2785,34 @@ function attCologne() {
   attendantDone(`🧴 Two sprays. Direct hit. <b>+25 pts</b>, but the musk is <i>substantial</i> — ` +
     `next round's timer runs 12% faster while the cloud follows you.`);
 }
+function attHaggle() {
+  G.haggles = (G.haggles || 0) + 1;
+  const t = G.haggles;
+  if (t === 1) {
+    gainScore(15, "mid");
+    attendantDone(`🤝 "For you? Special price." He respects the hustle. <b>+15 pts.</b> ` +
+      `But his eyes say the next negotiation won't be so friendly.`);
+  } else if (t === 2) {
+    if (Math.random() < 0.5) {
+      gainScore(35, "mid");
+      attendantDone(`🤝 You talked him into the <i>premium</i> towel tier. <b>+35 pts.</b> He's impressed. He's also keeping score.`);
+    } else {
+      gainScore(-15);
+      attendantDone(`🤝 "Sir. This is a restroom." <b>−15 pts.</b> The cologne bottle is pointed at you like a dueling pistol.`);
+    }
+  } else {
+    if (Math.random() < 0.3) {
+      gainScore(60, "big");
+      attendantDone(`🤝 THE LEGENDARY DEAL. Towel, cologne, gum, a firm handshake. <b>+60 pts.</b> Men will speak of this.`);
+    } else {
+      gainScore(-30);
+      buzz([60, 40, 60]);
+      attendantDone(`🤝 You pushed it. He mists you on principle and raises the tip jar meaningfully. <b>−30 pts.</b> ` +
+        `Negotiations are CLOSED.`);
+    }
+  }
+}
+
 function attWalk() {
   if (Math.random() < 0.5) {
     gainScore(-15);
@@ -2792,7 +2964,7 @@ function resolveChoice(i) {
       relieve(); addPee();
       buzz([30, 20, 30]); sfx.ok();
       verdict("GRITTED TEETH 😬", "ok");
-      markSlot(i, "chosen-good");
+      markSlot(i, "chosen-good"); postPickBonuses(r, i);
       showLesson("Desperate times.",
         (r.stallTried ? `The stall betrayed you, so you took the least-bad spot, ` :
          desperate() ? `${drinksAtPick} drinks past the point of no return, so you took the least-bad spot, ` :
@@ -2812,7 +2984,7 @@ function resolveChoice(i) {
         addPee();
         buzz([25, 15, 25]); sfx.ok();
         verdict("SENT IT 🎲", "ok");
-        markSlot(i, "chosen-good");
+        markSlot(i, "chosen-good"); postPickBonuses(r, i);
         showLesson("Fortune favors the desperate.",
           `No good option existed — the stall was the percentage play — but you sent it next to ` +
           `${neighborDesc(r, i)} and somehow… nothing happened. Nobody spoke. Nobody looked. ` +
@@ -2840,7 +3012,7 @@ function resolveChoice(i) {
     relieve(); addPee();
     buzz(30); sfx.good();
     verdict("PERFECT!", "good");
-    markSlot(i, "chosen-good");
+    markSlot(i, "chosen-good"); postPickBonuses(r, i);
     sparkleAt(i);
     flashTint("rgba(47,180,107,.22)");
     showLesson("Textbook etiquette. 👌",
@@ -2853,7 +3025,7 @@ function resolveChoice(i) {
     relieve(); addPee();
     buzz([15, 30, 15]); sfx.ok();
     verdict("ACCEPTABLE", "ok");
-    markSlot(i, "chosen-good");
+    markSlot(i, "chosen-good"); postPickBonuses(r, i);
     showLesson("Fine. Technically fine.",
       `No splash zone, but the pros would take ${describeBest(r)}. Streak reset.` +
       (sc.flicker ? ` Also: you chose the spot under the <b>dying fluorescent light</b>. On purpose. Bold.` : ""), pts);
@@ -2922,6 +3094,15 @@ function onSlot(i) {
   }
   G.locked = true;
   stopTimer();
+  if (!s.blocked && i === r.dogAt) {
+    // the petting urge is not optional
+    G.timeLeft = Math.max(0, G.timeLeft - 1);
+    gainScore(5, "mid");
+    toast("🐕 He's SUCH a good boy. −1s, +5. Worth it.");
+    buzz([15, 10, 15]); tone(980, .08, "sine", .06); tone(1240, .1, "sine", .05, .08);
+    resolveChoice(i);
+    return;
+  }
   if (!s.blocked && i === r.wetAt) {
     // the sign was RIGHT THERE: 2 seconds of cartoon skating, then your pick resolves
     G.timeLeft = Math.max(0, G.timeLeft - 2);
@@ -2941,6 +3122,9 @@ function onSlot(i) {
     } else if (s.blockType === "construction") {
       fail(i, "HARD HAT AREA! 🚧", `You ducked under two layers of caution tape into an active plumbing repair. ` +
         `The contractor will be telling this story for years. ` +
+        `The right call was ${describeBest(r)}.`);
+    } else if (s.blockType === "burst") {
+      fail(i, "GEYSER! ⛲", `That pipe gave every warning a pipe can give, and you walked into the spray zone anyway. ` +
         `The right call was ${describeBest(r)}.`);
     } else {
       fail(i, "TRIPPED!", `You went over the rolling luggage like a bowling pin. ` +
@@ -2975,8 +3159,10 @@ function onStall() {
   setTimeout(() => {
     door.classList.remove("knocking");
     // stall luck is unseeded on purpose — daily/challenge boards stay identical, your luck is your own
-    if (Math.random() < STALL_ODDS) stallSuccess();
-    else stallOccupied();
+    if (Math.random() < STALL_ODDS) {
+      if (mechanicOn("nopaper") && Math.random() < 0.25) stallNoPaper();
+      else stallSuccess();
+    } else stallOccupied();
   }, 1050);
 }
 
@@ -3005,6 +3191,17 @@ function stallSuccess() {
       `and keep the streak alive. Streak reset. Bladder reset to zero, though — not nothing.`, pts);
   }
   updateHUD();
+}
+
+function stallNoPaper() {
+  G.timeLeft = Math.max(0.8, G.timeLeft - 1.2);
+  G.locked = false;
+  buzz([60, 40, 60]);
+  tone(240, .3, "sawtooth", .08);
+  announce("🧻", "NO. PAPER.", `The door swings open… the dispenser is EMPTY. You back out on principle. ` +
+    `−1.2s and a stall wait. ${G.stalls > 0 ? `${G.stalls} left. ` : "That was your last one. "}Pick a spot.`, 2100, "warn");
+  updateHUD();
+  resumeTimer();
 }
 
 function stallOccupied() {
@@ -3062,6 +3259,13 @@ function startRound() {
   if (G.cur.spots.some(s => s.persona === "shifty")) hazards.push("👀 wandering eyes");
   if (G.cur.spots.some(s => s.persona === "lurker")) hazards.push("🧍 a lurker");
   if (G.cur.spots.some(s => s.persona === "crooner")) hazards.push("🎤 live vocals");
+  if (G.cur.spots.some(s => s.persona === "boss")) hazards.push("👔 the boss is here");
+  if (G.cur.fogged) hazards.push("🌫️ steam — who's even in there?");
+  if (G.cur.newsSide >= 0) hazards.push("🎥 news crew — half the room is ON AIR");
+  if (G.cur.pipeAt >= 0) hazards.push("🔧 a pipe is rattling");
+  if (G.cur.dogAt >= 0) hazards.push("🐕 a very good boy");
+  if (G.cur.draftEnd >= 0) hazards.push("🚪 door propped — that corner's exposed");
+  if (G.cur.iceAt >= 0) hazards.push("🧊 iced urinal — tradition");
   const hazardNote = hazards.length ? ` · ${hazards.join(" · ")}` : "";
   const pkIntro = THEMES.stadium.parkRef;
   const chantNote = (pkIntro && G.cur.themeKey === "stadium") ? ` · ${pkIntro.chant}!` : "";
@@ -3307,7 +3511,7 @@ function resetGame(mode, seed) {
     : m === "daily" ? dateSeed()
     : (Math.floor(Math.random() * 2147483647));
   setSeed(s);
-  Object.assign(G, { mode: m, seed: s, round: 0, score: 0, streak: 0, lives: 3, drinks: 0, held: [], pissed: false,
+  Object.assign(G, { mode: m, seed: s, round: 0, score: 0, streak: 0, lives: 3, drinks: 0, held: [], pissed: false, haggles: 0,
     shield: false, musk: false, stalls: 3, splashes: 0, perfects: 0, trail: [], locked: false });
   $("end").classList.add("hidden");
   $("start").classList.add("hidden");
@@ -3635,9 +3839,14 @@ function build3D(round) {
       T3.group.add(d);
     }
     if (s.occupant) {
-      const person = t3Person(s.persona, parseInt(pick(SHIRTS).slice(1), 16));
+      const person = t3Person(s.persona, s.persona === "boss" ? 0x23293a : parseInt(pick(SHIRTS).slice(1), 16));
       person.position.set(x, 0, 0.55);
       if (s.persona === "lurker") person.rotation.y = Math.PI; // facing the room. unsettling.
+      if (s.persona === "boss") {
+        const bc = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.16, 0.08), smat(0x4a3423, 0.7));
+        bc.position.set(x + 0.3, 0.08, 0.6);
+        T3.group.add(bc); // the briefcase waits with him
+      }
       T3.group.add(person); T3.people.push(person);
     } else if (s.blocked) {
       if (s.blockType === "bag") {
@@ -3662,6 +3871,13 @@ function build3D(round) {
           tape.position.set(x + S / 2, 1.0, 0.55);
           T3.group.add(tape);
         }
+      } else if (s.blockType === "burst") {
+        const jet = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.85, 12, 1, true),
+          smat(0x9fd8f5, 0.2, 0, { transparent: true, opacity: 0.55 }));
+        jet.position.set(x, 1.1, 0.25);
+        const puddle = new THREE.Mesh(new THREE.CircleGeometry(0.4, 20), smat(0x7fb8dd, 0.15, 0, { transparent: true, opacity: 0.5 }));
+        puddle.rotation.x = -Math.PI / 2; puddle.position.set(x, 0.012, 0.5);
+        T3.group.add(jet, puddle);
       } else {
         const bagcase = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.5, 0.2), smat(0xc0392b, 0.5)); bagcase.castShadow = true;
         bagcase.position.set(x, 0.25, 0.7);
@@ -3669,6 +3885,34 @@ function build3D(round) {
         handle.position.set(x, 0.62, 0.7);
         T3.group.add(bagcase, handle);
       }
+    }
+    if (round.iceAt === i && !s.occupant && !s.blocked) {
+      const ice = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.1, 0.16), smat(0xdff2ff, 0.25, 0, { transparent: true, opacity: 0.85 }));
+      ice.position.set(x, 0.7, 0.16);
+      T3.group.add(ice);
+    }
+    if (round.dogAt === i && !s.occupant && !s.blocked) {
+      const dog = new THREE.Group();
+      const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.09, 0.16, 4, 10), smat(0x8a5a2b, 0.85));
+      body.rotation.z = Math.PI / 2; body.position.y = 0.14;
+      const dh = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 10), smat(0x8a5a2b, 0.85));
+      dh.position.set(0.16, 0.24, 0);
+      const ear = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.07, 8), smat(0x6b4420, 0.9));
+      ear.position.set(0.19, 0.32, 0.04);
+      dog.add(body, dh, ear);
+      dog.position.set(x + 0.38, 0, 1.0);
+      T3.group.add(shadowify(dog));
+    }
+    if (round.draftEnd === i) {
+      const dft = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.2), new THREE.MeshBasicMaterial({
+        toneMapped: false, side: THREE.DoubleSide, map: tex((c2, w, h) => {
+          c2.fillStyle = "#2b3547"; c2.fillRect(0, 0, w, h);
+          c2.fillStyle = "#c9d6e4"; c2.textAlign = "center"; c2.font = "bold 34px Trebuchet MS";
+          c2.fillText("🚪💨 DRAFT", w / 2, 46); c2.font = "bold 22px Trebuchet MS";
+          c2.fillText("DOOR PROPPED", w / 2, 76);
+        }, 256, 96) }));
+      dft.position.set(x, 1.9, 0.08);
+      T3.group.add(dft);
     }
     if (round.wetAt === i) {
       const wet = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.36), new THREE.MeshBasicMaterial({
@@ -3684,8 +3928,9 @@ function build3D(round) {
     }
     // pick-ring for selectable spots
     if (!s.occupant && !s.blocked) {
+      const onAir = round.newsSide >= 0 && (round.newsSide === 0 ? i < n / 2 : i >= n / 2);
       const ring = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.045, 12, 36),
-        new THREE.MeshBasicMaterial({ color: 0x57b8ff, transparent: true, opacity: 0.85 }));
+        new THREE.MeshBasicMaterial({ color: onAir ? 0xff8a6f : 0x57b8ff, transparent: true, opacity: 0.85 }));
       ring.rotation.x = -Math.PI / 2; ring.position.set(x, 0.02, 0.8);
       T3.group.add(ring);
       T3.rings[i] = ring;
@@ -3892,7 +4137,20 @@ function t3Frame(now) {
   const target = $("scene").classList.contains("scoring") ? 1 : 0;
   T3.dim += (target - T3.dim) * 0.12;
   T3.renderer.toneMappingExposure = 1 - T3.dim * 0.55;
-  T3.renderer.render(T3.scene, T3.cam);
+  try {
+    T3.renderer.render(T3.scene, T3.cam);
+    T3.renderErrs = 0;
+  } catch (e) {
+    // a struggling GPU gets three strikes, then the classic 2D view takes over
+    T3.renderErrs = (T3.renderErrs || 0) + 1;
+    if (T3.renderErrs >= 3) {
+      T3.failed = true; T3.ready = false;
+      cancelAnimationFrame(T3.raf); T3.raf = null;
+      $("scene").classList.remove("mode3d");
+      if (G.cur) renderRound(G.cur);
+      return;
+    }
+  }
   T3.raf = requestAnimationFrame(t3Frame);
 }
 function t3Click(e) {
@@ -3950,6 +4208,7 @@ $("locbtn").addEventListener("click", () => localizeStadium());
 $("att-tip").addEventListener("click", () => attTip());
 $("att-col").addEventListener("click", () => attCologne());
 $("att-walk").addEventListener("click", () => attWalk());
+$("att-hag").addEventListener("click", () => attHaggle());
 $("sharebtn").addEventListener("click", () => doShare(resultText()));
 $("certbtn").addEventListener("click", () => shareCertificate());
 $("chalbtn").addEventListener("click", () => shareChallenge());

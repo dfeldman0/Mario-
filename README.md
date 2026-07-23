@@ -107,6 +107,16 @@ repeating:
 | 8 | 🎤 **The crooner** — mid-ballad; his radius is bigger than his talent |
 | 9 | 🚪 **Rush-hour walk-ins** — dawdle and someone takes the best spot |
 | 10 | 🌪️ **Full chaos** — every hazard rolls hotter and stacks |
+| 11 | 🌫️ **Festival steam** — the room opens in fog; you can't see who's where until it lifts (~2s) |
+| 12 | 🧊 **The iced urinal** — stadium tradition; picking it pays +15 |
+| 13 | 👔 **The boss** — stand next to him and you WILL discuss Q3 (−25) |
+| 14 | 🎥 **The news crew** — half the room is ON AIR (red rings, comfort penalty) |
+| 15 | 🧻 **No paper** — new stall heartbreak: door opens, dispenser's empty, you back out |
+| 16 | 🔧 **The rattling pipe** — telegraphs all round, then blows mid-round and blocks the spot |
+| 17 | 🐕 **The service dog** — petting urge: −1 second, +5 cuteness |
+| 18 | 🔌 **Power dips** — lights out for a full second; the clock does not care |
+| 19 | 🚪 **The propped door** — the end spot near it loses its corner privilege |
+| 20 | 🤝 **Attendant haggling** — negotiate; stakes escalate every time (+15 → ±35 → +60/−30) |
 
 Level-ups are announced before the next round; the start screen tracks your
 career. The Daily Challenge always runs the full rotation so it stays
