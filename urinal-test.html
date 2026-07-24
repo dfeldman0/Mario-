@@ -715,6 +715,41 @@
   .ef-a1 { font-size: clamp(26px, 8.4vw, 40px); font-weight: 900; color: #fff; text-shadow: 3px 4px 0 rgba(0,0,0,.35); }
   .ef-a2 { font-size: clamp(20px, 6.4vw, 30px); font-weight: 900; color: #ffe9a0; margin-top: 10px; text-shadow: 2px 3px 0 rgba(0,0,0,.3); transform: rotate(-1.4deg); }
   .ef-a3 { font-size: clamp(16px, 5vw, 24px); font-weight: 900; color: #c9f0ff; margin-top: 10px; text-shadow: 2px 3px 0 rgba(0,0,0,.3); transform: rotate(1deg); }
+  /* ---------- the vendor stand ---------- */
+  #drinkrow { display: none; position: absolute; left: 0; right: 0; bottom: 0; z-index: 45; padding: 8px 10px 12px;
+    background: linear-gradient(transparent, rgba(6,9,14,.82) 30%); }
+  #drinkrow.show { display: block; animation: bkup .55s cubic-bezier(.2, 1.35, .4, 1); }
+  @keyframes bkup { from { transform: translateY(108%); } }
+  .bk-top { display: flex; align-items: flex-end; gap: 6px; margin-bottom: 6px; }
+  #barkeep { width: 104px; flex: 0 0 104px; margin-bottom: -6px; animation: bkbob 2.4s ease-in-out infinite .6s; transform-origin: 50% 100%; }
+  @keyframes bkbob { 0%, 100% { transform: rotate(-1.2deg); } 50% { transform: rotate(1.2deg) translateY(-2px); } }
+  .bk-bubble { position: relative; background: #f4f7f9; color: #1d2430; border-radius: 14px 14px 14px 4px;
+    padding: 8px 12px; font-size: clamp(13px, 3.6vw, 15px); animation: bubpop .3s cubic-bezier(.2, 1.5, .4, 1) .25s backwards; }
+  .bk-bubble::before { content: ""; position: absolute; left: -8px; bottom: 8px; border: 8px solid transparent;
+    border-right-color: #f4f7f9; border-left-width: 0; }
+  @keyframes bubpop { from { transform: scale(.4); opacity: 0; } }
+  .bk-bubble .dq-sub { display: block; font-weight: normal; color: #66788d; font-size: 10.5px; margin-top: 2px; }
+  .bk-cards { display: flex; gap: 8px; }
+  .bk-cards button { flex: 1; font-family: inherit; font-weight: bold; color: #fff; cursor: pointer;
+    border-radius: 16px; padding: 10px 4px 9px; font-size: clamp(12px, 3.2vw, 14px); line-height: 1.25;
+    border: 1.5px solid rgba(255,255,255,.22); backdrop-filter: blur(8px);
+    animation: cardin .45s cubic-bezier(.2, 1.4, .4, 1) backwards;
+    box-shadow: 0 6px 18px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.18); }
+  .bk-cards button:active { transform: scale(.94); }
+  @keyframes cardin { from { transform: translateY(26px) scale(.85) rotate(2deg); opacity: 0; } }
+  .bk-cards .dk-beer { background: linear-gradient(160deg, rgba(230,162,61,.9), rgba(160,100,24,.85)); }
+  .bk-cards .dk-coffee { background: linear-gradient(160deg, rgba(138,106,82,.92), rgba(84,58,44,.88)); }
+  .bk-cards .dk-espresso { background: linear-gradient(160deg, rgba(208,96,90,.92), rgba(140,44,42,.88)); }
+  .bk-cards .dk-pass { background: linear-gradient(160deg, rgba(74,86,104,.85), rgba(44,52,66,.85)); }
+  .bk-art { display: block; width: 44px; margin: 0 auto 2px; }
+  .bk-name { display: block; letter-spacing: .5px; }
+  .bk-cards small { font-weight: normal; display: block; margin-top: 2px; }
+  .bk-steam { animation: steamup 1.6s ease-in-out infinite; }
+  @keyframes steamup { 0%, 100% { opacity: .35; transform: translateY(0); } 50% { opacity: .9; transform: translateY(-2px); } }
+  .bk-bub { animation: bubrise 1.8s linear infinite; }
+  .bk-bub.b2 { animation-delay: .7s; }
+  @keyframes bubrise { from { transform: translateY(6px); opacity: 0; } 30% { opacity: 1; } to { transform: translateY(-14px); opacity: 0; } }
+
   /* ---------- the drink ceremony ---------- */
   #drinkintro { position: fixed; inset: 0; background: rgba(5,8,12,.95); z-index: 115;
     display: flex; align-items: center; justify-content: center; padding: 18px; }
@@ -1053,6 +1088,13 @@
         <div class="pp-tap">TAP TO ENTER 🚪</div>
       </div>
       <div id="doorwipe"><div class="dw dwl"></div><div class="dw dwr"></div></div>
+      <div id="drinkrow">
+        <div class="bk-top">
+          <div id="barkeep"></div>
+          <div class="bk-bubble"><div id="drinkq"></div></div>
+        </div>
+        <div class="bk-cards" id="drinkbtns"></div>
+      </div>
       <div id="announce"><div class="aicon"></div><div class="atitle"></div><div class="asub"></div></div>
       <div id="verdict"></div>
       <div id="lesson">
@@ -1068,10 +1110,7 @@
           </div>
         </div>
         <div id="attnote"></div>
-        <div id="drinkrow">
-          <div class="attq" id="drinkq"></div>
-          <div class="attbtns" id="drinkbtns"></div>
-        </div>
+
         <button id="nextbtn">NEXT →</button>
       </div>
     </div>
@@ -1750,7 +1789,7 @@ function mechanicOn(key) {
 }
 /* Training wheels: the first 10 career pees play with the answers color-coded.
    People learn from labeled consequences, not rule decks. Never in the Daily. */
-function trainingOn() { return careerPees() < 10 && G.mode !== "daily"; }
+function trainingOn() { return careerPees() < 4 && G.mode !== "daily"; }
 
 function addPee() {
   const before = careerLevel();
@@ -3054,6 +3093,74 @@ function clockPct() { return Math.min(50, Math.round(G.held.reduce((s, k) => s +
 function heldIcons() { return G.held.map(k => DRINKS[k].icon).join(""); }
 function buzzMult() { return 1 + buzzPct() / 100; }
 
+/* ---------- the vendor: a character serves the menu, venue-appropriate ---------- */
+function vendorSVG(kind) {
+  const skin = pick(["#e8b48a", "#c68b5e", "#8d5a3b", "#f0c9a5"]);
+  const head = `<circle cx="60" cy="30" r="17" fill="${skin}"/>`;
+  if (kind === "barista") return `<svg viewBox="0 0 120 100">
+    <path d="M28 100 Q28 62 60 60 Q92 62 92 100 Z" fill="#5a4638"/>
+    <path d="M40 100 Q40 72 60 70 Q80 72 80 100 Z" fill="#3f6b52"/>
+    <rect x="52" y="66" width="16" height="8" rx="2" fill="#2c4a3a"/>
+    ${head}
+    <path d="M43 26 Q60 6 77 26 L77 20 Q60 2 43 20 Z" fill="#c9622f"/>
+    <rect x="47" y="24" width="11" height="7" rx="3" fill="none" stroke="#222" stroke-width="2.4"/>
+    <rect x="62" y="24" width="11" height="7" rx="3" fill="none" stroke="#222" stroke-width="2.4"/>
+    <line x1="58" y1="27" x2="62" y2="27" stroke="#222" stroke-width="2.4"/>
+    <circle cx="52" cy="29" r="1.8" fill="#1d2430"/><circle cx="67" cy="29" r="1.8" fill="#1d2430"/>
+    <path d="M54 38 q6 4 12 0" stroke="#1d2430" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M88 70 q14 -4 14 -18" stroke="${skin}" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <rect x="94" y="38" width="16" height="13" rx="3" fill="#f4f7f9"/>
+    <path d="M97 34 q2 -5 0 -8 M103 34 q2 -5 0 -8" stroke="#cfd9df" stroke-width="2" fill="none" stroke-linecap="round" class="bk-steam"/>
+  </svg>`;
+  if (kind === "hawker") return `<svg viewBox="0 0 120 100">
+    <path d="M28 100 Q28 62 60 60 Q92 62 92 100 Z" fill="#b03a30"/>
+    <path d="M34 68 L86 68 L90 96 L30 96 Z" fill="#d9c9a5"/>
+    <rect x="36" y="72" width="12" height="16" rx="2" fill="#f2c14e"/>
+    <rect x="52" y="72" width="12" height="16" rx="2" fill="#f2c14e"/>
+    <rect x="68" y="72" width="12" height="16" rx="2" fill="#f2c14e"/>
+    <path d="M34 68 Q60 40 86 68" stroke="#7a5c33" stroke-width="4" fill="none"/>
+    ${head}
+    <path d="M42 24 Q60 8 78 24 L78 29 L42 29 Z" fill="#2c4a72"/>
+    <rect x="55" y="12" width="10" height="6" rx="2" fill="#2c4a72"/>
+    <circle cx="53" cy="30" r="1.8" fill="#1d2430"/><circle cx="67" cy="30" r="1.8" fill="#1d2430"/>
+    <ellipse cx="60" cy="39" rx="4.5" ry="5.5" fill="#5e3b2c"/>
+    <path d="M30 62 q-12 -8 -8 -22" stroke="${skin}" stroke-width="9" fill="none" stroke-linecap="round"/>
+  </svg>`;
+  // bartender (default)
+  return `<svg viewBox="0 0 120 100">
+    <path d="M28 100 Q28 62 60 60 Q92 62 92 100 Z" fill="#20242c"/>
+    <path d="M50 62 L60 74 L70 62 L70 100 L50 100 Z" fill="#f4f7f9"/>
+    <path d="M55 63 L65 63 L60 70 Z" fill="#b03a30"/>
+    ${head}
+    <path d="M44 22 Q60 8 76 22 L76 18 Q60 4 44 18 Z" fill="#1d2430"/>
+    <circle cx="53" cy="29" r="1.8" fill="#1d2430"/><circle cx="67" cy="29" r="1.8" fill="#1d2430"/>
+    <path d="M50 38 q10 6 20 0 q-4 5 -10 5 q-6 0 -10 -5" fill="#3a2b20"/>
+    <path d="M90 66 q14 -6 12 -20" stroke="${skin}" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <rect x="94" y="30" width="13" height="18" rx="4" fill="#dde4ea"/>
+    <rect x="96" y="26" width="9" height="6" rx="2" fill="#aab6c2"/>
+    <path d="M22 70 q-8 2 -10 10 l14 2 Z" fill="#f4f7f9"/>
+  </svg>`;
+}
+const DRINK_ART = {
+  beer: `<svg viewBox="0 0 60 72"><path d="M14 20 L46 20 L42 64 L18 64 Z" fill="rgba(255,255,255,.14)" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+    <path d="M16 26 L44 26 L41 61 L19 61 Z" fill="#e8a33c"/>
+    <circle cx="22" cy="20" r="6" fill="#fff8ea"/><circle cx="32" cy="17" r="7" fill="#fff8ea"/><circle cx="41" cy="20" r="5.5" fill="#fff8ea"/>
+    <path d="M46 28 q10 2 8 12 q-2 10 -10 8" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="4"/>
+    <circle cx="26" cy="40" r="2" fill="#ffd98c" class="bk-bub"/><circle cx="34" cy="50" r="1.6" fill="#ffd98c" class="bk-bub b2"/></svg>`,
+  coffee: `<svg viewBox="0 0 60 72"><path d="M16 14 L44 14 L41 64 L19 64 Z" fill="rgba(255,255,255,.16)" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+    <path d="M18 30 L42 30 L40 61 L20 61 Z" fill="#6b4a33"/>
+    <rect x="21" y="20" width="9" height="9" rx="2" fill="rgba(255,255,255,.7)" transform="rotate(-8 25 24)"/>
+    <rect x="31" y="23" width="8" height="8" rx="2" fill="rgba(255,255,255,.65)" transform="rotate(12 35 27)"/>
+    <rect x="27" y="2" width="4" height="26" rx="2" fill="#b03a30" transform="rotate(14 29 15)"/></svg>`,
+  espresso: `<svg viewBox="0 0 60 72"><ellipse cx="30" cy="62" rx="24" ry="5" fill="rgba(255,255,255,.25)"/>
+    <path d="M14 34 L46 34 L42 58 L18 58 Z" fill="#f4f7f9"/>
+    <ellipse cx="30" cy="34" rx="16" ry="4.5" fill="#4a2c1e"/>
+    <path d="M46 38 q9 2 7 9 q-2 7 -9 6" fill="none" stroke="#f4f7f9" stroke-width="3.5"/>
+    <path d="M23 26 q3 -6 0 -12 M31 28 q3 -7 0 -14 M39 26 q3 -6 0 -12" stroke="rgba(255,255,255,.6)" stroke-width="2.5" fill="none" stroke-linecap="round" class="bk-steam"/></svg>`,
+  pass: `<svg viewBox="0 0 60 72"><circle cx="30" cy="38" r="20" fill="none" stroke="#8fa2b8" stroke-width="4"/>
+    <line x1="16" y1="24" x2="44" y2="52" stroke="#8fa2b8" stroke-width="4"/></svg>`,
+};
+
 /* The drink is YOUR call: buzz bonus vs. bladder vs. clock. Consequences are all yours. */
 function showDrinkOffer() {
   const key = G.cur.themeKey;
@@ -3080,19 +3187,28 @@ function renderDrinkOffer() {
   // venue decides the menu (deterministic, so daily/challenge stays fair)
   const beerN = key === "coffee" ? 0 : (t.drinks || (key === "airport" ? 1 : 0));
   const menu = beerN ? [["beer", beerN], ["espresso", 1]] : [["coffee", 1], ["espresso", 1]];
-  $("drinkq").innerHTML = `${beerN ? "🍺" : "☕"} <b>Round's on the house?</b> <span class="dq-sub">each drink +1 bladder · 3 = desperate</span>`;
+  const kind = key === "coffee" ? "barista" : (key === "stadium" || key === "festival") ? "hawker" : "bartender";
+  $("barkeep").innerHTML = vendorSVG(kind);
+  const line = kind === "barista" ? vdraw("bkq-c", ["Single origin. Obviously.", "Cortado weather, no?", "It WILL go through you.", "Oat? Whole? Courage?"])
+    : kind === "hawker" ? vdraw("bkq-h", ["BEER HERE! ICE COLD!", "TALLBOYS! GET YA TALLBOYS!", "COLD ONES, LAST CALL!"])
+    : vdraw("bkq-b", ["Cold one, champ?", "You earned this round.", "Tab's open. For now.", "The usual?"]);
+  $("drinkq").innerHTML = `<b>${line}</b><span class="dq-sub">each drink +1 bladder · 3 = desperate</span>`;
   const bb = $("drinkbtns");
-  bb.innerHTML = menu.map(([k, n]) => {
+  bb.innerHTML = menu.map(([k, n], mi) => {
     const d = DRINKS[k];
-    return `<button class="dk dk-${k}" data-k="${k}" data-n="${n}">${d.icon} ${d.name}${n > 1 ? ` ×${n}` : ""}` +
+    return `<button class="dk dk-${k}" data-k="${k}" data-n="${n}" style="animation-delay:${0.12 + mi * 0.09}s">` +
+      `<span class="bk-art">${DRINK_ART[k]}</span><span class="bk-name">${d.name}${n > 1 ? ` ×${n}` : ""}</span>` +
       `<small class="dk-gain">▲ score +${Math.round(d.buzz * 100 * n)}%</small>` +
       `<small class="dk-cost">▼ time −${Math.round(d.clock * 100 * n)}%</small></button>`;
-  }).join("") + `<button class="walk" id="dr-no">🚱 PASS<small>no boost</small><small>no risk</small></button>`;
+  }).join("") + `<button class="walk dk-pass" id="dr-no" style="animation-delay:0.3s"><span class="bk-art">${DRINK_ART.pass}</span>` +
+    `<span class="bk-name">PASS</span><small>no boost</small><small>no risk</small></button>`;
+  $("nextbtn").style.display = "none"; // the vendor deserves an answer
   bb.querySelectorAll(".dk").forEach(b => b.addEventListener("click", () => takeDrink(b.dataset.k, Number(b.dataset.n) || 1)));
   $("dr-no").addEventListener("click", () => drinkNo());
   $("drinkrow").classList.add("show");
 }
 function takeDrink(key, n) {
+  $("nextbtn").style.display = "";
   const d = DRINKS[key];
   for (let i = 0; i < n; i++) G.held.push(key);
   G.drinks = G.held.length;
@@ -3105,6 +3221,7 @@ function takeDrink(key, n) {
   updateHUD();
 }
 function drinkNo() {
+  $("nextbtn").style.display = "";
   $("drinkrow").classList.remove("show");
   announce("🚱", "STAYING LIGHT", "No buzz bonus, no bladder. The disciplined path.", 1300);
   updateHUD();
@@ -3481,7 +3598,7 @@ function startRound() {
   if (trainingOn() && G.round === 0) {
     stages.push({ ms: 2900, run: () =>
       announce("🎓", "TRAINING WHEELS ON", "GREEN ring = the pro pick · AMBER = safe · RED = splash zone. " +
-        "They come off after 10 career pees. The clock runs slow while you learn.", 2850),
+        "Off after 4 pees. Clock runs slow while you learn.", 2850),
       end: () => {} });
   }
   if (G.pendingUnlock) {
