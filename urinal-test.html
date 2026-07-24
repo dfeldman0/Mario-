@@ -238,6 +238,8 @@
   #lesson .attbtns .col { background: linear-gradient(#8a6fd0, #6247a8); }
   #lesson .attbtns .walk { background: linear-gradient(#5a6a80, #425063); }
   .attbtns button small { font-weight: normal; display: block; margin-top: 2px; opacity: .92; }
+  .attbtns .dk-gain { color: #b8f5d0; font-weight: bold; }
+  .attbtns .dk-cost { color: #ffdcb0; }
 
   /* ---------- start screen: attract mode, ticker, staged buttons ---------- */
   #start > * { flex-shrink: 0; }
@@ -3035,8 +3037,9 @@ function showDrinkOffer() {
   bb.innerHTML = menu.map(([k, n]) => {
     const d = DRINKS[k];
     return `<button class="dk dk-${k}" data-k="${k}" data-n="${n}">${d.icon} ${d.name}${n > 1 ? ` ×${n}` : ""}` +
-      `<small>🏆 +${Math.round(d.buzz * 100 * n)}% · ⏱ −${Math.round(d.clock * 100 * n)}%</small></button>`;
-  }).join("") + `<button class="walk" id="dr-no">🚱 PASS<small>stay light</small></button>`;
+      `<small class="dk-gain">▲ score +${Math.round(d.buzz * 100 * n)}%</small>` +
+      `<small class="dk-cost">▼ time −${Math.round(d.clock * 100 * n)}%</small></button>`;
+  }).join("") + `<button class="walk" id="dr-no">🚱 PASS<small>no boost</small><small>no risk</small></button>`;
   bb.querySelectorAll(".dk").forEach(b => b.addEventListener("click", () => takeDrink(b.dataset.k, Number(b.dataset.n) || 1)));
   $("dr-no").addEventListener("click", () => drinkNo());
   $("drinkrow").classList.add("show");
