@@ -3954,22 +3954,30 @@ function t3Urinal() {
   const pts = [];
   const prof = [[0.02, 0.0], [0.1, 0.02], [0.17, 0.08], [0.215, 0.2], [0.225, 0.34], [0.21, 0.46], [0.185, 0.55], [0.19, 0.62], [0.21, 0.66]];
   for (const [r, y] of prof) pts.push(new THREE.Vector2(r, y));
-  // half-shell spans phi −π/2→π/2: the porcelain belly bulges INTO the room, open half against the wall
-  const bowl = new THREE.Mesh(new THREE.LatheGeometry(pts, 36, -Math.PI / 2, Math.PI), porcelain);
-  bowl.position.set(0, 0.62, 0.05);
+  // full vessel, tipped forward and half-sunk into the wall: you look DOWN INTO the basin.
+  // The belly is concave toward the user — anything else goes on the floor.
+  const bowlG = new THREE.Group();
+  const bowl = new THREE.Mesh(new THREE.LatheGeometry(pts, 36), porcelain);
+  const cavity = new THREE.Mesh(new THREE.CircleGeometry(0.19, 26),
+    smat(0xcfd9df, 0.4, 0, { side: THREE.DoubleSide }));
+  cavity.rotation.x = -Math.PI / 2; cavity.position.y = 0.655;
+  const cavityDrain = new THREE.Mesh(new THREE.CircleGeometry(0.06, 16), smat(0x5b666f, 0.5, 0.6));
+  cavityDrain.rotation.x = -Math.PI / 2; cavityDrain.position.y = 0.658;
+  bowlG.add(bowl, cavity, cavityDrain);
+  bowlG.rotation.x = -0.34; // opening tips toward the room
+  bowlG.position.set(0, 0.58, 0.02); // back half buried in the wall panel
   const back = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.78, 0.05), porcelain);
   back.position.set(0, 0.95, 0.025);
   const rim = new THREE.Mesh(new THREE.TorusGeometry(0.205, 0.022, 10, 26, Math.PI), porcelain);
   rim.position.set(0, 1.28, 0.07); rim.rotation.z = Math.PI;
-  const drain = new THREE.Mesh(new THREE.CircleGeometry(0.055, 16), smat(0x5b666f, 0.5, 0.6));
-  drain.rotation.x = -Math.PI / 2; drain.position.set(0, 0.65, 0.14);
+
   const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.34, 14), chrome);
   pipe.position.set(0, 1.5, 0.05);
   const valve = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.05, 0.11, 14), chrome);
   valve.position.set(0, 1.36, 0.05);
   const sensor = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.05, 0.02), smat(0x222831, 0.3, 0.3));
   sensor.position.set(0, 1.3, 0.075);
-  g.add(bowl, back, rim, drain, pipe, valve, sensor);
+  g.add(bowlG, back, rim, pipe, valve, sensor);
   return shadowify(g);
 }
 function t3Dispose(obj) {
