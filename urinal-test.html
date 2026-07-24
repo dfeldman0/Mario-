@@ -316,7 +316,10 @@
     border-radius: 8px; overflow: hidden; position: relative; }
   #bladder { height: 100%; width: 100%; background: linear-gradient(90deg, #57b8ff, #2f7fd4); transition: width .2s linear; }
   #bladderwrap.low #bladder { background: linear-gradient(90deg, #ffb15c, #e6483d); }
-  #bladderwrap::after { content: "BLADDER"; position: absolute; inset: 0; font-size: 9px; letter-spacing: 3px;
+  #bladderlabel { position: absolute; inset: 0; font-size: 9px; letter-spacing: 3px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center; color: #cdd8e4;
+    text-shadow: 0 1px 2px rgba(0,0,0,.7); pointer-events: none; }
+  #bladderwrap.low #bladderlabel { animation: dangerpulse 0.7s ease-in-out infinite; color: #fff; }
     display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.75); }
 
   /* ---------- scene ---------- */
@@ -769,6 +772,10 @@
   @keyframes rise { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
   #lesson .ltitle { font-weight: bold; margin-bottom: 4px; }
   #lesson .lpts { float: right; color: #6fe3a1; font-weight: bold; }
+  #lesson #lwhy { font-family: inherit; font-size: 11px; font-weight: normal; color: #8fa2b8; background: #223047;
+    border: 1px solid #3a4a63; border-radius: 999px; padding: 1px 9px; cursor: pointer;
+    margin-top: 0; width: auto; display: inline; }
+  .ldetail { color: #8fa2b8; font-size: 0.92em; }
   #lesson button { margin-top: 10px; width: 100%; font-family: inherit; font-weight: bold; font-size: 15px;
     padding: 10px; border: none; border-radius: 10px; background: #2f7fd4; color: #fff; cursor: pointer; }
 
@@ -804,6 +811,7 @@
   #attrow, #drinkrow { display: none; margin-top: 10px; }
   #attrow.show, #drinkrow.show { display: block; }
   .attq { font-weight: bold; color: #ffd76a; margin-bottom: 8px; }
+  .attq .dq-sub { display: block; font-weight: normal; color: #66788d; font-size: 11px; margin-top: 2px; }
   .attbtns { display: flex; gap: 6px; }
   .attbtns:has(> :nth-child(4)) { flex-wrap: wrap; }
   .attbtns:has(> :nth-child(4)) button { flex: 1 1 45%; }
@@ -950,7 +958,7 @@
     <span class="hudchip" id="lives">👖👖👖</span>
   </div>
   <div id="themebar"></div>
-  <div id="bladderwrap"><div id="bladder"></div></div>
+  <div id="bladderwrap"><div id="bladder"></div><span id="bladderlabel">🫙 HOLDING IT</span></div>
 
   <div id="scenewrap">
     <div id="scene">
@@ -1021,7 +1029,7 @@
         <div class="ltitle"><span class="lpts" id="lpts"></span><span id="ltitle"></span></div>
         <div id="ltext"></div>
         <div id="attrow">
-          <div class="attq">🧖 The attendant blocks your path to the sinks. Towel over his arm. Eyebrows raised.</div>
+          <div class="attq">🧖 <b>The attendant.</b> Towel over arm. Eyebrows up.</div>
           <div class="attbtns">
             <button class="tip" id="att-tip">💵 Tip $2<br><small>−20 pts, towel blessing</small></button>
             <button class="col" id="att-col">🧴 Free cologne<br><small>+25 pts, strong musk</small></button>
@@ -2642,6 +2650,8 @@ function runTimer() {
     }
     const p = Math.max(0, G.timeLeft / G.timerTotal * 100);
     bar.style.width = p + "%";
+    $("bladderlabel").textContent = desperate() ? "🌊 DEFCON 1 — DO NOT LAUGH"
+      : p > 60 ? "🫙 HOLDING IT" : p > 30 ? "😬 GOTTA GO" : "🚨 CODE YELLOW";
     if (p < 30) wrap.classList.add("low");
     // ambient restroom: the occasional distant drip
     if (Math.random() < 0.012) { tone(rnd(500, 900), .09, "sine", .02); tone(rnd(280, 460), .12, "sine", .015, .08); }
@@ -2835,9 +2845,13 @@ function flashTint(color) {
 }
 
 /* ---------- outcome handling ---------- */
-function showLesson(title, text, pts) {
+function showLesson(title, text, pts, detail) {
   $("ltitle").textContent = title;
-  $("ltext").innerHTML = text;
+  $("ltext").innerHTML = text + (detail ? ` <button id="lwhy">why?</button>` : "");
+  if (detail) $("lwhy").addEventListener("click", e => {
+    e.stopPropagation();
+    e.target.outerHTML = `<span class="ldetail">${detail}</span>`;
+  });
   $("lpts").textContent = pts > 0 ? `+${pts}` : (pts < 0 ? `${pts}` : "");
   $("lesson").classList.add("show");
   const sc2 = $("scene");
@@ -3017,16 +3031,13 @@ function showDrinkOffer() {
   // venue decides the menu (deterministic, so daily/challenge stays fair)
   const beerN = key === "coffee" ? 0 : (t.drinks || (key === "airport" ? 1 : 0));
   const menu = beerN ? [["beer", beerN], ["espresso", 1]] : [["coffee", 1], ["espresso", 1]];
-  $("drinkq").innerHTML = beerN
-    ? `🍺 ${t.drinkMsg || "The boys are ordering another round…"} Or just a jolt?`
-    : key === "coffee" ? `☕ ${t.drinkMsg} Or a quick shot at the bar?`
-    : `☕ Victory beverage? The cart's right there. Every drink is +1 to the tank.`;
+  $("drinkq").innerHTML = `${beerN ? "🍺" : "☕"} <b>Round's on the house?</b> <span class="dq-sub">each drink +1 bladder · 3 = desperate</span>`;
   const bb = $("drinkbtns");
   bb.innerHTML = menu.map(([k, n]) => {
     const d = DRINKS[k];
     return `<button class="dk dk-${k}" data-k="${k}" data-n="${n}">${d.icon} ${d.name}${n > 1 ? ` ×${n}` : ""}` +
-      `<small>+${Math.round(d.buzz * 100 * n)}% pts · clock −${Math.round(d.clock * 100 * n)}% · +${n} bladder</small></button>`;
-  }).join("") + `<button class="walk" id="dr-no">🚱 PASS<small>no buzz · no bladder</small></button>`;
+      `<small>🏆 +${Math.round(d.buzz * 100 * n)}% · ⏱ −${Math.round(d.clock * 100 * n)}%</small></button>`;
+  }).join("") + `<button class="walk" id="dr-no">🚱 PASS<small>stay light</small></button>`;
   bb.querySelectorAll(".dk").forEach(b => b.addEventListener("click", () => takeDrink(b.dataset.k, Number(b.dataset.n) || 1)));
   $("dr-no").addEventListener("click", () => drinkNo());
   $("drinkrow").classList.add("show");
@@ -3067,10 +3078,10 @@ function resolveChoice(i) {
       verdict("GRITTED TEETH 😬", "ok");
       markSlot(i, "chosen-good"); postPickBonuses(r, i);
       showLesson("Desperate times.",
-        (r.stallTried ? `The stall betrayed you, so you took the least-bad spot, ` :
-         desperate() ? `${drinksAtPick} drinks past the point of no return, so you took the least-bad spot, ` :
-         `Out of stall waits, you took the least-bad spot, `) +
-        `stared straight ahead, and said nothing. Respect.`, pts);
+        `Least-bad spot. Eyes forward. Respect.`, pts,
+        (r.stallTried ? `The stall betrayed you, so gritting was honorable.` :
+         desperate() ? `${drinksAtPick} drinks past the point of no return — gritting was honorable.` :
+         `Out of stall waits — gritting was honorable.`));
       if (r.attendant) showAttendant(); else showDrinkOffer();
       updateHUD();
       return;
@@ -3087,9 +3098,9 @@ function resolveChoice(i) {
         verdict("SENT IT 🎲", "ok");
         markSlot(i, "chosen-good"); postPickBonuses(r, i);
         showLesson("Fortune favors the desperate.",
-          `No good option existed — the stall was the percentage play — but you sent it next to ` +
-          `${neighborDesc(r, i)} and somehow… nothing happened. Nobody spoke. Nobody looked. ` +
-          `Streak survives. <b>This time.</b>`, pts);
+          `Sent it. Got away with it. 🎲 <b>This time.</b>`, pts,
+          `No good option existed — the stall was the percentage play — but you wedged in next to ` +
+          `${neighborDesc(r, i)} and nobody spoke. Nobody looked. Streak survives.`);
         if (r.attendant) showAttendant(); else showDrinkOffer();
         updateHUD();
         return;
@@ -3117,7 +3128,8 @@ function resolveChoice(i) {
     sparkleAt(i);
     flashTint("rgba(47,180,107,.22)");
     showLesson("Textbook etiquette. 👌",
-      `Optimal pick: ${describeBest(r)}.${buzzNote} ${G.streak >= 3 ? `🔥 ${G.streak}-streak multiplier active!` : ""}`, pts);
+      `Nailed it.${G.streak >= 3 ? ` 🔥 ${G.streak}-streak!` : ""}${buzzNote}`, pts,
+      `Optimal pick: ${describeBest(r)}.`);
     if (r.attendant) showAttendant(); else showDrinkOffer();
   } else if (sc.eff > 1.0) {
     G.streak = 0; G.trail.push("🟨");
@@ -3128,10 +3140,12 @@ function resolveChoice(i) {
     verdict("ACCEPTABLE", "ok");
     markSlot(i, "chosen-good"); postPickBonuses(r, i);
     showLesson("Fine. Technically fine.",
-      `No splash zone, but the pros would take ${describeBest(r)}. Streak reset.` +
-      (i === r.draftEnd ? ` Your end sits in the <b>propped-door draft</b> 🚪💨 — corner privilege void. That's the whole gap.` : "") +
-      (sc.onAir ? ` Also: you did that <b>ON AIR</b> 🎥. The segment runs at 6.` : "") +
-      (sc.flicker ? ` Also: you chose the spot under the <b>dying fluorescent light</b>. On purpose. Bold.` : ""), pts);
+      `Safe — but the ✔ spot beat yours. Streak reset.` +
+      (i === r.draftEnd ? ` 🚪💨 Drafty end.` : "") +
+      (sc.onAir ? ` 🎥 You were ON AIR.` : "") +
+      (sc.flicker ? ` 💡 Under the dying light. Bold.` : ""), pts,
+      `The pros would take ${describeBest(r)}.` +
+      (i === r.draftEnd ? ` The propped door voids your corner bonus — that's the whole gap.` : ""));
     if (r.attendant) showAttendant(); else showDrinkOffer();
   } else {
     relieve();
@@ -3284,16 +3298,17 @@ function stallSuccess() {
     gainScore(pts, "big"); G.perfects++;
     verdict("PRO MOVE 🚻", "good");
     showLesson("Grandmaster patience.",
+      `The stall was the play — and it paid. Bladder: zero.`, pts,
       `Every open spot meant standing shoulder-to-shoulder${r.spots.some(s => s.persona === "glasses") ? " (one of them was <b>recording</b>)" : ""}. ` +
-      `The stall was the only dignified exit — and you gambled right. Bladder reset to zero.`, pts);
+      `Waiting was the only dignified exit.`);
   } else {
     G.streak = 0; G.trail.push("🚻");
     const pts = 30;
     gainScore(pts, "mid");
     verdict("STALL REFUGE 🚻", "ok");
     showLesson("It worked… but the board was solvable.",
-      `The stall opened and nobody can take that from you. Still, the pros would take ${describeBest(r)} ` +
-      `and keep the streak alive. Streak reset. Bladder reset to zero, though — not nothing.`, pts);
+      `Safe harbor. Streak reset · bladder zero.`, pts,
+      `The stall opened and nobody can take that from you. Still, the pros would take ${describeBest(r)} and keep the streak alive.`);
   }
   updateHUD();
 }
