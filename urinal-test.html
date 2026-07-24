@@ -715,6 +715,21 @@
   .ef-a1 { font-size: clamp(26px, 8.4vw, 40px); font-weight: 900; color: #fff; text-shadow: 3px 4px 0 rgba(0,0,0,.35); }
   .ef-a2 { font-size: clamp(20px, 6.4vw, 30px); font-weight: 900; color: #ffe9a0; margin-top: 10px; text-shadow: 2px 3px 0 rgba(0,0,0,.3); transform: rotate(-1.4deg); }
   .ef-a3 { font-size: clamp(16px, 5vw, 24px); font-weight: 900; color: #c9f0ff; margin-top: 10px; text-shadow: 2px 3px 0 rgba(0,0,0,.3); transform: rotate(1deg); }
+  /* ---------- the drink ceremony ---------- */
+  #drinkintro { position: fixed; inset: 0; background: rgba(5,8,12,.95); z-index: 115;
+    display: flex; align-items: center; justify-content: center; padding: 18px; }
+  #drinkintro.show { display: flex !important; }
+  .di-card { background: linear-gradient(#242b1c, #1a2130); border: 2px solid #8a6a1d; border-radius: 16px;
+    padding: 22px 18px; width: 100%; max-width: 400px; text-align: center; animation: layin .35s ease; }
+  .di-big { font-size: 54px; animation: soapbob 1.4s ease-in-out infinite; }
+  .di-h { font-size: clamp(22px, 6.4vw, 30px); font-weight: 900; letter-spacing: 1.5px; color: #ffd76a; margin: 6px 0 4px; }
+  .di-sub { color: #b9c6d4; font-size: 14px; margin-bottom: 12px; }
+  .di-row { font-weight: bold; font-size: clamp(14px, 4vw, 17px); margin: 7px 0; }
+  .di-row.up { color: #6fe3a1; }
+  .di-row.down { color: #ffb15c; }
+  .di-row.tank { color: #9fc4e8; }
+  .di-warn { color: #ff9a90; font-size: 12.5px; margin: 12px 0 16px; line-height: 1.5; }
+
   /* ---------- layover: the travel window between rounds ---------- */
   #layover { position: fixed; inset: 0; background: rgba(5,8,12,.94); z-index: 110;
     display: flex; align-items: center; justify-content: center; padding: 18px; }
@@ -923,6 +938,20 @@
       <div class="picksub">Its photos, colors, airport &amp; station come with it.</div>
       <div id="picklist"></div>
       <button class="bigbtn alt" id="pickclose" style="min-width:0;width:100%;margin-top:10px">CLOSE</button>
+    </div>
+  </div>
+
+  <!-- one-time drink ceremony: winners drink free -->
+  <div id="drinkintro" class="hiddenrow">
+    <div class="di-card">
+      <div class="di-big">🍺</div>
+      <div class="di-h">WINNERS DRINK FREE</div>
+      <div class="di-sub">Nail a pick, earn a round. Every drink:</div>
+      <div class="di-row up">▲ your score multiplier goes UP</div>
+      <div class="di-row down">▼ the round clock gets SHORTER</div>
+      <div class="di-row tank">🫙 +1 in the tank · at 3 you're DESPERATE</div>
+      <div class="di-warn">Run out of time desperate and you piss yourself.<br>Game over. Your call, champ.</div>
+      <button class="bigbtn" id="drinkgo" style="min-width:0;width:100%">🍻 SHOW ME THE MENU</button>
     </div>
   </div>
 
@@ -3027,6 +3056,25 @@ function buzzMult() { return 1 + buzzPct() / 100; }
 
 /* The drink is YOUR call: buzz bonus vs. bladder vs. clock. Consequences are all yours. */
 function showDrinkOffer() {
+  const key = G.cur.themeKey;
+  // a round is an OCCASION: offered where drinks are sold, or when you're on a heater.
+  // Every-round offers would cheapen it.
+  const drinkVenue = ["divebar", "stadium", "festival", "coffee", "airport"].includes(key);
+  if (!drinkVenue && G.streak < 3) return;
+  // the first offer ever gets the full ceremony
+  let seenIntro = true;
+  try { seenIntro = localStorage.getItem("ut_drinkintro") === "1"; } catch (e) {}
+  if (!seenIntro) { showDrinkIntro(); return; }
+  renderDrinkOffer();
+}
+
+/* One-time full-screen moment: you won, the round's on the house, here's the deal. */
+function showDrinkIntro() {
+  const d = $("drinkintro");
+  d.classList.remove("hiddenrow"); d.classList.add("show");
+  sfx.good();
+}
+function renderDrinkOffer() {
   const t = THEMES[G.cur.themeKey];
   const key = G.cur.themeKey;
   // venue decides the menu (deterministic, so daily/challenge stays fair)
@@ -3353,6 +3401,7 @@ function startRound() {
   $("lesson").classList.remove("show");
   $("attrow").classList.remove("show");
   $("drinkrow").classList.remove("show");
+  $("drinkintro").classList.remove("show"); $("drinkintro").classList.add("hiddenrow");
   $("attnote").classList.remove("show");
   $("nextbtn").style.display = "";
   $("verdict").className = "";
@@ -4980,6 +5029,13 @@ $("chalbtn").addEventListener("click", () => shareChallenge());
 $("roadtripbtn").addEventListener("click", () => openParkPicker("start"));
 $("endroadtripbtn").addEventListener("click", () => openParkPicker("end"));
 $("pickclose").addEventListener("click", () => { closeParkPicker(); if (pickerCtx === "layover") resumeFromLayover(); });
+$("drinkgo").addEventListener("click", () => {
+  try { localStorage.setItem("ut_drinkintro", "1"); } catch (e) {}
+  const d = $("drinkintro");
+  d.classList.remove("show"); d.classList.add("hiddenrow");
+  buzz(20);
+  renderDrinkOffer(); // the menu they were promised
+});
 $("laystay").addEventListener("click", () => resumeFromLayover());
 $("laygo").addEventListener("click", () => {
   $("layover").classList.remove("show"); $("layover").classList.add("hiddenrow");
