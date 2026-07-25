@@ -4091,6 +4091,39 @@ function boardMesh(title, rows, w, h) {
   }, 1024, 512);
   return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t, toneMapped: false }));
 }
+/* Everyone in 3D faces the wall, so a persona's identity has to live ABOVE him.
+   Billboard sprite = the 2D chip, readable from the only angle we ever get. */
+function t3Tag(text, colorHex) {
+  const pill = (x, w, h, r) => {
+    x.beginPath();
+    x.moveTo(r, 0); x.lineTo(w - r, 0); x.arcTo(w, 0, w, r, r);
+    x.lineTo(w, h - r); x.arcTo(w, h, w - r, h, r);
+    x.lineTo(r, h); x.arcTo(0, h, 0, h - r, r);
+    x.lineTo(0, r); x.arcTo(0, 0, r, 0, r);
+    x.closePath();
+  };
+  const t = tex((x, w, h) => {
+    x.clearRect(0, 0, w, h);
+    x.translate(6, 6);
+    pill(x, w - 12, h - 12, (h - 12) / 2);
+    x.fillStyle = "rgba(10,14,20,.9)"; x.fill();
+    x.strokeStyle = colorHex; x.lineWidth = 7; x.stroke();
+    x.fillStyle = "#ffffff";
+    let fs = 74;
+    x.font = `bold ${fs}px Trebuchet MS`;
+    while (x.measureText(text).width > w - 60 && fs > 30) { fs -= 3; x.font = `bold ${fs}px Trebuchet MS`; }
+    x.textAlign = "center"; x.textBaseline = "middle";
+    x.fillText(text, (w - 12) / 2, (h - 12) / 2);
+  }, 384, 128);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, toneMapped: false, depthWrite: false }));
+  sp.renderOrder = 6;
+  return sp;
+}
+/* Only the personas whose presence changes the MATH get a tag — flavor stays quiet. */
+const TAGGED = { glasses: "#ff2d2d", shifty: "#ffd76a", lurker: "#9fc4e8", crooner: "#d0a0ff", boss: "#9fe0b8" };
+/* Short, punchy labels for the 3D floor — the 2D chips are chattier than a billboard allows. */
+const TAG_TEXT = { glasses: "🔴 REC", shifty: "👀 EYES", lurker: "🧍 NOT GOING", crooner: "🎤 SINGING", boss: "👔 YOUR BOSS" };
+
 function t3Person(persona, shirtHex, front) {
   const g = new THREE.Group();
   const skin = pick([0xe8b48a, 0xc68b5e, 0x8d5a3b, 0xf0c9a5, 0x6b4429]);
@@ -4147,14 +4180,26 @@ function t3Person(persona, shirtHex, front) {
     g.add(bun, frank, hL, hR);
   }
   g.userData.head = hd;
+  if (TAGGED[persona]) {
+    const tag = t3Tag(TAG_TEXT[persona] || PERSONAS[persona].chip, TAGGED[persona]);
+    tag.position.set(0, 1.7, 0);
+    const w = 1.05 * (T3.sgn || 1);
+    tag.scale.set(w, w / 3, 1);
+    g.add(tag);
+    g.userData.tag = tag; // build3D staggers height so neighbouring tags don't collide
+  }
   if (persona === "shifty") g.userData.swivel = hd; // the neck that will not quit
   if (persona === "glasses") {
-    const band = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.022, 8, 24), smat(0x111111, 0.35, 0.4));
+    // the band reads as hardware from behind: pale temple arms, not black-on-black hair
+    const band = new THREE.Mesh(new THREE.TorusGeometry(0.152, 0.026, 8, 26), smat(0x2b3240, 0.3, 0.55));
     band.position.y = 1.15; band.rotation.x = Math.PI / 2;
-    const led = new THREE.Mesh(new THREE.SphereGeometry(0.028, 10, 8), new THREE.MeshBasicMaterial({ color: 0xff2d2d }));
-    led.position.set(0.14, 1.16, 0.06);
-    g.add(band, led);
-    g.userData.led = led;
+    const led = new THREE.Mesh(new THREE.SphereGeometry(0.042, 12, 10), new THREE.MeshBasicMaterial({ color: 0xff2d2d, toneMapped: false }));
+    led.position.set(0.125, 1.17, 0.085); // back-right temple — the side we can actually see
+    const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex(), color: 0xff2d2d,
+      transparent: true, opacity: 0.85, toneMapped: false, depthWrite: false }));
+    halo.scale.set(0.34, 0.34, 1); halo.position.copy(led.position);
+    g.add(band, led, halo);
+    g.userData.led = led; g.userData.halo = halo;
   } else if (persona === "headphones") {
     const arc = new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.03, 8, 20, Math.PI), smat(0x222222, 0.4));
     arc.position.y = 1.16;
@@ -4165,6 +4210,18 @@ function t3Person(persona, shirtHex, front) {
     g.add(pillow);
   }
   return shadowify(g);
+}
+let glowTexCache = null;
+function glowTex() {
+  if (glowTexCache) return glowTexCache;
+  glowTexCache = tex((x, w, h) => {
+    const g2 = x.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
+    g2.addColorStop(0, "rgba(255,255,255,1)");
+    g2.addColorStop(0.35, "rgba(255,255,255,.55)");
+    g2.addColorStop(1, "rgba(255,255,255,0)");
+    x.fillStyle = g2; x.fillRect(0, 0, w, h);
+  }, 128, 128);
+  return glowTexCache;
 }
 function t3Urinal() {
   const g = new THREE.Group();
@@ -4219,6 +4276,7 @@ function build3D(round) {
   const hHalf0 = Math.atan(Math.tan(58 * Math.PI / 360) * (T3.cam.aspect || 0.5));
   const camDist = Math.max(4.2, halfW0 / Math.tan(hHalf0) + 0.7);
   const sgn = Math.min(2.3, Math.max(1, camDist / 6.2)); // signage scale: constant apparent size
+  T3.sgn = sgn; // persona tags ride the same scale so they stay readable at any row width
   const wallC = new THREE.Color(round.theme.wall);
   const floor1 = new THREE.Color(round.theme.floor1);
   // room shell — 4K treatment: hi-res tiled walls, glossy floor, baseboard, depth fog
@@ -4500,6 +4558,7 @@ function build3D(round) {
       if (s.occupant) {
         const person = t3Person(s.persona, parseInt(pick(SHIRTS).slice(1), 16));
         person.position.set(x, 0, 0.72);
+        if (person.userData.tag) person.userData.tag.position.y += (i % 2) * 0.36;
         blob(x, 0.78, 0.3);
         T3.group.add(person); T3.people.push(person);
       } else if (s.blocked) {
@@ -4564,6 +4623,7 @@ function build3D(round) {
       if (s.occupant) {
         const person = t3Person(s.persona, parseInt(pick(SHIRTS).slice(1), 16), far);
         person.position.set(x, 0, z);
+        if (person.userData.tag) person.userData.tag.position.y += (i % 2) * 0.36;
         if (far) person.rotation.y = Math.PI; // facing the room — hot dog visible, orientation unmistakable
         blob(x, z, 0.3);
         T3.group.add(person); T3.people.push(person);
@@ -4593,6 +4653,7 @@ function build3D(round) {
     if (s.occupant) {
       const person = t3Person(s.persona, s.persona === "boss" ? 0x23293a : parseInt(pick(SHIRTS).slice(1), 16));
       person.position.set(x, 0, 0.55);
+      if (person.userData.tag) person.userData.tag.position.y += (i % 2) * 0.36;
       blob(x, 0.6, 0.3);
       if (s.persona === "lurker") person.rotation.y = Math.PI; // facing the room. unsettling.
       if (s.persona === "boss") {
@@ -4980,7 +5041,11 @@ function t3Frame(now) {
   T3.people.forEach((p, i) => {
     p.rotation.z = Math.sin(t * 1.3 + i * 2) * 0.03;
     p.scale.y = 1 + Math.sin(t * 1.9 + i * 1.4) * 0.006;
-    if (p.userData.led) p.userData.led.visible = Math.floor(t * 2) % 2 === 0;
+    if (p.userData.led) {
+      const on = Math.floor(t * 2) % 2 === 0;
+      p.userData.led.visible = on;
+      if (p.userData.halo) p.userData.halo.material.opacity = on ? 0.85 : 0.12;
+    }
     if (p.userData.swivel) p.userData.swivel.rotation.y = Math.sin(t * 1.4 + i) * 0.9;
     else if (p.userData.head) {
       // idle micro-glances; everyone clocks a walk-in for a beat, then eyes front
