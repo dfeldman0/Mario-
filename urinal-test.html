@@ -715,6 +715,52 @@
   .ef-a1 { font-size: clamp(26px, 8.4vw, 40px); font-weight: 900; color: #fff; text-shadow: 3px 4px 0 rgba(0,0,0,.35); }
   .ef-a2 { font-size: clamp(20px, 6.4vw, 30px); font-weight: 900; color: #ffe9a0; margin-top: 10px; text-shadow: 2px 3px 0 rgba(0,0,0,.3); transform: rotate(-1.4deg); }
   .ef-a3 { font-size: clamp(16px, 5vw, 24px); font-weight: 900; color: #c9f0ff; margin-top: 10px; text-shadow: 2px 3px 0 rgba(0,0,0,.3); transform: rotate(1deg); }
+  /* ---------- the passport ---------- */
+  #passport { position: fixed; inset: 0; background: rgba(5,8,12,.94); z-index: 112;
+    display: flex; align-items: center; justify-content: center; padding: 18px; }
+  #passport.show { display: flex !important; }
+  .pp-box { background: #1a2130; border: 2px solid #3a4a63; border-radius: 16px; padding: 16px;
+    width: 100%; max-width: 440px; max-height: 88vh; display: flex; flex-direction: column; }
+  #pp-body { overflow-y: auto; flex: 1; min-height: 0; -webkit-overflow-scrolling: touch; }
+  .pp-h { color: #ffd76a; font-weight: 900; letter-spacing: 2px; font-size: 12px; margin: 12px 0 7px; }
+  .pp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 6px; }
+  .pp-stamp { border-radius: 10px; padding: 7px 3px; text-align: center; font-size: 9px; font-weight: bold;
+    line-height: 1.2; border: 2px dashed rgba(255,255,255,.18); color: #4a5567; background: #141a26; }
+  .pp-stamp.got { color: #fff; border-style: solid; transform: rotate(-2deg);
+    box-shadow: 0 0 10px rgba(0,0,0,.4), inset 0 0 14px rgba(255,255,255,.12); }
+  .pp-stamp .pe { display: block; font-size: 15px; margin-bottom: 2px; }
+  #statstrip { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 10px; max-width: 92%; }
+  #statstrip .sc { background: #172033; border: 1px solid #2b3547; border-radius: 999px;
+    padding: 4px 11px; font-size: 12px; color: #9fb0c3; white-space: nowrap; }
+  #statstrip .sc:empty { display: none; }
+  #statstrip .tap { cursor: pointer; border-color: #3a5c48; color: #9fe0b8; }
+  #ss-title { color: #b8a5e8; border-color: #443a63; }
+  #ss-streak { color: #ffb15c; border-color: #5c4630; font-weight: bold; }
+  #nearmiss { color: #ffd76a; font-size: clamp(13px, 3.6vw, 15px); margin-bottom: 10px; min-height: 18px; }
+  .pickrow .pb { color: #6fe3a1; font-size: 11px; font-weight: bold; }
+
+  /* ---------- local weather ---------- */
+  #weather { position: absolute; inset: 0; z-index: 27; pointer-events: none; opacity: 0; transition: opacity .8s; }
+  #weather.heat, #weather.cold { opacity: 1; }
+  #weather.heat { background:
+      linear-gradient(rgba(255,170,60,.16), rgba(255,120,40,.05) 45%, rgba(255,90,30,.14)),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 2px, transparent 2px 7px);
+    animation: shimmer 3.4s ease-in-out infinite; }
+  @keyframes shimmer { 0%, 100% { background-position: 0 0, 0 0; } 50% { background-position: 0 0, 0 5px; } }
+  #weather.cold { background:
+      linear-gradient(rgba(130,185,255,.3), rgba(190,225,255,.12) 50%, rgba(110,165,255,.28)),
+      radial-gradient(circle at 12% 18%, rgba(255,255,255,.5) 0 1.5px, transparent 2px),
+      radial-gradient(circle at 74% 34%, rgba(255,255,255,.45) 0 1.5px, transparent 2px),
+      radial-gradient(circle at 38% 62%, rgba(255,255,255,.4) 0 1.5px, transparent 2px),
+      radial-gradient(circle at 88% 78%, rgba(255,255,255,.5) 0 1.5px, transparent 2px),
+      radial-gradient(circle at 26% 88%, rgba(255,255,255,.4) 0 1.5px, transparent 2px);
+    background-size: auto, 140px 140px, 190px 190px, 160px 160px, 210px 210px, 175px 175px;
+    animation: flurry 9s linear infinite; }
+  @keyframes flurry { to { background-position: 0 0, 20px 140px, -26px 190px, 16px 160px, -20px 210px, 24px 175px; } }
+  #weather::after { content: ""; position: absolute; inset: 0; }
+  #weather.cold::after { box-shadow: inset 0 0 95px 30px rgba(205,235,255,.5); }
+  #weather.heat::after { box-shadow: inset 0 0 70px 18px rgba(255,150,60,.2); }
+
   /* ---------- the vendor stand ---------- */
   #drinkrow { display: none; position: absolute; left: 0; right: 0; bottom: 0; z-index: 45; padding: 8px 10px 12px;
     background: linear-gradient(transparent, rgba(6,9,14,.82) 30%); }
@@ -928,6 +974,11 @@
     <div id="towelline"></div>
     <div id="bestline"></div>
     <div id="careerline"></div>
+    <div id="statstrip">
+      <span class="sc" id="ss-title"></span>
+      <span class="sc" id="ss-streak"></span>
+      <span class="sc tap" id="ss-pass"></span>
+    </div>
     <div class="subnote">📱 Best on a phone — wrong picks trigger haptic splash feedback.</div>
     <div id="ticker"><div id="tickertrack"></div></div>
   </div>
@@ -936,6 +987,7 @@
   <div id="end" class="screen hidden">
     <h1 id="endtitle">RESULTS</h1>
     <div class="rank" id="ranktext"></div>
+    <div id="nearmiss"></div>
     <div class="finalscore" id="finaltext"></div>
     <div class="statline" id="stattext"></div>
     <div id="trailline"></div>
@@ -973,6 +1025,16 @@
       <div class="picksub">Its photos, colors, airport &amp; station come with it.</div>
       <div id="picklist"></div>
       <button class="bigbtn alt" id="pickclose" style="min-width:0;width:100%;margin-top:10px">CLOSE</button>
+    </div>
+  </div>
+
+  <!-- the passport: every city, venue and character you've met -->
+  <div id="passport" class="hiddenrow">
+    <div class="pp-box">
+      <div class="picktitle">🛂 THE PASSPORT</div>
+      <div class="picksub" id="pp-sub"></div>
+      <div id="pp-body"></div>
+      <button class="bigbtn alt" id="pp-close" style="min-width:0;width:100%;margin-top:10px">CLOSE</button>
     </div>
   </div>
 
@@ -1061,6 +1123,7 @@
       <div id="tod"></div>
       <div id="dim"></div>
       <div id="flash"></div>
+      <div id="weather"></div>
       <div id="fogsteam"></div>
       <div id="blackout"></div>
       <div id="newsbadge"></div>
@@ -1526,6 +1589,36 @@ function parkPhotoURL(p) {
   return `parks/${s}-${v}.jpg`;
 }
 
+const MONTHS = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"];
+/* Desert cities bake dry; gulf/river cities bake wet. Everything else falls out of latitude. */
+const DESERT_PARKS = ["Chase Field", "Sutter Health Park", "Angel Stadium", "Dodger Stadium", "Petco Park", "Globe Life Field"];
+const SWAMP_PARKS = ["Daikin Park", "loanDepot park", "Tropicana Field", "Truist Park", "Nationals Park",
+  "Busch Stadium", "Great American Ball Park", "Camden Yards", "Citizens Bank Park"];
+function climateOf(pk, when) {
+  if (!pk) return null;
+  const d = when || new Date(), m = d.getMonth(), lat = pk.lat;
+  const summer = m >= 5 && m <= 8;     // Jun–Sep
+  const winter = m === 11 || m <= 2;   // Dec–Mar
+  if (summer && (DESERT_PARKS.includes(pk.park) || SWAMP_PARKS.includes(pk.park) || lat < 33.5)) {
+    const dry = DESERT_PARKS.includes(pk.park);
+    return { kind: "heat", icon: dry ? "🥵" : "💧",
+      hud: dry ? "🥵 HEAT ADVISORY" : "💧 SWAMP AIR",
+      title: dry ? "HEAT ADVISORY" : "SWAMP AIR",
+      note: dry
+        ? `${pk.city} in ${MONTHS[m]}. It's a dry heat — which is why you've had a gallon of water today. <b>Clock runs 10% faster.</b>`
+        : `${pk.city} in ${MONTHS[m]}. Ninety percent humidity. Everything is damp, including this decision. <b>Clock runs 10% faster.</b>` };
+  }
+  if (winter && lat > 39.5) {
+    return { kind: "cold", icon: "🥶", hud: "🥶 DEEP FREEZE", title: "DEEP FREEZE",
+      note: `${pk.city} in ${MONTHS[m]}. Single digits out there, and cold makes you go — everyone knows this. ` +
+        `<b>You hit desperate at 2 drinks instead of 3.</b>` };
+  }
+  return null;
+}
+/* Cold snaps shrink the tank; the Daily stays mechanically identical worldwide. */
+function coldSnap() { return G.climate && G.climate.kind === "cold" && G.mode !== "daily"; }
+
 function applyPark(p, km) {
   const s = THEMES.stadium;
   // warm the photo cache so the interstitial never pops in late
@@ -1640,9 +1733,10 @@ function openParkPicker(ctx) {
   [...MLB_PARKS].sort((a, b) => a.city.localeCompare(b.city)).forEach(p => {
     const b = document.createElement("button");
     b.className = "pickrow" + (cur && cur.park === p.park ? " current" : "");
+    const pb = cityBests()[p.park];
     b.innerHTML = `<span class="dot" style="background:${p.c}"></span>` +
       `<span><span class="pn">${p.park}</span><br><small>${p.team}</small></span>` +
-      `<span class="pc">${p.city}</span>`;
+      `<span class="pc">${p.city}${pb ? `<br><span class="pb">🏆 ${pb}</span>` : ""}</span>`;
     b.addEventListener("click", () => {
       applyPark(p, null);
       try { localStorage.setItem("ut_park", JSON.stringify({ park: p.park, km: null })); } catch (e) {}
@@ -1754,9 +1848,81 @@ const G = {
   splashes: 0, perfects: 0, trail: [], seed: null, city: null, stalls: 3,
   cur: null, timer: null, timeLeft: 0, timerTotal: 10, introT: null, locked: false,
 };
-function desperate() { return G.drinks >= 3; }
+function desperate() { return G.drinks >= (coldSnap() ? 2 : 3); }
 
 /* ---------- career ladder: every 10 successful pees adds a mechanic ---------- */
+/* ---------- daily streak: the reason to come back tomorrow ---------- */
+function readJSON(k, dflt) { try { return JSON.parse(localStorage.getItem(k)) || dflt; } catch (e) { return dflt; } }
+function writeJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+function dayNumber(d) { const t = d || new Date(); return Math.floor(Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()) / 86400000); }
+function streakData() { return readJSON("ut_streak", { day: 0, n: 0, best: 0 }); }
+function streakCount() {
+  const s = streakData(), today = dayNumber();
+  return (s.day === today || s.day === today - 1) ? s.n : 0; // yesterday still counts until midnight
+}
+function bumpStreak() {
+  const s = streakData(), today = dayNumber();
+  if (s.day === today) return s.n;             // already counted today
+  s.n = (s.day === today - 1) ? s.n + 1 : 1;   // continued, or a fresh start
+  s.day = today;
+  s.best = Math.max(s.best || 0, s.n);
+  writeJSON("ut_streak", s);
+  return s.n;
+}
+/* Streak perks — small, permanent-feeling, and impossible to buy. */
+function perkLives() { return streakCount() >= 3 ? 1 : 0; }
+function perkStalls() { return streakCount() >= 7 ? 1 : 0; }
+function streakBadge() {
+  const n = streakCount();
+  if (!n) return "";
+  const flame = n >= 30 ? "🔥🔥🔥" : n >= 7 ? "🔥🔥" : "🔥";
+  return `${flame} ${n}-day streak`;
+}
+
+/* ---------- the passport: a set worth completing ---------- */
+function passport() { return readJSON("ut_passport", { cities: {}, venues: {}, chars: {} }); }
+function stampCity(park) {
+  if (!park) return;
+  const p = passport();
+  if (p.cities[park]) return;
+  p.cities[park] = 1; writeJSON("ut_passport", p);
+}
+function stampVenue(v) { const p = passport(); if (p.venues[v]) return; p.venues[v] = 1; writeJSON("ut_passport", p); }
+function stampChar(c) { const p = passport(); if (p.chars[c]) return; p.chars[c] = 1; writeJSON("ut_passport", p); }
+const PASSPORT_CHARS = ["glasses", "shifty", "lurker", "crooner", "boss", "traveler", "phone", "headphones"];
+const PASSPORT_VENUES = ["office", "coffee", "mall", "tech", "divebar", "airport", "station", "stadium", "festival"];
+function passportCounts() {
+  const p = passport();
+  return { cities: Object.keys(p.cities).length, venues: Object.keys(p.venues).length,
+           chars: Object.keys(p.chars).length, p };
+}
+
+/* ---------- per-city personal bests ---------- */
+function cityBests() { return readJSON("ut_citybest", {}); }
+function recordCityBest(park, score) {
+  if (!park || !score) return false;
+  const b = cityBests();
+  if ((b[park] || 0) >= score) return false;
+  b[park] = score; writeJSON("ut_citybest", b);
+  return true;
+}
+
+/* ---------- earned titles: cosmetics you can only get by playing ---------- */
+const TITLES = [
+  { at: 0,   name: "Rookie", icon: "🚹" },
+  { at: 10,  name: "Regular", icon: "🧻" },
+  { at: 25,  name: "Veteran of the Row", icon: "📘" },
+  { at: 50,  name: "Divider Diplomat", icon: "🎓" },
+  { at: 100, name: "Porcelain Professor", icon: "🧠" },
+  { at: 200, name: "Grand Marshal of the Urinal", icon: "👑" },
+];
+function currentTitle() {
+  const n = careerPees();
+  let t = TITLES[0];
+  for (const x of TITLES) if (n >= x.at) t = x;
+  return t;
+}
+
 function careerPees() { try { return Number(localStorage.getItem("ut_pees") || 0); } catch (e) { return 0; } }
 function careerLevel() { return Math.floor(careerPees() / 10) + 1; }
 const CAREER_LADDER = [
@@ -1952,6 +2118,17 @@ function updateStartLines() {
     const bestScore = Number(localStorage.getItem("ut_bestEndlessScore") || 0);
     $("bestline").textContent = best ? `♾️ Endless best: round ${best} · ${bestScore} pts` : "";
   } catch (e) {}
+  const ttl = currentTitle();
+  $("ss-title").textContent = `${ttl.icon} ${ttl.name}`;
+  const sN = streakCount();
+  const perks = [];
+  if (sN >= 3) perks.push("👖+1");
+  if (sN >= 7) perks.push("🚻+1");
+  $("ss-streak").textContent = sN
+    ? `${streakBadge()}${perks.length ? " · " + perks.join(" ") : ""}`
+    : "🔥 Daily streak: play to start";
+  const pc = passportCounts();
+  $("ss-pass").textContent = `🛂 ${pc.cities}/30 · ${pc.venues}/9 · ${pc.chars}/8`;
   const pees = careerPees(), lvl = careerLevel();
   const next = CAREER_LADDER[lvl];
   $("careerline").textContent = pees > 0
@@ -1962,6 +2139,32 @@ function updateStartLines() {
 }
 
 /* Attract mode: a looping demo of the sacred code, right on the menu. */
+const VENUE_LABEL = { office: "Office", coffee: "Roastery", mall: "Mall", tech: "Tech", divebar: "Dive Bar",
+  airport: "Airport", station: "Station", stadium: "Ballpark", festival: "Festival" };
+const VENUE_ICON = { office: "🏢", coffee: "☕", mall: "🛍️", tech: "💻", divebar: "🍺",
+  airport: "✈️", station: "🚆", stadium: "🏟️", festival: "🎸" };
+const CHAR_LABEL = { glasses: "REC Guy", shifty: "Glancer", lurker: "Lurker", crooner: "Crooner",
+  boss: "The Boss", traveler: "Traveler", phone: "Speakerphone", headphones: "Headphones" };
+const CHAR_ICON = { glasses: "🕶️", shifty: "👀", lurker: "🧍", crooner: "🎤",
+  boss: "👔", traveler: "🧳", phone: "📱", headphones: "🎧" };
+function openPassport() {
+  const pc = passportCounts(), bests = cityBests();
+  const stamp = (got, icon, label, color, extra) =>
+    `<div class="pp-stamp${got ? " got" : ""}"${got && color ? ` style="background:${color};border-color:rgba(255,255,255,.55)"` : ""}>` +
+    `<span class="pe">${got ? icon : "❔"}</span>${label}${extra ? `<br>${extra}` : ""}</div>`;
+  $("pp-sub").textContent = `${pc.cities}/30 cities · ${pc.venues}/9 venues · ${pc.chars}/8 characters`;
+  $("pp-body").innerHTML =
+    `<div class="pp-h">🏟️ BALLPARKS VISITED</div><div class="pp-grid">` +
+    [...MLB_PARKS].sort((a, b) => a.city.localeCompare(b.city)).map(p =>
+      stamp(!!pc.p.cities[p.park], "⚾", p.city, p.c, bests[p.park] ? `${bests[p.park]} pts` : "")).join("") +
+    `</div><div class="pp-h">🚻 VENUES CLEARED</div><div class="pp-grid">` +
+    PASSPORT_VENUES.map(v => stamp(!!pc.p.venues[v], VENUE_ICON[v], VENUE_LABEL[v], "#2f7fd4")).join("") +
+    `</div><div class="pp-h">🙋 CHARACTERS MET</div><div class="pp-grid">` +
+    PASSPORT_CHARS.map(c => stamp(!!pc.p.chars[c], CHAR_ICON[c], CHAR_LABEL[c], "#6247a8")).join("") +
+    `</div>`;
+  const d = $("passport"); d.classList.remove("hiddenrow"); d.classList.add("show");
+}
+
 function buildAttract() {
   if ($("attract").childElementCount) return;
   const occ = { 0: "regular", 2: "glasses" };
@@ -3529,12 +3732,18 @@ function startRound() {
   const sc = $("scene");
   sc.classList.remove("dollying"); void sc.offsetWidth; sc.classList.add("dollying");
   setTimeout(() => sc.classList.remove("dollying"), 1600);
+  stampVenue(G.cur.themeKey);
+  if (G.cur.themeKey === "stadium" && THEMES.stadium.parkRef) stampCity(THEMES.stadium.parkRef.park);
+  G.cur.spots.forEach(s => { if (s.occupant && s.persona && s.persona !== "regular") stampChar(s.persona); });
+  G.climate = climateOf(THEMES.stadium.parkRef);
+  $("weather").className = G.climate ? G.climate.kind : "";
   if (mechanicOn("soap") && G.cur.layout === "wall" && Math.random() < 0.3) spawnSoap();
   let factor = Math.max(0.5, 1 - clockPct() / 100); // every drink makes the clock meaner
   let muskNote = "";
   if (G.musk) { factor *= 0.88; G.musk = false; muskNote = " · 🧴 cologne cloud: −12% time"; }
   if (G.held.length) muskNote += ` · ${heldIcons()} clock −${clockPct()}%`;
   if (trainingOn()) { factor *= 1.5; muskNote += " · 🎓 rookie clock"; }
+  if (G.climate && G.climate.kind === "heat" && G.mode !== "daily") factor *= 0.9; // you've been drinking water all day
   $("bladder").style.width = "100%";
   $("bladderwrap").classList.remove("low");
   // big round-intro card — THE readable moment, before any pressure starts
@@ -3556,6 +3765,7 @@ function startRound() {
   if (G.cur.dogAt >= 0) hazards.push("🐕 a very good boy");
   if (G.cur.draftEnd >= 0) hazards.push("🚪 door propped — that corner's exposed");
   if (G.cur.iceAt >= 0) hazards.push("🧊 iced urinal — tradition");
+  if (G.climate) hazards.push(G.climate.hud);
   const hazardNote = hazards.length ? ` · ${hazards.join(" · ")}` : "";
   const pkIntro = THEMES.stadium.parkRef;
   const chantNote = (pkIntro && G.cur.themeKey === "stadium") ? ` · ${pkIntro.chant}!` : "";
@@ -3599,6 +3809,11 @@ function startRound() {
     stages.push({ ms: 2900, run: () =>
       announce("🎓", "TRAINING WHEELS ON", "GREEN ring = the pro pick · AMBER = safe · RED = splash zone. " +
         "Off after 4 pees. Clock runs slow while you learn.", 2850),
+      end: () => {} });
+  }
+  if (G.climate && G.round === 0) {
+    stages.push({ ms: 2600, run: () =>
+      announce(G.climate.icon, G.climate.title, G.climate.note, 2550, G.climate.kind === "heat" ? "warn" : ""),
       end: () => {} });
   }
   if (G.pendingUnlock) {
@@ -3902,11 +4117,31 @@ function endGame(survived) {
     `${G.perfects} perfect picks · ${G.splashes} splash${G.splashes === 1 ? "" : "es"} · ` +
     (G.mode === "endless" ? `survived to round ${roundsReached}` : `reached round ${Math.min(roundsReached, 10)}/10`);
   $("trailline").textContent = G.trail.join("");
+  // your city's high score, and how close you came to the next rank
+  const parkNow = THEMES.stadium.parkRef;
+  const newBest = recordCityBest(parkNow && parkNow.park, G.score);
+  const NEXT = [[650, "📘 CERTIFIED STALL SCHOLAR"], [1000, "🎓 RESTROOM STRATEGIST"], [1400, "🧘 URINAL GRANDMASTER"]];
+  let miss = "";
+  if (newBest && parkNow) miss = `🏆 New ${parkNow.city} record: ${G.score}!`;
+  else if (!G.pissed) {
+    const nx = NEXT.find(([n]) => G.score < n);
+    if (nx && nx[0] - G.score <= 260) miss = `😤 ${nx[0] - G.score} points short of ${nx[1]}. So close.`;
+  }
+  $("nearmiss").innerHTML = miss;
   // daily: record first result of the day
   if (G.mode === "daily") {
     try {
       const k = "ut_daily_" + dailyKey();
-      if (!localStorage.getItem(k)) localStorage.setItem(k, JSON.stringify({ score: G.score, rank, trail: G.trail.join("") }));
+      if (!localStorage.getItem(k)) {
+        localStorage.setItem(k, JSON.stringify({ score: G.score, rank, trail: G.trail.join("") }));
+        const n = bumpStreak(); // a played Daily is a day on the streak
+        const hit = n === 3 ? "👖 +1 pair of pants from here on."
+          : n === 7 ? "🚻 +1 stall wait from here on."
+          : n === 30 ? "👑 Thirty days. You are the standard."
+          : "";
+        $("nearmiss").innerHTML = `🔥 ${n}-day Daily streak!${hit ? " " + hit : ""}` +
+          ($("nearmiss").innerHTML ? `<br>${$("nearmiss").innerHTML}` : "");
+      }
     } catch (e) {}
   }
   // challenge verdict
@@ -3944,8 +4179,9 @@ function resetGame(mode, seed) {
     : m === "daily" ? dateSeed()
     : (Math.floor(Math.random() * 2147483647));
   setSeed(s);
-  Object.assign(G, { mode: m, seed: s, round: 0, score: 0, streak: 0, lives: 3, drinks: 0, held: [], pissed: false, haggles: 0,
-    shield: false, musk: false, stalls: 3, splashes: 0, perfects: 0, trail: [], locked: false });
+  Object.assign(G, { mode: m, seed: s, round: 0, score: 0, streak: 0, lives: 3 + perkLives(), drinks: 0, held: [],
+    pissed: false, haggles: 0, shield: false, musk: false, stalls: 3 + perkStalls(),
+    splashes: 0, perfects: 0, trail: [], locked: false });
   $("end").classList.add("hidden");
   $("start").classList.add("hidden");
   $("respawnrow").classList.add("hiddenrow");
@@ -4909,8 +5145,11 @@ function build3D(round) {
   const VSl = VENUE_STYLE[round.themeKey] || {};
   T3.amb.intensity = g2.amb; T3.amb.color.setHex(g2.col);
   T3.dir.intensity = tod === "night" ? 0.22 : 0.55;
-  T3.p1.color.setHex(VSl.party ? 0xff9ad0 : (VSl.lightC || 0xfff6dd));
-  T3.p2.color.setHex(VSl.party ? 0x9ac8ff : (VSl.lightC || 0xfff6dd));
+  const wx = G.climate ? G.climate.kind : null;
+  const lightC = wx === "heat" ? 0xffd9a0 : wx === "cold" ? 0xd6e8ff : (VSl.lightC || 0xfff6dd);
+  T3.p1.color.setHex(VSl.party && !wx ? 0xff9ad0 : lightC);
+  T3.p2.color.setHex(VSl.party && !wx ? 0x9ac8ff : lightC);
+  if (wx) T3.amb.color.setHex(wx === "heat" ? 0xffe6c4 : 0xdcebff);
   const roomW2 = roomW;
   T3.p1.position.set(-roomW2 / 4, 2.6, 2.4); T3.p2.position.set(roomW2 / 4, 2.6, 2.4);
   T3.p1.intensity = T3.p2.intensity = g2.pt * (VSl.pt || 1);
@@ -5227,6 +5466,10 @@ $("certbtn").addEventListener("click", () => shareCertificate());
 $("chalbtn").addEventListener("click", () => shareChallenge());
 $("roadtripbtn").addEventListener("click", () => openParkPicker("start"));
 $("endroadtripbtn").addEventListener("click", () => openParkPicker("end"));
+$("ss-pass").addEventListener("click", () => openPassport());
+$("pp-close").addEventListener("click", () => {
+  const d = $("passport"); d.classList.remove("show"); d.classList.add("hiddenrow");
+});
 $("pickclose").addEventListener("click", () => { closeParkPicker(); if (pickerCtx === "layover") resumeFromLayover(); });
 $("drinkgo").addEventListener("click", () => {
   try { localStorage.setItem("ut_drinkintro", "1"); } catch (e) {}

@@ -100,6 +100,37 @@ and **Endless Rush** (procedurally generated rounds until the rush claims you).
   Grand Central, 30th Street…), and stamps a "CHICAGO EDITION" banner on the
   title screen.
 
+### 🌡️ Local climate
+
+Your home city's actual weather is part of the joke, derived from the park's own
+coordinates — no data table to go stale. **Phoenix in July** throws up a
+🥵 *HEAT ADVISORY* (dry-heat cities) and **Houston or Miami** get 💧 *SWAMP AIR*:
+amber heat shimmer over the room, warm lighting, and the clock runs 10% faster
+because you've been chugging water all day. **Boston, Minneapolis, Toronto or
+Denver in January** get 🥶 *DEEP FREEZE*: icy blue cast, drifting flurries, frost
+creeping in from the edges — and since cold makes you go, **you hit desperate at
+2 drinks instead of 3**. Spring and fall play neutral. The mechanical half is
+skipped in the Daily so the shared challenge stays identical worldwide.
+
+### 🔥 Streaks, 🛂 passport & personal bests
+
+All client-side in `localStorage` — no backend, nothing to sign up for.
+
+- **Daily streak** — playing the Daily on consecutive days builds a streak with
+  permanent-feeling perks: **3 days = +1 pair of pants**, **7 days = +1 stall
+  wait**, 30 days = bragging rights. Yesterday still counts until midnight.
+- **🛂 The passport** — a stamp for every one of the 30 ballparks visited, all 9
+  venue types cleared, and all 8 characters met. Earned stamps fill in with the
+  team's own colour and a tilted rubber-stamp look; the rest sit as dashed
+  placeholders daring you to finish the set.
+- **Per-city personal bests** — your high score in each city, shown on its
+  passport stamp and beside it in the Road Trip picker.
+- **Near-miss framing** — the end screen tells you exactly how far you fell
+  short ("😤 140 points short of RESTROOM STRATEGIST") or celebrates a new city
+  record, so a loss ends pointing at the retry.
+- **Earned titles** — Rookie → Regular → Veteran of the Row → Divider Diplomat →
+  Porcelain Professor → Grand Marshal of the Urinal, by career pees.
+
 ### 🏅 Career progression
 
 Every **10 successful pees** (lifetime, saved on-device) levels you up and
