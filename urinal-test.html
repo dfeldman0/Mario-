@@ -4512,6 +4512,8 @@ function build3D(round) {
     wet.position.set(x2 + 0.2, 0.18, z2); wet.rotation.x = -0.22;
     T3.group.add(wet);
   };
+  T3.spotPos = [];
+  const mark = (i, x2, y2, z2) => { T3.spotPos[i] = new THREE.Vector3(x2, y2, z2); };
   const mkRing = (i, x2, z2, halo) => {
     const onAir = round.newsSide >= 0 && (round.newsSide === 0 ? i < n / 2 : i >= n / 2);
     const ring = new THREE.Mesh(new THREE.TorusGeometry(halo ? 0.24 : 0.28, 0.045, 12, 36),
@@ -4521,6 +4523,7 @@ function build3D(round) {
     ring.userData.gx = x2; ring.userData.gz = z2;
     T3.group.add(ring);
     T3.rings[i] = ring;
+    mark(i, x2, 0.02, z2); // the ring IS the tap target
   };
   const mkCol = (i, x2, z2, w2) => {
     const col = new THREE.Mesh(new THREE.BoxGeometry(w2, 2.2, 1.2), new THREE.MeshBasicMaterial({ visible: false }));
@@ -4558,6 +4561,7 @@ function build3D(round) {
       if (s.occupant) {
         const person = t3Person(s.persona, parseInt(pick(SHIRTS).slice(1), 16));
         person.position.set(x, 0, 0.72);
+        mark(i, x, 0.85, 0.72);
         if (person.userData.tag) person.userData.tag.position.y += (i % 2) * 0.36;
         blob(x, 0.78, 0.3);
         T3.group.add(person); T3.people.push(person);
@@ -4575,6 +4579,7 @@ function build3D(round) {
         mkRing(i, x, 1.0, false);
       }
       if (round.wetAt === i) wetSign3(x, 1.15);
+      if (!T3.spotPos[i]) mark(i, x, 0.6, 0.85);
       mkCol(i, x, 0.9, S * 0.94);
     }
   } else if (round.layout === "tub") {
@@ -4623,6 +4628,7 @@ function build3D(round) {
       if (s.occupant) {
         const person = t3Person(s.persona, parseInt(pick(SHIRTS).slice(1), 16), far);
         person.position.set(x, 0, z);
+        mark(i, x, 0.85, z);
         if (person.userData.tag) person.userData.tag.position.y += (i % 2) * 0.36;
         if (far) person.rotation.y = Math.PI; // facing the room — hot dog visible, orientation unmistakable
         blob(x, z, 0.3);
@@ -4653,6 +4659,7 @@ function build3D(round) {
     if (s.occupant) {
       const person = t3Person(s.persona, s.persona === "boss" ? 0x23293a : parseInt(pick(SHIRTS).slice(1), 16));
       person.position.set(x, 0, 0.55);
+      mark(i, x, 0.85, 0.55);
       if (person.userData.tag) person.userData.tag.position.y += (i % 2) * 0.36;
       blob(x, 0.6, 0.3);
       if (s.persona === "lurker") person.rotation.y = Math.PI; // facing the room. unsettling.
@@ -4750,6 +4757,7 @@ function build3D(round) {
       T3.group.add(ring);
       T3.rings[i] = ring;
     }
+    if (!T3.spotPos[i]) mark(i, x, 0.9, 0.4); // blocked spots still answer a tap
     // straight-on view: full-column hitboxes don't overlap head-on — generous taps
     u.traverse(o => { o.userData.slot = i; });
     T3.hits.push(u);
@@ -5103,19 +5111,32 @@ function t3Frame(now) {
   }
   T3.raf = requestAnimationFrame(t3Frame);
 }
+/* WYSIWYG tap resolution: every tappable thing registers the world point the
+   player can actually SEE, and a tap picks the nearest one on screen. Immune to
+   camera angle, overlapping hit volumes and objects hiding behind each other. */
+function t3Nearest(px, py, rect) {
+  let best = null, bestD = Infinity;
+  const consider = (wp, val) => {
+    if (!wp) return;
+    const p = wp.clone().project(T3.cam);
+    if (p.z > 1) return; // behind the camera
+    const sx = (p.x * 0.5 + 0.5) * rect.width, sy = (-p.y * 0.5 + 0.5) * rect.height;
+    const d = Math.hypot(sx - px, sy - py);
+    if (d < bestD) { bestD = d; best = val; }
+  };
+  (T3.spotPos || []).forEach((wp, i) => consider(wp, { slot: i }));
+  if (T3.door) consider(T3.door.position, { door: true });
+  return { best, d: bestD };
+}
 function t3Click(e) {
   if (G.locked) return;
-  const r = $("three3d").getBoundingClientRect();
-  const v = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
-  const rc = new THREE.Raycaster();
-  rc.setFromCamera(v, T3.cam);
-  const hit = rc.intersectObjects(T3.hits, true)[0];
-  if (!hit) return;
+  const rect = $("three3d").getBoundingClientRect();
+  const px = e.clientX - rect.left, py = e.clientY - rect.top;
+  const hit = t3Nearest(px, py, rect);
+  if (!hit.best || hit.d > Math.min(rect.width, rect.height) * 0.26) return;
   e.stopPropagation();
-  let o = hit.object;
-  while (o && o.userData.slot === undefined && !o.userData.door) o = o.parent;
-  if (o && o.userData.door) { onStall(); return; }
-  if (o) onSlot(o.userData.slot);
+  if (hit.best.door) onStall();
+  else onSlot(hit.best.slot);
 }
 function t3Mark(i, cls) {
   const ring = T3.rings[i];
