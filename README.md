@@ -135,29 +135,43 @@ All client-side in `localStorage` — no backend, nothing to sign up for.
 
 Every **10 successful pees** (lifetime, saved on-device) levels you up and
 adds a new mechanic to the rotation, so the game keeps evolving instead of
-repeating:
+repeating. The juvenile stuff comes early on purpose:
 
 | Level | Unlock |
 |---|---|
 | 2 | ⚠️ **Wet floors** — a caution sign at a random spot; picking it costs a 2-second slip |
-| 3 | 👀 **The side-glancer** — one guy keeps looking sideways; dividers can't stop a wandering neck |
-| 4 | 🎲 **The send-it gamble** — on no-good-option boards, going anyway is a coin flip, not an automatic splash |
-| 5 | 🫧 **Soap jackpot** — a tappable dispenser worth +8 |
-| 6 | 📱 **The phone zombie** — mid-round, a guy drifts one urinal over without looking up; the board re-scores |
-| 7 | 🧍 **The lurker** — standing at a urinal, facing the room, not going, not leaving |
-| 8 | 🎤 **The crooner** — mid-ballad; his radius is bigger than his talent |
-| 9 | 🚪 **Rush-hour walk-ins** — dawdle and someone takes the best spot |
-| 10 | 🌪️ **Full chaos** — every hazard rolls hotter and stacks |
-| 11 | 🌫️ **Festival steam** — the room opens in fog; you can't see who's where until it lifts (~2s) |
-| 12 | 🧊 **The iced urinal** — stadium tradition; picking it pays +15 |
-| 13 | 👔 **The boss** — stand next to him and you WILL discuss Q3 (−25) |
-| 14 | 🎥 **The news crew** — half the room is ON AIR (red rings, comfort penalty) |
-| 15 | 🧻 **No paper** — new stall heartbreak: door opens, dispenser's empty, you back out |
-| 16 | 🔧 **The rattling pipe** — telegraphs all round, then blows mid-round and blocks the spot |
-| 17 | 🐕 **The service dog** — petting urge: −1 second, +5 cuteness |
-| 18 | 🔌 **Power dips** — lights out for a full second; the clock does not care |
-| 19 | 🚪 **The propped door** — the end spot near it loses its corner privilege |
-| 20 | 🤝 **Attendant haggling** — negotiate; stakes escalate every time (+15 → ±35 → +60/−30) |
+| 3 | 🐀 **The rat** — sprints in mid-round and parks under a urinal; nobody stands over a rat (−2.0 comfort: never the pro pick), neighbors jump a spot. Tap it: +50 EXTERMINATOR |
+| 4 | 👀 **The side-glancer** — one guy keeps looking sideways; dividers can't stop a wandering neck |
+| 5 | 👋 **Two shakes** — after a perfect pick, tap exactly twice (+10). One is a drip (−5). Three is playing with it (−15, and he noticed) |
+| 6 | 🎲 **The send-it gamble** — on no-good-option boards, going anyway is a coin flip, not an automatic splash |
+| 7 | 🕷️ **The spider** — hangs over the BEST urinal. Brave it: 70% +30 NERVES OF STEEL, 30% it drops on you (−2s). Or tap it onto the neighbor, who leaves |
+| 8 | 🫧 **Soap jackpot** — a tappable dispenser worth +8 |
+| 9 | 📱 **The phone zombie** — mid-round, a guy drifts one urinal over without looking up; the board re-scores |
+| 10 | 👟 **Nice shoes** — box-fresh white sneakers are a splash zone (−0.35 aura). Unless he's an 🧢 **away fan** in rival colors: then his kicks are fair game (+0.35, and +40 for splashing them) |
+| 11 | 🧍 **The lurker** — standing at a urinal, facing the room, not going, not leaving |
+| 12 | 🍺 **Aim** — two drinks deep the stream sways; tap left/right for 1.6s to keep it in the bowl. Steady = +40; miss = −20%, a puddle, and a wet floor next round that is entirely your fault |
+| 13 | 🎤 **The crooner** — mid-ballad; his radius is bigger than his talent |
+| 14 | ✍️ **Write your name** — every 3-streak (wall rooms, not the Daily): the camera walks up to the wall and you swipe your name. In piss. Legible = +100 LEGEND, sloppy = +25, either way it empties your bladder, skips the bar, and stays on that building's wall on every return visit. If the boss or the REC guy saw, the attendant charges double on your next stall |
+| 15 | 🚪 **Rush-hour walk-ins** — dawdle and someone takes the best spot |
+| 16 | 🌪️ **Full chaos** — every hazard rolls hotter and stacks |
+| 17 | 🌫️ **Festival steam** — the room opens in fog; you can't see who's where until it lifts (~2s) |
+| 18 | 🧊 **The iced urinal** — stadium tradition; picking it pays +15 |
+| 19 | 👔 **The boss** — stand next to him and you WILL discuss Q3 (−25) |
+| 20 | 🎥 **The news crew** — half the room is ON AIR (red rings, comfort penalty) |
+| 21 | 🧻 **No paper** — new stall heartbreak: door opens, dispenser's empty, you back out |
+| 22 | 🔧 **The rattling pipe** — telegraphs all round, then blows mid-round and blocks the spot |
+| 23 | 🐕 **The service dog** — petting urge: −1 second, +5 cuteness |
+| 24 | 🔌 **Power dips** — lights out for a full second; the clock does not care |
+| 25 | 🚪 **The propped door** — the end spot near it loses its corner privilege |
+| 26 | 🤝 **Attendant haggling** — negotiate; stakes escalate every time (+15 → ±35 → +60/−30) |
+
+The juvenile tier (rat, spider, shoes, aim, shakes, graffiti) is all taps and
+swipes in the scene — no new buttons. The rat and spider are tappable in 3D
+via the same nearest-marker resolution as the urinals; AIM and the graffiti
+share one 3D stream (a bezier tube from you to wherever you're pointing it),
+and the graffiti canvas unprojects your finger onto the wall plane so the
+stream, the paint and the baked wall decal all agree. Tags are stored in
+`localStorage` (`ut_tags`, keyed by park + venue).
 
 Level-ups are announced before the next round; the start screen tracks your
 career. The Daily Challenge always runs the full rotation so it stays

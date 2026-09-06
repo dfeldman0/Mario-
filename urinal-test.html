@@ -186,6 +186,52 @@
     animation: draftsway 1.8s ease-in-out infinite; }
   @keyframes draftsway { 0%, 100% { transform: translateX(-58%); } 50% { transform: translateX(-42%); } }
   .slot.rattle .fixture { animation: pipettl .35s linear infinite; }
+  /* juvenile tier */
+  .spider { position: absolute; left: 50%; top: -6px; transform: translateX(-50%); z-index: 6; font-size: 17px; cursor: pointer;
+    animation: dangle 2.2s ease-in-out infinite; transform-origin: 50% -30px; filter: drop-shadow(0 2px 3px rgba(0,0,0,.5)); }
+  .spider i { position: absolute; left: 50%; bottom: 100%; width: 1px; height: 30px; background: rgba(230,230,230,.6); }
+  @keyframes dangle { 0%, 100% { transform: translateX(-50%) rotate(-6deg) translateY(0); } 50% { transform: translateX(-50%) rotate(6deg) translateY(5px); } }
+  .ratspot { position: absolute; left: 50%; bottom: -3px; transform: translateX(-50%); z-index: 7; font-size: 22px; cursor: pointer;
+    animation: ratrun .5s ease-out, ratwig .6s ease-in-out .5s infinite; filter: drop-shadow(0 2px 3px rgba(0,0,0,.5)); }
+  @keyframes ratrun { from { transform: translateX(-260px) scaleX(-1); } to { transform: translateX(-50%); } }
+  @keyframes ratwig { 0%, 100% { transform: translateX(-50%) rotate(-3deg); } 50% { transform: translateX(-46%) rotate(3deg); } }
+  .puddle { position: absolute; left: 50%; bottom: -8px; transform: translateX(-40%); width: 56%; height: 12px; border-radius: 50%; z-index: 2;
+    background: radial-gradient(rgba(240,214,90,.7), rgba(220,190,60,.25) 70%, transparent); }
+  #aimgame, #shakegame, #gfgame { display: none; position: absolute; inset: 0; z-index: 46; }
+  #aimgame.show, #shakegame.show, #gfgame.show { display: block; }
+  #aimgame { background: rgba(6,9,14,.28); cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: none; }
+  .ag-hud { position: absolute; left: 50%; top: 9%; transform: translateX(-50%); background: rgba(13,17,24,.94); border: 2px solid #e6b93d;
+    border-radius: 14px; padding: 8px 18px; font-weight: 900; font-size: clamp(16px, 5vw, 22px); white-space: nowrap; box-shadow: 0 0 22px rgba(230,185,61,.45); }
+  .ag-hud small { display: block; font-weight: bold; font-size: 11px; color: #b9c6d4; letter-spacing: .5px; }
+  .ag-bowl { position: absolute; left: 50%; top: 58%; width: 72%; height: 26px; transform: translate(-50%,-50%); }
+  .ag-target { position: absolute; left: 50%; top: 50%; width: 36%; height: 100%; transform: translate(-50%,-50%); border-radius: 50%;
+    border: 3px solid rgba(255,255,255,.85); background: rgba(160,210,255,.18); box-shadow: 0 0 18px rgba(120,190,255,.5); }
+  .ag-dot { position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%;
+    background: radial-gradient(#fff4a8, #e6c23d); box-shadow: 0 0 14px rgba(240,214,90,.9); }
+  #aimgame.miss .ag-dot { background: radial-gradient(#ffb0a8, #e6483d); }
+  .ag-meter { position: absolute; left: 50%; top: 68%; width: 60%; height: 8px; transform: translateX(-50%); border-radius: 4px; background: rgba(255,255,255,.15); overflow: hidden; }
+  .ag-meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #2fb46b, #6fe3a1); }
+  .ag-zones { position: absolute; inset: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 6%; pointer-events: none;
+    font-size: 42px; color: rgba(255,255,255,.35); font-weight: 900; }
+  #shakegame { cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+  .sg-card { position: absolute; left: 50%; top: 40%; transform: translate(-50%,-50%); background: rgba(13,17,24,.95); border: 2px solid #6fe3a1;
+    border-radius: 16px; padding: 14px 26px; text-align: center; box-shadow: 0 0 26px rgba(111,227,161,.45); animation: vpop .3s cubic-bezier(.2,1.6,.4,1) both; }
+  .sg-t { font-weight: 900; font-size: clamp(18px, 6vw, 26px); letter-spacing: 1px; }
+  .sg-pips { display: flex; gap: 10px; justify-content: center; margin: 10px 0 6px; }
+  .sg-pips i { width: 26px; height: 26px; border-radius: 50%; border: 3px solid #3a4a63; background: #16202c; transition: all .12s; }
+  .sg-pips i.on { background: #6fe3a1; border-color: #6fe3a1; box-shadow: 0 0 12px rgba(111,227,161,.8); transform: scale(1.15); }
+  .sg-pips i.bad { background: #e6483d; border-color: #e6483d; box-shadow: 0 0 12px rgba(230,72,61,.8); }
+  .sg-s { color: #b9c6d4; font-size: 13px; }
+  #gfgame { touch-action: none; user-select: none; -webkit-user-select: none; }
+  #gfcanvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; }
+  .gf-hud { position: absolute; left: 50%; top: 5%; transform: translateX(-50%); background: rgba(13,17,24,.94); border: 2px solid #e6c23d; border-radius: 14px;
+    padding: 7px 16px; font-weight: 900; font-size: clamp(14px, 4.4vw, 20px); white-space: nowrap; pointer-events: none; box-shadow: 0 0 22px rgba(230,194,61,.45); }
+  .gf-hud small { display: block; font-weight: bold; font-size: 11px; color: #b9c6d4; }
+  #gfdone { position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%); font-family: inherit; font-weight: 900; font-size: 17px; padding: 12px 34px;
+    border: none; border-radius: 12px; background: #e6c23d; color: #1b1400; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.45); }
+  #lesson #gfbtn { display: none; background: linear-gradient(#f0d24a, #d9ad2b); color: #1b1400; }
+  #lesson #gfbtn.show { display: block; }
+  #lesson #gfbtn small { display: block; font-weight: bold; font-size: 11px; color: #4a3a05; }
   @keyframes pipettl { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-1.3px); } 75% { transform: translateX(1.3px); } }
   .burstspray { position: absolute; left: 50%; transform: translateX(-50%); top: 22%; z-index: 4; font-size: 26px;
     animation: soapbob 0.7s ease-in-out infinite; }
@@ -1158,6 +1204,18 @@
         </div>
         <div class="bk-cards" id="drinkbtns"></div>
       </div>
+      <div id="aimgame">
+        <div class="ag-hud">🍺 AIM <small>tap LEFT / RIGHT to steady it</small></div>
+        <div class="ag-bowl"><div class="ag-target"></div><div class="ag-dot"></div></div>
+        <div class="ag-meter"><i></i></div>
+        <div class="ag-zones"><span>◀</span><span>▶</span></div>
+      </div>
+      <div id="shakegame"><div class="sg-card"><div class="sg-t">👋 TWO SHAKES</div><div class="sg-pips"><i></i><i></i><i></i></div><div class="sg-s">tap tap. <b>exactly</b> twice.</div></div></div>
+      <div id="gfgame">
+        <canvas id="gfcanvas"></canvas>
+        <div class="gf-hud">✍️ SWIPE YOUR NAME <small>on the tile · lift to pause · DONE when it's legible</small></div>
+        <button id="gfdone">DONE ✔</button>
+      </div>
       <div id="announce"><div class="aicon"></div><div class="atitle"></div><div class="asub"></div></div>
       <div id="verdict"></div>
       <div id="lesson">
@@ -1174,6 +1232,7 @@
         </div>
         <div id="attnote"></div>
 
+        <button id="gfbtn">✍️ WRITE YOUR NAME ON THE WALL<br><small>3-streak perk · legible = +100 · empties the bladder · skips the bar</small></button>
         <button id="nextbtn">NEXT →</button>
       </div>
     </div>
@@ -1286,6 +1345,8 @@ const PERSONAS = {
   lurker:   { chip: "🧍 (not going)", desc: "the lurker — not going, not leaving" },
   crooner:  { chip: "🎤 SWEET CAROLIIINE", desc: "the crooner mid-ballad" },
   boss:     { chip: "👔 got a minute?",    desc: "your boss. yes, here." },
+  kicks:    { chip: "👟 FRESH KICKS",      desc: "the guy in box-fresh white sneakers" },
+  awayfan:  { chip: "🧢 AWAY FAN",         desc: "an away fan. in OUR house." },
 };
 
 /* Detailed guy: varied build, hair, outfit, stance. facing: 'back' | 'front' */
@@ -1295,7 +1356,7 @@ function personSVG(persona, facing) {
   const shirt = pick(SHIRTS);
   const skin = pick(["#e8b48a", "#c68b5e", "#8d5a3b", "#f0c9a5", "#6b4429", "#a9764f"]);
   const pants = pick(["#3a4553", "#54606e", "#2e3a49", "#5b4a3a", "#37517a"]);
-  const shoe = pick(["#222", "#3a2c20", "#e8e8e8", "#553333"]);
+  const shoe = (persona === "kicks" || persona === "awayfan") ? "#fafafa" : pick(["#222", "#3a2c20", "#553333"]);
   const hairC = pick(["#2b2119", "#4a382a", "#111", "#6e6e6e", "#a5763a", "#8a8a8a"]);
   const torsoW = rand(32, 40);
   const x0 = 35 - torsoW / 2;
@@ -1928,12 +1989,18 @@ function careerLevel() { return Math.floor(careerPees() / 10) + 1; }
 const CAREER_LADDER = [
   null, // level 1: the base game
   { key: "wet",     icon: "⚠️", name: "WET FLOORS",          tease: "Caution signs appear at random spots. Slipping costs 2 seconds." },
+  { key: "rat",     icon: "🐀", name: "THE RAT",             tease: "Mid-round a rat sprints in and parks under a urinal. Nobody stands over a rat. TAP IT to scare it off: +50." },
   { key: "glancer", icon: "👀", name: "THE SIDE-GLANCER",    tease: "One guy can't keep his eyes to himself. Dividers don't stop a wandering neck." },
+  { key: "shakes",  icon: "👋", name: "TWO SHAKES",          tease: "After a perfect pick: tap twice. Exactly twice. Three is playing with it." },
   { key: "gamble",  icon: "🎲", name: "THE SEND-IT GAMBLE",  tease: "No good option? Going anyway is now a coin flip instead of a guaranteed splash." },
+  { key: "spider",  icon: "🕷️", name: "THE SPIDER",          tease: "A spider hangs over the best urinal. Brave it (70% +30, 30% it DROPS ON YOU) or tap it onto the neighbor." },
   { key: "soap",    icon: "🫧", name: "SOAP JACKPOT",        tease: "A soap dispenser worth tapping appears sometimes. Free hygiene points." },
   { key: "drift",   icon: "📱", name: "THE PHONE ZOMBIE",    tease: "Mid-round, a guy glued to his phone drifts one urinal over. The board changes under you." },
+  { key: "shoes",   icon: "👟", name: "NICE SHOES",          tease: "White sneakers = splash zone, give him room. Unless he's an AWAY FAN. Then his kicks are fair game: +40." },
   { key: "lurker",  icon: "🧍", name: "THE LURKER",          tease: "A guy standing at a urinal. Facing out. Not going. Not leaving. Needs the same wide berth as the glancer." },
+  { key: "aim",     icon: "🍺", name: "AIM",                 tease: "Two drinks deep, the stream sways. Tap left and right to keep it in the bowl. Miss = puddle, −20%." },
   { key: "crooner", icon: "🎤", name: "THE CROONER",         tease: "One patron is mid-ballad. His radius is bigger than his talent." },
+  { key: "graffiti", icon: "✍️", name: "WRITE YOUR NAME",    tease: "Every 3-streak: swipe your name on the wall. In piss. Legible = +100. It stays up in that city." },
   { key: "sniper",  icon: "🚪", name: "RUSH-HOUR WALK-INS",  tease: "Dawdle too long and someone walks in and TAKES the best spot." },
   { key: "chaos",   icon: "🌪️", name: "FULL CHAOS",          tease: "Every hazard can now stack in one room. You asked for this, legend." },
   { key: "fog",     icon: "🌫️", name: "FESTIVAL STEAM",      tease: "Some rooms open in a wall of steam — you can't see who's where until it lifts." },
@@ -2245,6 +2312,12 @@ function makeRound(idx) {
         const cand = occupiedIdx.filter(i => !spots[i].persona);
         if (cand.length) spots[gpick(cand)].persona = "boss";
       }
+      // nice shoes: the sneaker guy guards a splash zone; the away fan's kicks are fair game
+      if (mechanicOn("shoes") && layout !== "tub" && idx > 0 && chance(0.3)) {
+        const cand = occupiedIdx.filter(i => !spots[i].persona);
+        const rival = ["stadium", "divebar", "festival"].includes(plan.theme) && chance(0.5);
+        if (cand.length) spots[gpick(cand)].persona = rival ? "awayfan" : "kicks";
+      }
       occupiedIdx.forEach(i => {
         if (!spots[i].persona) spots[i].persona = grnd() < 0.3 ? gpick(["phone", "headphones"]) : "regular";
       });
@@ -2302,6 +2375,9 @@ function makeRound(idx) {
     if (layout !== "tub" && mechanicOn("wet") && idx > 0 && chance(Math.min(0.6, 0.3 * chaosB)) && freeIdx().length > 1) {
       wetAt = gpick(freeIdx());
     }
+    // last round's puddle is this round's wet floor — you did that
+    let puddleWet = false;
+    if (G.puddleNext && wetAt < 0 && layout !== "tub" && freeIdx().length > 1) { wetAt = gpick(freeIdx()); puddleWet = true; }
     // levels 11-20: the room keeps learning new tricks
     const taken = j => j === wetAt;
     let iceAt = -1, dogAt = -1, pipeAt = -1;
@@ -2327,7 +2403,8 @@ function makeRound(idx) {
     if (mechanicOn("draft") && layout === "wall" && idx > 1 && chance(0.25)) draftEnd = gpick([0, n - 1]);
 
     round = { idx, theme, themeKey: plan.theme, plan, n, spots, dividers, layout, luggageAt, time: plan.time,
-      hasBag, constructionAt, flickerAt, wetAt, iceAt, dogAt, pipeAt, fogged, fogLifted: false, newsSide, draftEnd,
+      hasBag, constructionAt, flickerAt, wetAt, puddleWet, iceAt, dogAt, pipeAt, fogged, fogLifted: false, newsSide, draftEnd,
+      spiderAt: -1, spiderGone: false, ratAt: -1, ratHere: -1, ratPending: false,
       attendant: layout === "wall" && chance(plan.attendant) };
     // mid-round events: a phone zombie drifting, or a walk-in taking the best spot
     round.driftAt = (mechanicOn("drift") && layout === "wall" && !plan.waitRound && idx > 0 && chance(0.28)) ? 0.55 : 0;
@@ -2343,6 +2420,18 @@ function makeRound(idx) {
     if (plan.waitRound && !isWait) continue;
     if (!plan.waitRound && isWait) continue;
     if (!plan.waitRound && round.selectable.length < 2 && idx > 0) continue;
+    // the juvenile tier — placed AFTER the board is proven fair, so it can only add flavor
+    const propped = j => j === wetAt || j === iceAt || j === dogAt || j === pipeAt;
+    if (mechanicOn("spider") && layout === "wall" && !plan.waitRound && idx > 0 && chance(0.22)) {
+      // it hangs over the BEST urinal: the brave pick, not a trap
+      const cand = round.bestSpots.filter(j => !propped(j));
+      if (cand.length) round.spiderAt = gpick(cand);
+    }
+    if (mechanicOn("rat") && layout === "wall" && !plan.waitRound && idx > 0 && !round.driftAt && !round.sniperAt &&
+        round.selectable.length >= 3 && chance(0.25)) {
+      const cand = round.selectable.filter(j => !propped(j) && j !== round.spiderAt);
+      if (cand.length) { round.ratAt = gpick(cand); round.ratPending = true; round.ratT = 0.62; }
+    }
     return round;
   }
   return round; // fallback: correctness keys off analyze(), so any layout still plays fair
@@ -2370,6 +2459,8 @@ function comfortOf(round, i) {
     if (spots[j].persona === "shifty") d -= 0.4;  // those eyes travel
     if (spots[j].persona === "lurker") d -= 0.4;  // he's facing the ROOM. watching.
     if (spots[j].persona === "crooner") d -= 0.35; // the ballad carries
+    if (spots[j].persona === "kicks") d -= 0.35;   // box-fresh. he WILL check them. splash zone.
+    if (spots[j].persona === "awayfan" && !sideBySide && d <= 2) d += 0.35; // one urinal between you: splashing range. Fair game.
     if (sideBySide) {
       hasAdjacent = true;
       if (spots[j].persona === "glasses") adjGlasses = true;
@@ -2394,8 +2485,9 @@ function comfortOf(round, i) {
   // the news crew's half of the room is ON AIR; the propped door voids one corner
   const onAir = round.newsSide >= 0 && (round.newsSide === 0 ? i < n / 2 : i >= n / 2);
   const endBonus = (isEnd && i !== round.draftEnd) ? 0.25 : 0;
-  return { raw: minRaw, eff, comfort: eff + endBonus - flickerPenalty - (onAir ? 0.3 : 0),
-    isEnd, onAir, flicker: round.flickerAt === i };
+  const ratPenalty = (round.ratHere === i) ? 2.0 : 0; // nobody stands over a rat: never the pro pick, always a bold one
+  return { raw: minRaw, eff, comfort: eff + endBonus - flickerPenalty - (onAir ? 0.3 : 0) - ratPenalty,
+    isEnd, onAir, flicker: round.flickerAt === i, rat: round.ratHere === i };
 }
 
 function analyze(round) {
@@ -2764,11 +2856,16 @@ function renderRound(round) {
     if (round.wetAt === i) inner += `<div class="wetsign">⚠️<span>WET<br>FLOOR</span></div>`;
     if (round.iceAt === i) inner += `<div class="icecube">🧊</div>`;
     if (round.dogAt === i) inner += `<div class="dogspot">🐕</div>`;
+    if (round.spiderAt === i && !round.spiderGone) inner += `<div class="spider" data-spider="1"><i></i>🕷️</div>`;
+    if (round.ratHere === i) inner += `<div class="ratspot" data-rat="1">🐀</div>`;
+    if (round.puddleAt === i) inner += `<div class="puddle"></div>`;
     if (round.pipeAt === i && !s.blocked) slot.classList.add("rattle");
     if (round.draftEnd === i) inner += `<div class="draftdoor">🚪💨</div>`;
     if (round.newsSide >= 0 && (round.newsSide === 0 ? i < round.n / 2 : i >= round.n / 2)) slot.classList.add("oncam");
     slot.innerHTML = inner;
     slot.addEventListener("click", () => onSlot(i));
+    const sp2 = slot.querySelector("[data-spider]"); if (sp2) sp2.addEventListener("click", e => { e.stopPropagation(); onSpider(); });
+    const rt2 = slot.querySelector("[data-rat]"); if (rt2) rt2.addEventListener("click", e => { e.stopPropagation(); onRat(); });
     (far ? rowfar : row).appendChild(slot);
     if (round.dividers && i < round.n - 1) {
       const d = document.createElement("div");
@@ -2840,6 +2937,22 @@ function gainScore(pts, kind) {
 
 /* Rewards and taxes that ride along with a successful pick. */
 function postPickBonuses(r, i) {
+  if (r.spiderBrave && i === r.spiderAt) {
+    gainScore(30, "mid");
+    setTimeout(() => toast("🕷️ NERVES OF STEEL. It never moved. +30."), 400);
+  }
+  if (r.layout !== "tub") {
+    const fanNear = r.spots.some((s, j) => s.occupant && s.persona === "awayfan" && Math.abs(j - i) <= 2);
+    if (fanNear) {
+      gainScore(40, "mid");
+      setTimeout(() => toast("👟 SPLASHED THE AWAY FAN'S KICKS. The city approves. +40"), 700);
+      if ($("scene").classList.contains("mode3d") && T3.X) { T3.lookAtX = T3.X(i); T3.lookUntil = performance.now() + 1800; }
+    }
+  }
+  if (G.aimSteady) {
+    gainScore(40, "mid");
+    setTimeout(() => toast("🍺 STEADY HANDS. Hammered, and not a drop wasted. +40"), 1100);
+  }
   if (i === r.iceAt) {
     gainScore(15, "mid");
     setTimeout(() => toast("🧊 ICED IT — stadium tradition upheld. +15."), 500);
@@ -2919,6 +3032,7 @@ function runTimer() {
       if (r0.sniperPending && frac <= r0.sniperAt) { r0.sniperPending = false; doSniper(r0); }
       if (r0.pipePending && frac <= 0.5) { r0.pipePending = false; doPipeBurst(r0); }
       if (r0.powerPending && frac <= r0.powerAt) { r0.powerPending = false; doPower(); }
+      if (r0.ratPending && frac <= r0.ratT) { r0.ratPending = false; doRat(r0); }
     }
     const p = Math.max(0, G.timeLeft / G.timerTotal * 100);
     bar.style.width = p + "%";
@@ -2982,6 +3096,54 @@ function doPipeBurst(r) {
 }
 
 /* Lights out. Clock on. */
+/* The rat: sprints in, parks under a urinal, and everyone near it takes a step away. */
+function doRat(r) {
+  if (r !== G.cur || G.locked || r.ratAt < 0 || r.spots[r.ratAt].occupant || r.spots[r.ratAt].blocked) return;
+  r.ratHere = r.ratAt;
+  const moves = [];
+  [r.ratAt - 1, r.ratAt + 1].forEach((j, k) => {
+    const away = k ? j + 1 : j - 1;
+    if (j < 0 || j >= r.n || !r.spots[j].occupant || r.spots[j].persona === "lurker") return;
+    if (away < 0 || away >= r.n || r.spots[away].occupant || r.spots[away].blocked || away === r.wetAt) return;
+    r.spots[away].occupant = r.spots[j].occupant; r.spots[away].persona = r.spots[j].persona;
+    r.spots[j].occupant = null; r.spots[j].persona = undefined;
+    moves.push([j, away]);
+  });
+  analyze(r);
+  renderRound(r);
+  if ($("scene").classList.contains("mode3d")) { t3RatRun(r.ratHere); moves.forEach(([a, b]) => t3Shuffle(a, b)); }
+  buzz([20, 10, 20, 10, 40]); tone(1400, .06, "square", .05); tone(1700, .06, "square", .05, .07);
+  toast(moves.length ? "🐀 RAT! Everyone jumped a spot. TAP IT to scare it off." : "🐀 RAT! Nobody stands over a rat. TAP IT.");
+}
+function onRat() {
+  const r = G.cur;
+  if (!r || G.locked || r.ratHere < 0) return;
+  r.ratHere = -1; r.ratGone = true;
+  gainScore(50, "mid");
+  buzz([30, 20, 30]); tone(900, .08, "square", .06); tone(1800, .12, "sine", .05, .08);
+  analyze(r);
+  renderRound(r);
+  toast("🐀 EXTERMINATOR +50. He's gone. Board's back.");
+}
+/* The spider: tap it and it lands on the neighbor, who leaves in a hurry. */
+function onSpider() {
+  const r = G.cur;
+  if (!r || G.locked || r.spiderAt < 0 || r.spiderGone) return;
+  r.spiderGone = true;
+  const j = [r.spiderAt - 1, r.spiderAt + 1].find(k => k >= 0 && k < r.n && r.spots[k].occupant);
+  if (j != null) {
+    r.spots[j].occupant = null; r.spots[j].persona = undefined;
+    gainScore(20, "mid");
+    toast("🕷️ FLICKED IT ONTO HIM. He left. +20");
+  } else {
+    gainScore(10, "mid");
+    toast("🕷️ Squished. +10. Nobody saw.");
+  }
+  buzz([15, 10, 25]); tone(520, .08, "square", .05); tone(260, .16, "sawtooth", .05, .08);
+  analyze(r);
+  renderRound(r);
+}
+
 function doPower() {
   const b = $("blackout");
   b.classList.add("on");
@@ -3441,7 +3603,7 @@ function resolveChoice(i) {
     if ((r.stallTried || desperate() || G.stalls <= 0) && sc.comfort >= r.bestComfort - 0.01) {
       const drinksAtPick = G.drinks;
       G.streak++; G.trail.push("😬");
-      const pts = Math.round(80 * buzzMult());
+      const pts = Math.round(80 * buzzMult() * aimMult());
       gainScore(pts, "ok"); G.perfects++;
       relieve(); addPee();
       buzz([30, 20, 30]); sfx.ok();
@@ -3488,7 +3650,7 @@ function resolveChoice(i) {
   if (sc.comfort >= r.bestComfort - 0.01) {
     G.streak++; G.trail.push("🟩");
     const mult = 1 + Math.min(0.5, (G.streak - 1) * 0.1);
-    const pts = Math.round((100 + speedBonus) * mult * buzzMult());
+    const pts = Math.round((100 + speedBonus) * mult * buzzMult() * aimMult());
     const buzzNote = G.held.length ? ` ${heldIcons()} +${buzzPct()}% buzz bonus!` : "";
     gainScore(pts, "big"); G.perfects++;
     relieve(); addPee();
@@ -3497,13 +3659,17 @@ function resolveChoice(i) {
     markSlot(i, "chosen-good"); postPickBonuses(r, i);
     sparkleAt(i);
     flashTint("rgba(47,180,107,.22)");
-    showLesson("Textbook etiquette. 👌",
-      `Nailed it.${G.streak >= 3 ? ` 🔥 ${G.streak}-streak!` : ""}${buzzNote}`, pts,
-      `Optimal pick: ${describeBest(r)}.`);
-    if (r.attendant) showAttendant(); else showDrinkOffer();
+    const after = () => {
+      showLesson("Textbook etiquette. 👌",
+        `Nailed it.${G.streak >= 3 ? ` 🔥 ${G.streak}-streak!` : ""}${buzzNote}${aimNote()}`, pts,
+        `Optimal pick: ${describeBest(r)}.`);
+      if (graffitiEligible(r)) offerGraffiti();
+      else if (r.attendant) showAttendant(); else showDrinkOffer();
+    };
+    if (mechanicOn("shakes")) runShakes(i, after); else after();
   } else if (sc.eff > 1.0) {
     G.streak = 0; G.trail.push("🟨");
-    const pts = Math.round(40 * buzzMult());
+    const pts = Math.round(40 * buzzMult() * aimMult());
     gainScore(pts, "mid");
     relieve(); addPee();
     buzz([15, 30, 15]); sfx.ok();
@@ -3513,9 +3679,12 @@ function resolveChoice(i) {
       `Safe — but the ✔ spot beat yours. Streak reset.` +
       (i === r.draftEnd ? ` 🚪💨 Drafty end.` : "") +
       (sc.onAir ? ` 🎥 You were ON AIR.` : "") +
-      (sc.flicker ? ` 💡 Under the dying light. Bold.` : ""), pts,
+      (sc.rat ? ` 🐀 Over the rat. Bold.` : "") +
+      (sc.flicker ? ` 💡 Under the dying light. Bold.` : "") + aimNote(), pts,
       `The pros would take ${describeBest(r)}.` +
-      (i === r.draftEnd ? ` The propped door voids your corner bonus — that's the whole gap.` : ""));
+      (i === r.draftEnd ? ` The propped door voids your corner bonus — that's the whole gap.` : "") +
+      (sc.rat ? ` Nobody stands over a rat — tapping it first would have cleared the spot.` : "") +
+      (r.spots.some(s => s.persona === "kicks") && Math.abs(r.spots.findIndex(s => s.persona === "kicks") - i) <= 2 ? ` 👟 Too close to the fresh kicks — that's a splash zone.` : ""));
     if (r.attendant) showAttendant(); else showDrinkOffer();
   } else {
     relieve();
@@ -3571,6 +3740,266 @@ function pissSelf(reason) {
   updateHUD();
 }
 
+/* ---------- AIM: two drinks deep, the stream has opinions ----------
+   1.6 seconds. The dot drifts; taps on the left/right half shove it back.
+   Inside the bowl 60%+ of the time = STEADY HANDS (+40). Less = a puddle, −20%, and
+   next round opens with a wet floor you personally created. */
+const AIM_BOWL = 0.5;
+const AIM = { active: false, i: -1, off: 0, vel: 0, bias: 1, t0: 0, last: 0, inside: 0, frames: 0, done: null, raf: null };
+function aimApplies() { return G.cur && mechanicOn("aim") && G.held.length >= 2 && G.cur.layout !== "tub"; }
+function aimMult() { return G.aimMiss ? 0.8 : 1; }
+function aimNote() { return G.aimMiss ? " 🍺 Puddle. −20%." : G.aimSteady ? " 🍺 Steady hands." : ""; }
+function startAim(i, done) {
+  Object.assign(AIM, { active: true, i, off: 0, vel: 0, bias: Math.random() < 0.5 ? -1 : 1, t0: performance.now(), last: performance.now(), inside: 0, frames: 0, done });
+  const ag = $("aimgame");
+  ag.classList.remove("miss"); ag.classList.add("show");
+  ag.querySelector(".ag-meter i").style.width = "0%";
+  buzz([20, 30, 20]); tone(300, .12, "sine", .05);
+  if (AIM.raf) cancelAnimationFrame(AIM.raf);
+  AIM.raf = requestAnimationFrame(aimFrame);
+}
+function aimNudge(dir) {
+  if (!AIM.active) return;
+  AIM.off += dir * 0.2; AIM.vel *= 0.5; // a shove, and it kills most of the drift
+  buzz(8); tone(dir > 0 ? 620 : 520, .05, "square", .04);
+}
+function aimFrame(now) {
+  if (!AIM.active) return;
+  // fixed 60Hz substeps: the sway is identical on a 120Hz phone and a struggling tablet
+  const steps = Math.min(15, Math.round((now - AIM.last) / 16.7));
+  const drunk = 0.7 + Math.min(1.3, G.held.length * 0.3);
+  for (let k = 0; k < steps; k++) {
+    AIM.last += 16.7;
+    const ts = (AIM.last - AIM.t0) / 1000;
+    // the sway: a slow lean plus a wobble, both scaled by how drunk you are
+    AIM.vel += (AIM.bias * (0.0017 + Math.sin(ts * 5.3) * 0.0012) + Math.sin(ts * 11.7) * 0.0005) * drunk;
+    AIM.vel *= 0.9; // heavy damping: the lean is steady, not a rocket. No taps = out in half a second.
+    AIM.off = Math.max(-1.35, Math.min(1.35, AIM.off + AIM.vel));
+    AIM.frames++; if (Math.abs(AIM.off) < AIM_BOWL) AIM.inside++;
+  }
+  const t = (now - AIM.t0) / 1000;
+  const ag = $("aimgame");
+  ag.querySelector(".ag-dot").style.left = (50 + AIM.off * 30) + "%";
+  ag.classList.toggle("miss", Math.abs(AIM.off) >= AIM_BOWL);
+  ag.querySelector(".ag-meter i").style.width = Math.min(100, t / 1.6 * 100) + "%";
+  if (t >= 1.6) { endAim(); return; }
+  AIM.raf = requestAnimationFrame(aimFrame);
+}
+function endAim() {
+  AIM.active = false; AIM.raf = null;
+  $("aimgame").classList.remove("show");
+  const frac = AIM.frames ? AIM.inside / AIM.frames : 0;
+  const r = G.cur, i = AIM.i;
+  if (frac >= 0.6) {
+    G.aimSteady = true;
+    buzz([20, 20, 40]); tone(880, .08, "sine", .06); tone(1320, .12, "sine", .05, .08);
+  } else {
+    G.aimMiss = true; G.puddleNext = true;
+    if (r) {
+      r.puddleAt = i; r.puddleOff = AIM.off > 0 ? 1 : -1;
+      const el = slotEl(i); if (el && !el.querySelector(".puddle")) { const p = document.createElement("div"); p.className = "puddle"; el.appendChild(p); }
+      if ($("scene").classList.contains("mode3d") && T3.X) t3Puddle(T3.X(i), r.puddleOff);
+    }
+    buzz([60, 30, 90]); tone(200, .3, "sawtooth", .07);
+    toast("💦 ON THE FLOOR. −20%. That's a wet floor next round. Yours.");
+  }
+  const done = AIM.done; AIM.done = null;
+  if (done) done();
+}
+
+/* ---------- TWO SHAKES: the one rule everybody knows ---------- */
+const SHK = { active: false, n: 0, t0: 0, first: 0, after: null, timer: null, i: -1 };
+function runShakes(i, after) {
+  Object.assign(SHK, { active: true, n: 0, t0: performance.now(), first: 0, after, i });
+  const sg = $("shakegame");
+  sg.querySelectorAll(".sg-pips i").forEach(p => { p.className = ""; });
+  sg.classList.add("show");
+  clearTimeout(SHK.timer); clearTimeout(SHK.cap);
+  SHK.timer = setTimeout(endShakes, 2000); // no taps at all is its own answer
+  SHK.cap = setTimeout(endShakes, 2600);   // and nothing keeps the prompt alive past this
+}
+function shakeTap() {
+  if (!SHK.active) return;
+  SHK.n++;
+  if (SHK.n === 1) { SHK.first = performance.now(); clearTimeout(SHK.timer); SHK.timer = setTimeout(endShakes, 1100); }
+  const pips = $("shakegame").querySelectorAll(".sg-pips i");
+  pips.forEach((p, k) => { p.className = k < SHK.n ? (k >= 2 ? "bad" : "on") : ""; });
+  if (SHK.n === 3) { clearTimeout(SHK.timer); SHK.timer = setTimeout(endShakes, 250); } // spamming past three changes nothing
+  buzz(10); tone(SHK.n >= 3 ? 220 : 700 + SHK.n * 120, .05, "square", .05);
+}
+function endShakes() {
+  if (!SHK.active) return;
+  SHK.active = false; clearTimeout(SHK.timer); clearTimeout(SHK.cap);
+  $("shakegame").classList.remove("show");
+  const n = SHK.n;
+  if (n === 2) { gainScore(10, "mid"); toast("👋 TWO SHAKES. Clean. +10"); buzz([15, 10, 15]); tone(990, .08, "sine", .06); }
+  else if (n >= 3) {
+    gainScore(-15, "bad"); toast("👋 THAT'S PLAYING WITH IT. −15. He noticed."); buzz([60, 40, 60]); tone(180, .3, "sawtooth", .07);
+    if ($("scene").classList.contains("mode3d") && T3.X) { T3.lookAtX = T3.X(SHK.i); T3.lookUntil = performance.now() + 1800; }
+  }
+  else { gainScore(-5, "bad"); toast(n === 1 ? "👋 One shake? …drip. −5" : "👋 No shakes. Drip. −5"); buzz(30); tone(300, .12, "sine", .05); }
+  const after = SHK.after; SHK.after = null;
+  if (after) setTimeout(after, 350);
+}
+
+/* ---------- WRITE YOUR NAME: the 3-streak perk, in the only medium available ---------- */
+const GF = { active: false, i: -1, down: false, strokes: 0, pts: 0, drips: [], raf: null, tile: null, wall: null, last: null, dpr: 1 };
+function tagKey() { const pk = THEMES.stadium.parkRef; return (pk ? pk.park : "road") + "|" + (G.cur ? G.cur.themeKey : "x"); }
+function savedTag() { const all = readJSON("ut_tags", {}); return all[tagKey()] || null; }
+function graffitiEligible(r) { return mechanicOn("graffiti") && r.layout === "wall" && G.streak >= 3 && G.streak % 3 === 0 && G.mode !== "daily"; }
+function offerGraffiti() {
+  $("gfbtn").classList.add("show");
+  setTimeout(() => announce("✍️", "THE WALL IS YOURS", "3-streak perk: write your name. Legible = +100. It stays up in this city.", 1900, "good"), 500);
+}
+function startGraffiti() {
+  const r = G.cur; if (!r) return;
+  $("gfbtn").classList.remove("show");
+  $("lesson").classList.remove("show");
+  $("scene").classList.remove("scoring"); $("scene").classList.add("review"); // lights up: you need to see the wall
+  $("verdict").className = "";
+  const i = G.lastPick >= 0 ? G.lastPick : 0;
+  Object.assign(GF, { active: true, i, down: false, strokes: 0, pts: 0, drips: [], wall: null, last: null });
+  const gg = $("gfgame"), cv = $("gfcanvas");
+  gg.classList.add("show");
+  const rect = $("scene").getBoundingClientRect();
+  GF.dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(rect.width * GF.dpr); cv.height = Math.round(rect.height * GF.dpr);
+  // the tile: a wall rectangle above your urinal. In 3D the camera walks right up to it —
+  // a name needs a whole screen, not a postage stamp.
+  const in3d = $("scene").classList.contains("mode3d") && T3.X && T3.cam;
+  if (in3d) {
+    const x = Math.max(-T3.roomW / 2 + 1, Math.min(T3.roomW / 2 - 1, T3.X(i)));
+    const TW = 1.4, TH = 0.84, TY = 2.08;
+    const d = Math.max(1.6, (TW / 0.78) / (2 * Math.tan(T3.cam.fov * Math.PI / 360) * (T3.cam.aspect || 0.6)));
+    GF.camSave = { from: T3.camFrom.clone(), to: T3.camTo.clone(), look: T3.look.clone() };
+    T3.camFrom = T3.cam.position.clone();
+    T3.camTo = new THREE.Vector3(x, TY - 0.05, d);
+    T3.look = new THREE.Vector3(x, TY, 0);
+    T3.camT = 0; T3.camSpeed = 0.05; // quick dolly-in
+    // project the tile with the camera where it's GOING to be
+    const vc = T3.cam.clone(); vc.position.copy(T3.camTo); vc.lookAt(T3.look); vc.updateMatrixWorld(true);
+    const proj = v => { const p = v.clone().project(vc); return { x: (p.x * 0.5 + 0.5) * rect.width, y: (-p.y * 0.5 + 0.5) * rect.height }; };
+    const a = proj(new THREE.Vector3(x - TW / 2, TY + TH / 2, 0.03)), b = proj(new THREE.Vector3(x + TW / 2, TY - TH / 2, 0.03));
+    GF.tile = { x: a.x, y: a.y, w: b.x - a.x, h: b.y - a.y, wx: x, ww: TW, wh: TH, wy: TY };
+  } else {
+    GF.tile = { x: rect.width * 0.15, y: rect.height * 0.16, w: rect.width * 0.7, h: rect.height * 0.3, wx: 0, ww: 1.4, wh: 0.84, wy: 2.08 };
+  }
+  gfDraw();
+  buzz([20, 20, 20]); sfx.good();
+  if (GF.raf) cancelAnimationFrame(GF.raf);
+  GF.raf = requestAnimationFrame(gfFrame);
+}
+function gfPoint(e) {
+  const rect = $("scene").getBoundingClientRect();
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top, rect };
+}
+function gfDown(e) {
+  if (!GF.active) return;
+  e.preventDefault(); e.stopPropagation();
+  if ($("scene").classList.contains("mode3d") && T3.camT < 1) return; // still walking up to the wall
+  const p = gfPoint(e);
+  GF.down = true; GF.strokes++; GF.last = p;
+  GF.wall = ($("scene").classList.contains("mode3d") && T3.cam) ? t3WallPoint(p.x, p.y, p.rect) : null;
+  gfStroke(p, p);
+}
+function gfMove(e) {
+  if (!GF.active || !GF.down) return;
+  e.preventDefault(); e.stopPropagation();
+  const p = gfPoint(e);
+  gfStroke(GF.last, p); GF.last = p;
+  GF.wall = ($("scene").classList.contains("mode3d") && T3.cam) ? t3WallPoint(p.x, p.y, p.rect) : null;
+  if (Math.random() < 0.14) GF.drips.push({ x: p.x, y: p.y, len: 0, max: rnd(10, 34), w: rnd(2, 4) });
+}
+function gfUp(e) { if (!GF.active) return; if (e) { e.preventDefault(); e.stopPropagation(); } GF.down = false; }
+function gfStroke(a, b) {
+  const cv = $("gfcanvas"), x = cv.getContext("2d"), d = GF.dpr;
+  const inTile = q => q.x >= GF.tile.x && q.x <= GF.tile.x + GF.tile.w && q.y >= GF.tile.y && q.y <= GF.tile.y + GF.tile.h;
+  x.lineCap = "round"; x.lineJoin = "round";
+  x.strokeStyle = inTile(b) ? "rgba(236,204,72,.92)" : "rgba(236,204,72,.45)";
+  x.lineWidth = 9 * d;
+  x.beginPath(); x.moveTo(a.x * d, a.y * d); x.lineTo(b.x * d, b.y * d); x.stroke();
+  if (inTile(b)) GF.pts++;
+  if (Math.random() < 0.5) { tone(rnd(700, 1100), .03, "sine", .012); }
+}
+function gfDraw() {
+  const cv = $("gfcanvas"), x = cv.getContext("2d"), d = GF.dpr, t = GF.tile;
+  x.save();
+  x.fillStyle = "rgba(0,0,0,.22)"; x.fillRect(t.x * d, t.y * d, t.w * d, t.h * d);
+  x.strokeStyle = "rgba(240,210,74,.9)"; x.lineWidth = 3 * d; x.setLineDash([10 * d, 7 * d]);
+  x.strokeRect(t.x * d, t.y * d, t.w * d, t.h * d);
+  x.restore();
+}
+function gfFrame(now) {
+  if (!GF.active) { GF.raf = null; return; }
+  const cv = $("gfcanvas"), x = cv.getContext("2d"), d = GF.dpr;
+  GF.drips.forEach(dr => {
+    if (dr.len >= dr.max) return;
+    const nl = Math.min(dr.max, dr.len + 0.45);
+    x.strokeStyle = "rgba(236,204,72,.8)"; x.lineCap = "round"; x.lineWidth = dr.w * d;
+    x.beginPath(); x.moveTo(dr.x * d, (dr.y + dr.len) * d); x.lineTo(dr.x * d, (dr.y + nl) * d); x.stroke();
+    dr.len = nl;
+  });
+  GF.raf = requestAnimationFrame(gfFrame);
+}
+function finishGraffiti() {
+  if (!GF.active) return;
+  GF.active = false; GF.down = false;
+  if (GF.raf) cancelAnimationFrame(GF.raf); GF.raf = null;
+  const cv = $("gfcanvas"), d = GF.dpr, t = GF.tile;
+  // judge: how much of the tile did you actually cover, and did it span the tile?
+  let painted = 0, minX = 1e9, maxX = -1;
+  try {
+    const img = cv.getContext("2d").getImageData(Math.round(t.x * d), Math.round(t.y * d), Math.max(1, Math.round(t.w * d)), Math.max(1, Math.round(t.h * d)));
+    const w = img.width;
+    for (let k = 3, px = 0; k < img.data.length; k += 4, px++) {
+      if (img.data[k] > 120) { painted++; const cx = px % w; if (cx < minX) minX = cx; if (cx > maxX) maxX = cx; }
+    }
+    var coverage = painted / (img.width * img.height), span = maxX > minX ? (maxX - minX) / w : 0;
+  } catch (e) { coverage = GF.pts > 40 ? 0.1 : 0; span = GF.strokes >= 2 ? 0.5 : 0; }
+  const legible = coverage >= 0.045 && coverage <= 0.6 && span >= 0.35 && GF.strokes >= 2;
+  // bake the tile and remember it for this building
+  let dataURL = null;
+  try {
+    const bake = document.createElement("canvas"); bake.width = 384; bake.height = 230;
+    bake.getContext("2d").drawImage(cv, t.x * d, t.y * d, t.w * d, t.h * d, 0, 0, 384, 230);
+    dataURL = bake.toDataURL("image/png");
+    const all = readJSON("ut_tags", {});
+    all[tagKey()] = { img: dataURL, x: t.wx, s: (t.ww || 1.4) / 1.3, legible, day: dayNumber() };
+    writeJSON("ut_tags", all);
+  } catch (e) {}
+  $("gfgame").classList.remove("show");
+  if (GF.camSave && T3.cam) { // walk back to where you were
+    T3.camFrom = T3.cam.position.clone(); T3.camTo = GF.camSave.to; T3.look = GF.camSave.look; T3.camT = 0; T3.camSpeed = 0.03;
+    GF.camSave = null;
+  }
+  // the costs and the payoff
+  const r = G.cur;
+  G.held = []; G.drinks = 0;
+  const witnessed = r && r.spots.some(s => s.occupant && (s.persona === "boss" || s.persona === "glasses"));
+  if (witnessed) G.wanted = true;
+  const pts = legible ? 100 : 25;
+  gainScore(pts, legible ? "big" : "mid");
+  G.trail.push("✍️");
+  if (legible) { buzz([40, 30, 40, 30, 80]); sfx.good(); verdict("LEGEND ✍️", "good"); }
+  else { buzz([30, 20, 30]); sfx.ok(); verdict("…SLOPPY ✍️", "ok"); }
+  if ($("scene").classList.contains("mode3d") && T3.group && dataURL) {
+    const bid = T3.buildId;
+    new THREE.TextureLoader().load(dataURL, tx => {
+      if (T3.buildId !== bid) { tx.dispose(); return; }
+      tx.colorSpace = THREE.SRGBColorSpace;
+      const pl = new THREE.Mesh(new THREE.PlaneGeometry(t.ww || 1.4, t.wh || 0.84), new THREE.MeshBasicMaterial({ map: tx, transparent: true, toneMapped: false }));
+      pl.position.set(t.wx, t.wy || 2.08, 0.034);
+      T3.group.add(pl);
+    });
+  }
+  showLesson(legible ? "It's up. It's legible. It's yours." : "It's up. Nobody can read it.",
+    (legible ? `LEGEND. Bladder: empty.` : `Sloppy — but it stays. Bladder: empty.`) +
+    (witnessed ? ` 👀 <b>Someone saw.</b> The attendant charges double on your next stall.` : ""), pts,
+    `Your tag stays on this wall every time you're back in this building. ${legible ? "Cover the tile with two or more strokes, edge to edge — you did." : "Legible means two or more strokes spanning the tile. Try edge to edge next time."}`);
+  $("nextbtn").style.display = "";
+  updateHUD();
+}
+
 /* ---------- input ---------- */
 function onSlot(i) {
   if (G.locked) return;
@@ -3589,7 +4018,7 @@ function onSlot(i) {
     gainScore(5, "mid");
     toast("🐕 He's SUCH a good boy. −1s, +5. Worth it.");
     buzz([15, 10, 15]); tone(980, .08, "sine", .06); tone(1240, .1, "sine", .05, .08);
-    resolveChoice(i);
+    goResolve(i);
     return;
   }
   if (!s.blocked && i === r.wetAt) {
@@ -3600,7 +4029,25 @@ function onSlot(i) {
     buzz([50, 30, 80]); tone(700, .12, "square", .07); tone(220, .25, "sawtooth", .07, .1);
     toast("🛼 WET FLOOR — you skated. −2s off your speed bonus.");
     const r0 = r; // if anything replaces the round mid-slide, the pick dies with it
-    setTimeout(() => { sw.classList.remove("slipping"); if (G.cur === r0) resolveChoice(i); }, 650);
+    setTimeout(() => { sw.classList.remove("slipping"); if (G.cur === r0) goResolve(i); }, 650);
+    return;
+  }
+  if (!s.blocked && i === r.spiderAt && !r.spiderGone) {
+    // the brave pick: 70% nerves of steel, 30% it drops on you. Unseeded — your nerve is your own.
+    if (Math.random() < 0.7) {
+      r.spiderBrave = true;
+      buzz(15);
+      goResolve(i);
+      return;
+    }
+    G.timeLeft = Math.max(0, G.timeLeft - 2);
+    r.spiderDropped = true; r.spiderGone = true;
+    const sw = $("scenewrap");
+    sw.classList.remove("slipping"); void sw.offsetWidth; sw.classList.add("slipping");
+    buzz([200, 40, 200, 40, 300]); tone(1800, .18, "sawtooth", .07); tone(2400, .25, "square", .05, .1);
+    toast("🕷️ IT DROPPED ON YOU. −2s. Scream internally.");
+    const r0 = r;
+    setTimeout(() => { sw.classList.remove("slipping"); if (G.cur === r0) goResolve(i); }, 700);
     return;
   }
   if (s.blocked) {
@@ -3623,7 +4070,13 @@ function onSlot(i) {
     updateHUD();
     return;
   }
-  resolveChoice(i);
+  goResolve(i);
+}
+/* Two drinks deep, the stream sways: AIM first, then the pick resolves. */
+function goResolve(i) {
+  G.lastPick = i;
+  if (aimApplies()) startAim(i, () => resolveChoice(i));
+  else resolveChoice(i);
 }
 
 /* ---------- the stall gamble: limited, slow, and sometimes occupied ---------- */
@@ -3695,11 +4148,14 @@ function stallNoPaper() {
 }
 
 function stallOccupied() {
-  G.timeLeft = Math.max(0.8, G.timeLeft - STALL_COST);
+  const cost = G.wanted ? STALL_COST * 2 : STALL_COST; // the attendant remembers the wall
+  const wantedNote = G.wanted ? " (DOUBLE — the attendant saw your tag) " : "";
+  G.wanted = false;
+  G.timeLeft = Math.max(0.8, G.timeLeft - cost);
   G.locked = false;
   buzz([80, 50, 80]);
   tone(160, .35, "sawtooth", .09);
-  announce("🚫", "OCCUPIED.", `"…someone's IN here!" — you lost ~${STALL_COST}s and a stall wait. ` +
+  announce("🚫", "OCCUPIED.", `"…someone's IN here!" — you lost ~${cost}s${wantedNote} and a stall wait. ` +
     `${G.stalls > 0 ? `${G.stalls} left. ` : "That was your last one. "}Pick a spot. NOW.`, 2000, "warn");
   updateHUD();
   resumeTimer();
@@ -3725,7 +4181,11 @@ function startRound() {
   $("attnote").classList.remove("show");
   $("nextbtn").style.display = "";
   $("verdict").className = "";
+  $("gfbtn").classList.remove("show");
+  ["aimgame", "shakegame", "gfgame"].forEach(id => $(id).classList.remove("show"));
+  AIM.active = false; SHK.active = false; GF.active = false;
   G.cur = makeRound(G.round);
+  G.puddleNext = false; G.aimSteady = false; G.aimMiss = false;
   renderRound(G.cur);
   updateHUD();
   // camera dolly: walk into the room
@@ -3765,6 +4225,12 @@ function startRound() {
   if (G.cur.dogAt >= 0) hazards.push("🐕 a very good boy");
   if (G.cur.draftEnd >= 0) hazards.push("🚪 door propped — that corner's exposed");
   if (G.cur.iceAt >= 0) hazards.push("🧊 iced urinal — tradition");
+  if (G.cur.puddleWet) hazards.push("💦 your puddle from last round");
+  if (G.cur.spiderAt >= 0) hazards.push("🕷️ a spider over the best urinal");
+  if (G.cur.spots.some(s => s.persona === "kicks")) hazards.push("👟 fresh kicks — splash zone");
+  if (G.cur.spots.some(s => s.persona === "awayfan")) hazards.push("🧢 an away fan — his kicks are fair game");
+  if (aimApplies()) hazards.push("🍺 buzzed — you'll have to AIM");
+  if (G.cur.layout === "wall" && savedTag()) hazards.push("✍️ your tag's still up");
   if (G.climate) hazards.push(G.climate.hud);
   const hazardNote = hazards.length ? ` · ${hazards.join(" · ")}` : "";
   const pkIntro = THEMES.stadium.parkRef;
@@ -4356,9 +4822,9 @@ function t3Tag(text, colorHex) {
   return sp;
 }
 /* Only the personas whose presence changes the MATH get a tag — flavor stays quiet. */
-const TAGGED = { glasses: "#ff2d2d", shifty: "#ffd76a", lurker: "#9fc4e8", crooner: "#d0a0ff", boss: "#9fe0b8" };
+const TAGGED = { glasses: "#ff2d2d", shifty: "#ffd76a", lurker: "#9fc4e8", crooner: "#d0a0ff", boss: "#9fe0b8", kicks: "#ffffff", awayfan: "#8fe3a8" };
 /* Short, punchy labels for the 3D floor — the 2D chips are chattier than a billboard allows. */
-const TAG_TEXT = { glasses: "🔴 REC", shifty: "👀 EYES", lurker: "🧍 NOT GOING", crooner: "🎤 SINGING", boss: "👔 YOUR BOSS" };
+const TAG_TEXT = { glasses: "🔴 REC", shifty: "👀 EYES", lurker: "🧍 NOT GOING", crooner: "🎤 SINGING", boss: "👔 YOUR BOSS", kicks: "👟 FRESH KICKS", awayfan: "🧢 AWAY FAN" };
 
 function t3Person(persona, shirtHex, front) {
   const g = new THREE.Group();
@@ -4375,6 +4841,14 @@ function t3Person(persona, shirtHex, front) {
     hip.add(leg);
     g.add(hip);
     g.userData.legs.push(hip);
+  }
+  // everyone gets shoes; the sneaker guy and the away fan get the box-fresh whites
+  const whites = persona === "kicks" || persona === "awayfan";
+  for (const lx of [-0.07, 0.07]) {
+    const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.055, 0.19), smat(whites ? 0xf7f7f7 : 0x262626, whites ? 0.35 : 0.8));
+    shoe.position.set(lx, 0.028, -0.02);
+    g.add(shoe);
+    if (whites) { const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.104, 0.012, 0.19), smat(0xd94848, 0.5)); stripe.position.set(lx, 0.02, -0.02); g.add(stripe); }
   }
   const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.17, 0.36, 6, 14), shirtM);
   torso.position.y = 0.74;
@@ -4414,6 +4888,14 @@ function t3Person(persona, shirtHex, front) {
     hL.position.set(-0.15, 0.5, -0.22);
     const hR = hL.clone(); hR.position.x = 0.15;
     g.add(bun, frank, hL, hR);
+  }
+  if (persona === "awayfan") {
+    // rival-colored cap, brim forward: he came to be seen
+    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.158, 20, 12, 0, Math.PI * 2, 0, Math.PI * 0.5), shirtM);
+    cap.position.y = 1.16;
+    const brim = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.015, 0.13), shirtM);
+    brim.position.set(0, 1.165, -0.19);
+    hd.add(cap, brim);
   }
   g.userData.head = hd;
   if (TAGGED[persona]) {
@@ -4503,6 +4985,7 @@ function build3D(round) {
   t3Resize();
   while (T3.group.children.length) { const c = T3.group.children[0]; T3.group.remove(c); t3Dispose(c); }
   T3.slots = []; T3.rings = []; T3.hits = []; T3.people = []; T3.anims = []; T3.flicker = null; T3.door = null;
+  T3.spider = null; T3.spiderPos = null; T3.rat = null; T3.ratPos = null; T3.stream = null; T3.buildId = (T3.buildId || 0) + 1;
   const n = round.n, S = 0.85;
   const X = i => (i - (n - 1) / 2) * S;
   const nFar = Math.ceil(n / 2);
@@ -4893,11 +5376,17 @@ function build3D(round) {
       T3.group.add(d);
     }
     if (s.occupant) {
-      const person = t3Person(s.persona, s.persona === "boss" ? 0x23293a : parseInt(pick(SHIRTS).slice(1), 16));
+      const person = t3Person(s.persona, s.persona === "boss" ? 0x23293a : s.persona === "awayfan" ? rivalHex() : parseInt(pick(SHIRTS).slice(1), 16));
       person.position.set(x, 0, 0.55);
       mark(i, x, 0.85, 0.55);
       if (person.userData.tag) person.userData.tag.position.y += (i % 2) * 0.36;
       blob(x, 0.6, 0.3);
+      if (s.persona === "kicks") {
+        // the splash zone, painted on the floor like a foul line
+        const zone = new THREE.Mesh(new THREE.RingGeometry(S * 1.35, S * 1.45, 48), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.35, side: THREE.DoubleSide }));
+        zone.rotation.x = -Math.PI / 2; zone.position.set(x, 0.011, 0.6);
+        T3.group.add(zone);
+      }
       if (s.persona === "lurker") person.rotation.y = Math.PI; // facing the room. unsettling.
       if (s.persona === "boss") {
         const bc = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.16, 0.08), smat(0x4a3423, 0.7));
@@ -4971,6 +5460,37 @@ function build3D(round) {
       dft.position.set(x, 1.9, 0.08);
       T3.group.add(dft);
     }
+    if (round.spiderAt === i && !round.spiderGone) {
+      const spd = new THREE.Group();
+      const thread = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 1.02, 5), smat(0xdedede, 0.9));
+      thread.position.y = 2.42;
+      const body = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 10), smat(0x141414, 0.7));
+      body.position.y = 1.9;
+      const abd = new THREE.Mesh(new THREE.SphereGeometry(0.065, 12, 10), smat(0x1c1c1c, 0.7));
+      abd.position.set(0, 1.92, -0.07);
+      spd.add(thread, body, abd);
+      for (let k = 0; k < 8; k++) {
+        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.004, 0.16, 5), smat(0x141414, 0.7));
+        const a = (k % 4) * 0.5 - 0.75, sgnL = k < 4 ? 1 : -1;
+        leg.position.set(sgnL * 0.08, 1.9, a * 0.09);
+        leg.rotation.z = sgnL * 1.1; leg.rotation.x = a * 0.6;
+        spd.add(leg);
+      }
+      spd.scale.set(1.7, 1.25, 1.7); // a spider you can SEE from the door
+      spd.position.set(x, -0.45, 0.35);
+      const stag = t3Tag("🕷️ TAP TO FLICK", "#ffb26b");
+      stag.position.set(x, 2.62, 0.35); const sw = 1.05 * (T3.sgn || 1); stag.scale.set(sw, sw / 3, 1);
+      T3.group.add(spd, stag);
+      T3.spider = spd; T3.spiderPos = new THREE.Vector3(x, 1.9, 0.35);
+    }
+    if (round.ratHere === i) {
+      const rat = t3Rat();
+      rat.scale.setScalar(1.6);
+      rat.position.set(x, 0, 0.75);
+      T3.group.add(rat);
+      T3.rat = rat; T3.ratPos = new THREE.Vector3(x, 0.1, 0.75);
+    }
+    if (round.puddleAt === i) t3Puddle(x, round.puddleOff || 0);
     if (round.wetAt === i) {
       const wet = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.36), new THREE.MeshBasicMaterial({
         toneMapped: false, side: THREE.DoubleSide, map: tex((c2, w, h) => {
@@ -5159,6 +5679,19 @@ function build3D(round) {
     T3.flicker.position.set(X(round.flickerAt), 2.5, 0.8);
     T3.group.add(T3.flicker);
   }
+  // your tag from last time, dried on the wall of this very building
+  const tg = round.layout === "wall" ? savedTag() : null;
+  if (tg && tg.img) {
+    const bid = T3.buildId;
+    new THREE.TextureLoader().load(tg.img, tx => {
+      if (T3.buildId !== bid) { tx.dispose(); return; }
+      tx.colorSpace = THREE.SRGBColorSpace;
+      const w = 1.3 * (tg.s || 1), tagX = Math.max(-roomW / 2 + 1, Math.min(roomW / 2 - 1, tg.x || 0));
+      const pl = new THREE.Mesh(new THREE.PlaneGeometry(w, w * 0.6), new THREE.MeshBasicMaterial({ map: tx, transparent: true, opacity: 0.78, toneMapped: false, depthWrite: false }));
+      pl.position.set(tagX, 2.08, 0.034);
+      T3.group.add(pl);
+    });
+  }
   // camera: STRAIGHT-ON — the whole row visible instantly, zero navigation.
   // Distance auto-fits the row width to the viewport, walk-in dollies straight through the door.
   T3.cam.fov = 58; T3.cam.updateProjectionMatrix();
@@ -5167,7 +5700,7 @@ function build3D(round) {
   T3.camFrom = new THREE.Vector3(0, isTub ? 5.4 : 1.82, dist + 2.4);
   T3.camTo = new THREE.Vector3(0, isTub ? 4.7 : 1.5, dist);
   T3.look = new THREE.Vector3(0, isTub ? 0.5 : 1.08, isTub ? 1.5 : 0.2);
-  T3.camT = 0;
+  T3.camT = 0; T3.camSpeed = 0; GF.camSave = null;
   T3.cam.position.copy(T3.camFrom);
   if (!T3.raf) T3.raf = requestAnimationFrame(t3Frame);
 }
@@ -5275,7 +5808,7 @@ function t3Frame(now) {
   const t = now / 1000;
   // walk-in dolly then idle breathing
   if (T3.camT < 1) {
-    T3.camT = Math.min(1, T3.camT + 0.012);
+    T3.camT = Math.min(1, T3.camT + (T3.camSpeed || 0.012));
     const e = 1 - Math.pow(1 - T3.camT, 3);
     T3.cam.position.lerpVectors(T3.camFrom, T3.camTo, e);
   } else {
@@ -5320,6 +5853,10 @@ function t3Frame(now) {
     }
     return true;
   });
+  // the spider dangles; the rat twitches; the stream (when there is one) sways
+  if (T3.spider) { T3.spider.position.y = -0.45 + Math.sin(t * 1.7) * 0.06; T3.spider.rotation.y = Math.sin(t * 0.9) * 0.5; }
+  if (T3.rat && !T3.anims.some(a => a.p === T3.rat)) { T3.rat.rotation.y = Math.sin(t * 9) * 0.12; T3.rat.position.y = Math.abs(Math.sin(t * 14)) * 0.006; }
+  t3StreamFrame(now);
   // rings pulse
   T3.rings.forEach(r => { if (r && !r.userData.lockedColor) { r.material.opacity = 0.55 + Math.sin(t * 5) * 0.3; } });
   // the trough's river runs; the tub's surface drifts; pick-pins bob
@@ -5365,6 +5902,8 @@ function t3Nearest(px, py, rect) {
   };
   (T3.spotPos || []).forEach((wp, i) => consider(wp, { slot: i }));
   if (T3.door) consider(T3.door.position, { door: true });
+  if (T3.spiderPos && G.cur && G.cur.spiderAt >= 0 && !G.cur.spiderGone) consider(T3.spiderPos, { spider: true });
+  if (T3.ratPos && G.cur && G.cur.ratHere >= 0) consider(T3.ratPos, { rat: true });
   return { best, d: bestD };
 }
 function t3Click(e) {
@@ -5375,6 +5914,8 @@ function t3Click(e) {
   if (!hit.best || hit.d > Math.min(rect.width, rect.height) * 0.26) return;
   e.stopPropagation();
   if (hit.best.door) onStall();
+  else if (hit.best.spider) onSpider();
+  else if (hit.best.rat) onRat();
   else onSlot(hit.best.slot);
 }
 function t3Mark(i, cls) {
@@ -5383,6 +5924,81 @@ function t3Mark(i, cls) {
   ring.userData.lockedColor = true;
   ring.material.color.setHex(cls === "chosen-good" ? 0x2fb46b : 0xe6483d);
   ring.material.opacity = 1;
+}
+function rivalHex() {
+  const pk = THEMES.stadium.parkRef;
+  const c = new THREE.Color(pk ? pk.c : "#1f6b3a");
+  c.offsetHSL(0.5, 0.05, 0.08); // the other team's colors: opposite on the wheel, a shade louder
+  return c.getHex();
+}
+function t3Rat() {
+  const g = new THREE.Group();
+  const fur = smat(0x76787e, 0.9), pink = smat(0xd99aa0, 0.7);
+  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.05, 0.13, 4, 10), fur);
+  body.rotation.z = Math.PI / 2; body.position.y = 0.06;
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 8), fur);
+  head.position.set(0.12, 0.07, 0);
+  const nose = new THREE.Mesh(new THREE.SphereGeometry(0.012, 6, 6), pink);
+  nose.position.set(0.16, 0.065, 0);
+  const tail = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.012, 0.24, 6), pink);
+  tail.rotation.z = Math.PI / 2 + 0.3; tail.position.set(-0.2, 0.05, 0);
+  g.add(body, head, nose, tail);
+  for (const ez of [-0.035, 0.035]) { const ear = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 6), pink); ear.position.set(0.11, 0.11, ez); g.add(ear); }
+  const rtag = t3Tag("🐀 TAP IT", "#ffb26b");
+  rtag.position.set(0, 0.42, 0); const rw = 0.7 * (T3.sgn || 1) / 1.6; rtag.scale.set(rw, rw / 3, 1);
+  g.add(rtag);
+  return shadowify(g);
+}
+/* The rat sprints in from the door side and parks under its urinal. */
+function t3RatRun(slot) {
+  if (!T3.X || !T3.rat) return;
+  const x = T3.X(slot);
+  const from = { x: T3.X(0) - 1.6, z: 1.35 };
+  T3.rat.position.set(from.x, 0, from.z);
+  T3.anims.push({ p: T3.rat, from, to: { x, z: 0.75 }, t0: performance.now(), dur: 600, kind: "rat" });
+  T3.lookAtX = x; T3.lookUntil = performance.now() + 1500; // everyone clocks the rat
+}
+/* A puddle where the stream landed. It dries never. */
+function t3Puddle(x, off) {
+  const pd = new THREE.Mesh(new THREE.CircleGeometry(0.24, 20), new THREE.MeshBasicMaterial({ color: 0xe0c65a, transparent: true, opacity: 0.55 }));
+  pd.rotation.x = -Math.PI / 2; pd.position.set(x + off * 0.42, 0.014, 0.7); pd.scale.set(1, 0.7, 1);
+  T3.group.add(pd);
+}
+/* The stream: a bezier tube from you to wherever you're pointing it. Rebuilt per frame while live. */
+function t3StreamFrame(now) {
+  const live = (AIM.active || (GF.active && GF.down)) && T3.X;
+  if (!live) { if (T3.stream) { T3.stream.visible = false; } return; }
+  if (!T3.stream) {
+    T3.stream = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color: 0xf2d54e, transparent: true, opacity: 0.88, toneMapped: false }));
+    T3.stream.renderOrder = 7;
+    T3.group.add(T3.stream);
+  }
+  let from, to;
+  if (AIM.active) {
+    const x = T3.X(AIM.i), inBowl = Math.abs(AIM.off) < AIM_BOWL;
+    from = new THREE.Vector3(x, 0.95, 0.95);
+    to = new THREE.Vector3(x + AIM.off * 0.42, inBowl ? 1.12 : 0.02, inBowl ? 0.12 : 0.7);
+  } else {
+    const x = T3.X(GF.i);
+    from = new THREE.Vector3(x, 0.95, 0.95);
+    to = GF.wall || new THREE.Vector3(x, 2.0, 0.03);
+  }
+  const ctrl = new THREE.Vector3((from.x + to.x) / 2, Math.max(from.y, to.y) + 0.25 + Math.sin(now / 90) * 0.01, (from.z + to.z) / 2);
+  const curve = new THREE.QuadraticBezierCurve3(from, ctrl, to);
+  const geo = new THREE.TubeGeometry(curve, 14, 0.013, 6, false);
+  T3.stream.geometry.dispose(); T3.stream.geometry = geo; T3.stream.visible = true;
+}
+/* Screen point -> the wall plane, so the finger and the stream agree on where the paint lands. */
+function t3WallPoint(px, py, rect) {
+  if (!T3.cam) return null;
+  const ndc = new THREE.Vector2((px / rect.width) * 2 - 1, -(py / rect.height) * 2 + 1);
+  const rc = new THREE.Raycaster(); rc.setFromCamera(ndc, T3.cam);
+  const out = new THREE.Vector3();
+  return rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -0.03), out) ? out : null;
+}
+function t3ScreenOf(v, rect) {
+  const p = v.clone().project(T3.cam);
+  return { x: (p.x * 0.5 + 0.5) * rect.width, y: (-p.y * 0.5 + 0.5) * rect.height };
 }
 /* A newcomer enters from the door and WALKS to his spot — legs and all. */
 function t3WalkIn(slot) {
@@ -5445,6 +6061,19 @@ $("rulenext").addEventListener("click", () => {
 });
 $("ruletrack").addEventListener("scroll", () => updateRuleUI(), { passive: true });
 $("scene").addEventListener("click", () => skipIntro());
+$("aimgame").addEventListener("pointerdown", e => { e.stopPropagation(); e.preventDefault(); const r = $("aimgame").getBoundingClientRect(); aimNudge(e.clientX - r.left < r.width / 2 ? -1 : 1); });
+$("aimgame").addEventListener("click", e => e.stopPropagation());
+$("shakegame").addEventListener("pointerdown", e => { e.stopPropagation(); e.preventDefault(); shakeTap(); });
+$("shakegame").addEventListener("click", e => e.stopPropagation());
+$("gfbtn").addEventListener("click", e => { e.stopPropagation(); startGraffiti(); });
+$("gfcanvas").addEventListener("pointerdown", gfDown);
+$("gfcanvas").addEventListener("pointermove", gfMove);
+$("gfcanvas").addEventListener("pointerup", gfUp);
+$("gfcanvas").addEventListener("pointercancel", gfUp);
+$("gfcanvas").addEventListener("pointerleave", gfUp);
+$("gfgame").addEventListener("click", e => e.stopPropagation());
+$("gfdone").addEventListener("click", e => { e.stopPropagation(); finishGraffiti(); });
+document.addEventListener("keydown", e => { if (AIM.active && (e.key === "ArrowLeft" || e.key === "ArrowRight")) aimNudge(e.key === "ArrowLeft" ? -1 : 1); });
 $("parkphoto").addEventListener("click", e => { e.stopPropagation(); enterThroughDoors(); });
 loadThree().then(ok => {
   if (!ok) { T3.failed = true; return; }
