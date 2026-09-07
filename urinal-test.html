@@ -1738,7 +1738,7 @@ function buildRulesDeck() {
     { e: "🚨", t: `<span class="hl">DESPERATION</span>`, x: `At 🍺×3 you're desperate. The clock <b>flies</b>. Run out of time and you will <b>piss yourself</b> in front of everyone. Going relieves 2 drinks. Plan accordingly.`, art: null },
     { e: "🚻", t: `THE <span class="hl">STALL</span> GAMBLE`, x: `No decent spot? Knock on the stall — <b>3 waits per run</b>, each burns ~2.5 seconds, and sometimes… <i>"someone's IN here!"</i>`, art: null },
     { e: "🧖", t: `TIP THE <span class="hl">ATTENDANT</span>`, x: `Towel? Cologne? Gum? <b>$2 buys a towel blessing</b> that saves your pants from one splash. Walk past at your own risk. He's seen things.`, art: artAtt },
-    { e: "🏅", t: `YOUR <span class="hl">CAREER</span>`, x: `Every <b>10 successful pees</b> unlocks a new mechanic — wet floors, the side-glancer, phone zombies, walk-ins… The rooms evolve as you do. The Daily always runs the full rotation.`, art: null },
+    { e: "🏅", t: `YOUR <span class="hl">CAREER</span>`, x: `Your <b>first four pees</b> unlock the rat. Then a new mechanic every few pees — write your name on the wall, the spider, the shakes, wet floors, walk-ins… The rooms evolve as you do. The Daily always runs the full rotation.`, art: null },
   ];
   $("ruletrack").innerHTML = CARDS.map(c =>
     `<div class="rulecard"><div class="rc-emoji">${c.e}</div><div class="rc-title">${c.t}</div>` +
@@ -1911,7 +1911,7 @@ const G = {
 };
 function desperate() { return G.drinks >= (coldSnap() ? 2 : 3); }
 
-/* ---------- career ladder: every 10 successful pees adds a mechanic ---------- */
+/* ---------- career ladder: every few pees adds a mechanic ---------- */
 /* ---------- daily streak: the reason to come back tomorrow ---------- */
 function readJSON(k, dflt) { try { return JSON.parse(localStorage.getItem(k)) || dflt; } catch (e) { return dflt; } }
 function writeJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
@@ -1985,22 +1985,33 @@ function currentTitle() {
 }
 
 function careerPees() { try { return Number(localStorage.getItem("ut_pees") || 0); } catch (e) { return 0; } }
-function careerLevel() { return Math.floor(careerPees() / 10) + 1; }
+/* Levels come FAST at first — the rat, the wall tag and the shakes are the
+   reasons people show anyone this game, and they can't be 100 pees away.
+   Once the room is fully loaded it settles into the old every-10 rhythm. */
+const EARLY_LEVELS = 9, EARLY_STEP = 4, LATE_STEP = 10;
+const EARLY_PEES = (EARLY_LEVELS - 1) * EARLY_STEP;
+function levelGate(lvl) { // career pees needed to REACH that level
+  return lvl <= EARLY_LEVELS ? (lvl - 1) * EARLY_STEP : EARLY_PEES + (lvl - EARLY_LEVELS) * LATE_STEP;
+}
+function careerLevel() {
+  const n = careerPees();
+  return n < EARLY_PEES ? Math.floor(n / EARLY_STEP) + 1 : EARLY_LEVELS + Math.floor((n - EARLY_PEES) / LATE_STEP);
+}
 const CAREER_LADDER = [
   null, // level 1: the base game
-  { key: "wet",     icon: "⚠️", name: "WET FLOORS",          tease: "Caution signs appear at random spots. Slipping costs 2 seconds." },
   { key: "rat",     icon: "🐀", name: "THE RAT",             tease: "Mid-round a rat sprints in and parks under a urinal. Nobody stands over a rat. TAP IT to scare it off: +50." },
-  { key: "glancer", icon: "👀", name: "THE SIDE-GLANCER",    tease: "One guy can't keep his eyes to himself. Dividers don't stop a wandering neck." },
+  { key: "graffiti", icon: "✍️", name: "WRITE YOUR NAME",    tease: "Every 3-streak: swipe your name on the wall. In piss. Legible = +100. It stays up in that city." },
   { key: "shakes",  icon: "👋", name: "TWO SHAKES",          tease: "After a perfect pick: tap twice. Exactly twice. Three is playing with it." },
-  { key: "gamble",  icon: "🎲", name: "THE SEND-IT GAMBLE",  tease: "No good option? Going anyway is now a coin flip instead of a guaranteed splash." },
   { key: "spider",  icon: "🕷️", name: "THE SPIDER",          tease: "A spider hangs over the best urinal. Brave it (70% +30, 30% it DROPS ON YOU) or tap it onto the neighbor." },
+  { key: "shoes",   icon: "👟", name: "NICE SHOES",          tease: "White sneakers = splash zone, give him room. Unless he's an AWAY FAN. Then his kicks are fair game: +40." },
+  { key: "aim",     icon: "🍺", name: "AIM",                 tease: "Two drinks deep, the stream sways. Tap left and right to keep it in the bowl. Miss = puddle, −20%." },
+  { key: "wet",     icon: "⚠️", name: "WET FLOORS",          tease: "Now the building puts up signs — including for the puddle you left. Slipping costs 2 seconds." },
+  { key: "glancer", icon: "👀", name: "THE SIDE-GLANCER",    tease: "One guy can't keep his eyes to himself. Dividers don't stop a wandering neck." },
+  { key: "gamble",  icon: "🎲", name: "THE SEND-IT GAMBLE",  tease: "No good option? Going anyway is now a coin flip instead of a guaranteed splash." },
   { key: "soap",    icon: "🫧", name: "SOAP JACKPOT",        tease: "A soap dispenser worth tapping appears sometimes. Free hygiene points." },
   { key: "drift",   icon: "📱", name: "THE PHONE ZOMBIE",    tease: "Mid-round, a guy glued to his phone drifts one urinal over. The board changes under you." },
-  { key: "shoes",   icon: "👟", name: "NICE SHOES",          tease: "White sneakers = splash zone, give him room. Unless he's an AWAY FAN. Then his kicks are fair game: +40." },
   { key: "lurker",  icon: "🧍", name: "THE LURKER",          tease: "A guy standing at a urinal. Facing out. Not going. Not leaving. Needs the same wide berth as the glancer." },
-  { key: "aim",     icon: "🍺", name: "AIM",                 tease: "Two drinks deep, the stream sways. Tap left and right to keep it in the bowl. Miss = puddle, −20%." },
   { key: "crooner", icon: "🎤", name: "THE CROONER",         tease: "One patron is mid-ballad. His radius is bigger than his talent." },
-  { key: "graffiti", icon: "✍️", name: "WRITE YOUR NAME",    tease: "Every 3-streak: swipe your name on the wall. In piss. Legible = +100. It stays up in that city." },
   { key: "sniper",  icon: "🚪", name: "RUSH-HOUR WALK-INS",  tease: "Dawdle too long and someone walks in and TAKES the best spot." },
   { key: "chaos",   icon: "🌪️", name: "FULL CHAOS",          tease: "Every hazard can now stack in one room. You asked for this, legend." },
   { key: "fog",     icon: "🌫️", name: "FESTIVAL STEAM",      tease: "Some rooms open in a wall of steam — you can't see who's where until it lifts." },
@@ -2010,7 +2021,7 @@ const CAREER_LADDER = [
   { key: "nopaper", icon: "🧻", name: "NO PAPER",            tease: "New stall heartbreak: the door opens… and there's no paper. Abort. Abort." },
   { key: "pipe",    icon: "🔧", name: "THE RATTLING PIPE",   tease: "One fixture rattles ominously. Mid-round, it blows. Don't be nearby." },
   { key: "dog",     icon: "🐕", name: "THE SERVICE DOG",     tease: "A very good boy sits beside one spot. Petting urge: −1 second, +5 cuteness." },
-  { key: "power",   icon: "🔌", name: "POWER DIPS",          tease: "The lights cut out for a full second mid-round. The clock does not care." },
+  { key: "power",   icon: "🔌", name: "POWER DIPS",          tease: "The lights cut out for a full second. The clock does not care." },
   { key: "draft",   icon: "🚪", name: "THE PROPPED DOOR",    tease: "Someone propped the door open. The end spot near it loses its corner privilege." },
   { key: "haggle",  icon: "🤝", name: "ATTENDANT HAGGLING",  tease: "You can now negotiate with the attendant. Stakes escalate every time." },
 ];
@@ -2200,7 +2211,7 @@ function updateStartLines() {
   const next = CAREER_LADDER[lvl];
   $("careerline").textContent = pees > 0
     ? `🏅 Career: ${pees} pee${pees === 1 ? "" : "s"} · Level ${lvl}` +
-      (next ? ` — ${10 - (pees % 10)} more to unlock “${next.name}”` : " — the full rotation. Legend.")
+      (next ? ` — ${Math.max(1, levelGate(lvl + 1) - pees)} more to unlock “${next.name}”` : " — the full rotation. Legend.")
     : "";
   buildAttract(); buildTicker();
 }
